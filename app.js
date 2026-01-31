@@ -1,17 +1,17 @@
 // Oscar Tracker App
-// 97th Academy Awards - Best Picture Nominees (2025)
+// 98th Academy Awards - Best Picture Nominees (2026)
 
 const FILMS = [
-    { id: 'anora', title: 'Anora', studio: 'Neon' },
-    { id: 'brutalist', title: 'The Brutalist', studio: 'A24' },
-    { id: 'conclave', title: 'Conclave', studio: 'Focus Features' },
-    { id: 'complete-unknown', title: 'A Complete Unknown', studio: 'Searchlight Pictures' },
-    { id: 'dune2', title: 'Dune: Part Two', studio: 'Warner Bros.' },
-    { id: 'emilia-perez', title: 'Emilia Pérez', studio: 'Netflix' },
-    { id: 'im-still-here', title: "I'm Still Here", studio: 'Sony Pictures Classics' },
-    { id: 'nickel-boys', title: 'Nickel Boys', studio: 'Amazon MGM Studios' },
-    { id: 'substance', title: 'The Substance', studio: 'Mubi' },
-    { id: 'wicked', title: 'Wicked', studio: 'Universal Pictures' }
+    { id: 'bugonia', title: 'Bugonia', studio: 'Focus Features' },
+    { id: 'f1', title: 'F1', studio: 'Apple Original Films' },
+    { id: 'frankenstein', title: 'Frankenstein', studio: 'Netflix' },
+    { id: 'hamnet', title: 'Hamnet', studio: 'Focus Features' },
+    { id: 'marty-supreme', title: 'Marty Supreme', studio: 'A24' },
+    { id: 'one-battle-after-another', title: 'One Battle After Another', studio: 'Warner Bros.' },
+    { id: 'secret-agent', title: 'The Secret Agent', studio: 'Neon' },
+    { id: 'sentimental-value', title: 'Sentimental Value', studio: 'Neon' },
+    { id: 'sinners', title: 'Sinners', studio: 'Warner Bros.' },
+    { id: 'train-dreams', title: 'Train Dreams', studio: 'Netflix' }
 ];
 
 const STORAGE_KEY = 'oscar-tracker-watched';
