@@ -597,8 +597,15 @@ body {
         font-size: 2.75rem;
     }
 
+    .category-selector {
+        flex-direction: row;
+        align-items: center;
+        gap: var(--spacing-sm);
+    }
+
     .category-select-row {
         flex-direction: row;
+        align-items: center;
         gap: 6px;
     }
 
