@@ -1,16 +1,17 @@
 // Service Worker for Oscar Tracker PWA
-const CACHE_NAME = 'oscar-tracker-v13';
+const CACHE_NAME = 'oscar-tracker-v14';
 
+// Use relative paths for subdirectory deployment compatibility
 const ASSETS_TO_CACHE = [
-    '/',
-    '/index.html',
-    '/style.css',
-    '/app.js',
-    '/manifest.json',
-    '/icons/icon-192.png',
-    '/icons/icon-512.png',
-    '/icons/netflix.svg',
-    '/icons/max.svg'
+    './',
+    './index.html',
+    './style.css',
+    './app.js',
+    './manifest.json',
+    './icons/icon-192.png',
+    './icons/icon-512.png',
+    './icons/netflix.svg',
+    './icons/max.svg'
 ];
 
 // Install event - cache assets
@@ -83,7 +84,7 @@ self.addEventListener('fetch', (event) => {
             .catch(() => {
                 // Offline fallback for navigation requests
                 if (event.request.mode === 'navigate') {
-                    return caches.match('/index.html');
+                    return caches.match('./index.html');
                 }
             })
     );
