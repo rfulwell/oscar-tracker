@@ -3,7 +3,7 @@ name: Deploy to GitHub Pages
 on:
   push:
     branches:
-      - claude/update-2026-Z1D9s
+      - main
 
 permissions:
   contents: read
