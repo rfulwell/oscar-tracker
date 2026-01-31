@@ -65,7 +65,86 @@ body {
     padding: var(--spacing-xl) var(--spacing-md) var(--spacing-lg);
     border-bottom: 1px solid var(--color-black-lighter);
     position: relative;
-    overflow: hidden;
+    overflow: visible;
+}
+
+/* Hamburger Menu */
+.menu-btn {
+    position: absolute;
+    top: var(--spacing-md);
+    right: var(--spacing-md);
+    width: 40px;
+    height: 40px;
+    background: var(--color-black-light);
+    border: 1px solid var(--color-black-lighter);
+    border-radius: 8px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-white-dim);
+    transition: all 0.2s ease;
+    z-index: 100;
+}
+
+.menu-btn:hover {
+    background: var(--color-black-lighter);
+    color: var(--color-gold);
+    border-color: var(--color-gold-dark);
+}
+
+.menu-btn svg {
+    width: 20px;
+    height: 20px;
+}
+
+.menu-dropdown {
+    position: absolute;
+    top: calc(var(--spacing-md) + 44px);
+    right: var(--spacing-md);
+    background: var(--color-black-light);
+    border: 1px solid var(--color-black-lighter);
+    border-radius: 8px;
+    padding: var(--spacing-xs);
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-8px);
+    transition: all 0.2s ease;
+    z-index: 99;
+    min-width: 160px;
+}
+
+.menu-dropdown.open {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.menu-item {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    width: 100%;
+    padding: var(--spacing-sm);
+    background: transparent;
+    border: none;
+    border-radius: 6px;
+    color: var(--color-white);
+    font-family: var(--font-body);
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.menu-item:hover {
+    background: var(--color-black-lighter);
+    color: var(--color-gold);
+}
+
+.menu-item svg {
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
 }
 
 .header::before {
@@ -289,6 +368,14 @@ body {
 @media (display-mode: standalone) {
     .header {
         padding-top: calc(var(--spacing-lg) + var(--safe-area-top));
+    }
+
+    .menu-btn {
+        top: calc(var(--spacing-md) + var(--safe-area-top));
+    }
+
+    .menu-dropdown {
+        top: calc(var(--spacing-md) + var(--safe-area-top) + 44px);
     }
 }
 
