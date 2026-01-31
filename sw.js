@@ -1,5 +1,5 @@
 // Service Worker for Oscar Tracker PWA
-const CACHE_NAME = 'oscar-tracker-v2';
+const CACHE_NAME = 'oscar-tracker-v3';
 
 const ASSETS_TO_CACHE = [
     '/',
