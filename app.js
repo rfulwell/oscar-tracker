@@ -316,6 +316,7 @@ const nextBtn = document.getElementById('next-category');
 const prevBtnBottom = document.getElementById('prev-category-bottom');
 const nextBtnBottom = document.getElementById('next-category-bottom');
 const hardRefreshBtn = document.getElementById('hard-refresh');
+const categoryHeader = document.querySelector('.category-header');
 
 // Initialize
 function init() {
@@ -537,7 +538,7 @@ function navigateToCategory(index, scrollToTop = false) {
     renderNominees();
     updateProgress();
     if (scrollToTop) {
-        window.scrollTo({ top: 0, behavior: 'smooth' });
+        categoryHeader.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
 }
 
