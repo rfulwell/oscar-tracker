@@ -131,14 +131,26 @@ body {
     margin-bottom: var(--spacing-lg);
 }
 
-.category-header {
+.category-header,
+.category-footer {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: var(--spacing-md);
     padding-bottom: var(--spacing-sm);
     border-bottom: 1px solid var(--color-black-lighter);
     gap: var(--spacing-xs);
+}
+
+.category-header {
+    margin-bottom: var(--spacing-md);
+}
+
+.category-footer {
+    margin-top: var(--spacing-md);
+    padding-top: var(--spacing-sm);
+    padding-bottom: 0;
+    border-bottom: none;
+    border-top: 1px solid var(--color-black-lighter);
 }
 
 .category-selector {

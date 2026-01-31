@@ -289,9 +289,13 @@ let currentCategoryIndex = 0;
 // DOM Elements
 const filmsList = document.getElementById('films-list');
 const progressEl = document.getElementById('progress');
+const progressElBottom = document.getElementById('progress-bottom');
 const categorySelect = document.getElementById('category-select');
+const categorySelectBottom = document.getElementById('category-select-bottom');
 const prevBtn = document.getElementById('prev-category');
 const nextBtn = document.getElementById('next-category');
+const prevBtnBottom = document.getElementById('prev-category-bottom');
+const nextBtnBottom = document.getElementById('next-category-bottom');
 const hardRefreshBtn = document.getElementById('hard-refresh');
 
 // Initialize
@@ -355,11 +359,13 @@ function getCurrentCategory() {
     return CATEGORIES[currentCategoryIndex];
 }
 
-// Render category options in select
+// Render category options in both selects
 function renderCategoryOptions() {
-    categorySelect.innerHTML = CATEGORIES.map((cat, index) =>
+    const optionsHtml = CATEGORIES.map((cat, index) =>
         `<option value="${index}" ${index === currentCategoryIndex ? 'selected' : ''}>${cat.name}</option>`
     ).join('');
+    categorySelect.innerHTML = optionsHtml;
+    categorySelectBottom.innerHTML = optionsHtml;
 }
 
 // Render nominees list
@@ -433,7 +439,9 @@ function updateProgress() {
     const category = getCurrentCategory();
     const watched = category.nominees.filter(n => watchedItems.has(n.id)).length;
     const total = category.nominees.length;
-    progressEl.textContent = `${watched} / ${total}`;
+    const progressText = `${watched} / ${total}`;
+    progressEl.textContent = progressText;
+    progressElBottom.textContent = progressText;
 
     // Update document title with total progress
     const totalWatched = CATEGORIES.reduce((sum, cat) =>
@@ -447,28 +455,32 @@ function updateProgress() {
 }
 
 // Navigate to category
-function navigateToCategory(index) {
+function navigateToCategory(index, scrollToTop = false) {
     currentCategoryIndex = index;
     saveCurrentCategory();
     categorySelect.value = index;
+    categorySelectBottom.value = index;
     renderNominees();
     updateProgress();
+    if (scrollToTop) {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
 }
 
 // Go to previous category
-function prevCategory() {
+function prevCategory(scrollToTop = false) {
     const newIndex = currentCategoryIndex === 0
         ? CATEGORIES.length - 1
         : currentCategoryIndex - 1;
-    navigateToCategory(newIndex);
+    navigateToCategory(newIndex, scrollToTop);
 }
 
 // Go to next category
-function nextCategory() {
+function nextCategory(scrollToTop = false) {
     const newIndex = currentCategoryIndex === CATEGORIES.length - 1
         ? 0
         : currentCategoryIndex + 1;
-    navigateToCategory(newIndex);
+    navigateToCategory(newIndex, scrollToTop);
 }
 
 // Setup event listeners
@@ -477,8 +489,14 @@ function setupEventListeners() {
         navigateToCategory(parseInt(e.target.value, 10));
     });
 
-    prevBtn.addEventListener('click', prevCategory);
-    nextBtn.addEventListener('click', nextCategory);
+    categorySelectBottom.addEventListener('change', (e) => {
+        navigateToCategory(parseInt(e.target.value, 10), true);
+    });
+
+    prevBtn.addEventListener('click', () => prevCategory(false));
+    nextBtn.addEventListener('click', () => nextCategory(false));
+    prevBtnBottom.addEventListener('click', () => prevCategory(true));
+    nextBtnBottom.addEventListener('click', () => nextCategory(true));
     hardRefreshBtn.addEventListener('click', hardRefresh);
 
     // Keyboard navigation
@@ -486,9 +504,9 @@ function setupEventListeners() {
         if (e.target.tagName === 'SELECT') return;
 
         if (e.key === 'ArrowLeft') {
-            prevCategory();
+            prevCategory(false);
         } else if (e.key === 'ArrowRight') {
-            nextCategory();
+            nextCategory(false);
         }
     });
 }
