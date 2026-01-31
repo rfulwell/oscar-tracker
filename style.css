@@ -116,6 +116,12 @@ body {
     color: var(--color-gold);
     letter-spacing: 0.15em;
     text-transform: uppercase;
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+.subtitle:hover {
+    color: var(--color-gold-light);
 }
 
 .ceremony-info {
