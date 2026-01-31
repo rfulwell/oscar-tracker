@@ -597,16 +597,23 @@ body {
         font-size: 2.75rem;
     }
 
+    .category-header,
+    .category-footer {
+        justify-content: center;
+        gap: var(--spacing-lg);
+    }
+
     .category-selector {
+        flex: unset;
         flex-direction: row;
         align-items: center;
-        gap: var(--spacing-sm);
+        gap: var(--spacing-lg);
     }
 
     .category-select-row {
         flex-direction: row;
         align-items: center;
-        gap: 6px;
+        gap: 8px;
     }
 
     .category-prefix {
