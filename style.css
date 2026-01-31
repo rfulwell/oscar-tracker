@@ -110,6 +110,13 @@ body {
     text-transform: uppercase;
 }
 
+.ceremony-info {
+    font-size: 0.8125rem;
+    font-weight: 300;
+    color: var(--color-white-dim);
+    margin-top: var(--spacing-xs);
+}
+
 /* Main Content */
 .main {
     flex: 1;
