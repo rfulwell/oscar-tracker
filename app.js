@@ -422,7 +422,7 @@ function getStreamingIconHtml(nomineeId) {
             name: 'Netflix'
         },
         max: {
-            url: `https://www.max.com/search?q=${encodedTitle}`,
+            url: `https://play.max.com/search?q=${encodedTitle}`,
             icon: 'icons/max.svg',
             name: 'Max'
         }
