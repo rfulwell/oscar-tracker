@@ -22,8 +22,6 @@ let watchedFilms = new Set();
 // DOM Elements
 const filmsList = document.getElementById('films-list');
 const progressEl = document.getElementById('progress');
-const menuBtn = document.getElementById('menu-btn');
-const menuDropdown = document.getElementById('menu-dropdown');
 const hardRefreshBtn = document.getElementById('hard-refresh');
 
 // Initialize
@@ -32,7 +30,7 @@ function init() {
     renderFilms();
     updateProgress();
     registerServiceWorker();
-    setupMenu();
+    setupRefreshButton();
 }
 
 // Load watched films from localStorage
@@ -141,33 +139,13 @@ function registerServiceWorker() {
     }
 }
 
-// Setup menu
-function setupMenu() {
-    menuBtn.addEventListener('click', toggleMenu);
+// Setup refresh button
+function setupRefreshButton() {
     hardRefreshBtn.addEventListener('click', hardRefresh);
-
-    // Close menu when clicking outside
-    document.addEventListener('click', (e) => {
-        if (!menuBtn.contains(e.target) && !menuDropdown.contains(e.target)) {
-            closeMenu();
-        }
-    });
-}
-
-function toggleMenu() {
-    const isOpen = menuDropdown.classList.toggle('open');
-    menuBtn.setAttribute('aria-expanded', isOpen);
-}
-
-function closeMenu() {
-    menuDropdown.classList.remove('open');
-    menuBtn.setAttribute('aria-expanded', 'false');
 }
 
 // Hard refresh - unregister service worker, clear caches, and reload
 async function hardRefresh() {
-    closeMenu();
-
     try {
         // Unregister all service workers
         if ('serviceWorker' in navigator) {
