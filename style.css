@@ -116,11 +116,15 @@ body {
     color: var(--color-gold);
     letter-spacing: 0.15em;
     text-transform: uppercase;
+}
+
+.subtitle-link {
+    color: inherit;
     text-decoration: none;
     transition: color 0.2s ease;
 }
 
-.subtitle:hover {
+.subtitle-link:hover {
     color: var(--color-gold-light);
 }
 

@@ -1,5 +1,5 @@
 // Service Worker for Oscar Tracker PWA
-const CACHE_NAME = 'oscar-tracker-v16';
+const CACHE_NAME = 'oscar-tracker-v17';
 
 // Use relative paths for subdirectory deployment compatibility
 const ASSETS_TO_CACHE = [
