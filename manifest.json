@@ -1,9 +1,10 @@
 {
-    "name": "Oscar Tracker",
-    "short_name": "Oscar Tracker",
+    "name": "Awards Tracker",
+    "short_name": "Awards Tracker",
     "description": "Track which Oscar-nominated films you've watched",
-    "start_url": "./index.html",
-    "scope": "./",
+    "id": "awardstracker-app",
+    "start_url": "/",
+    "scope": "/",
     "display": "standalone",
     "background_color": "#0a0a0a",
     "theme_color": "#0a0a0a",
@@ -83,7 +84,7 @@
             "name": "Best Picture",
             "short_name": "Best Picture",
             "description": "View Best Picture nominees",
-            "url": "./index.html"
+            "url": "/"
         }
     ]
 }
