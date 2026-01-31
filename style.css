@@ -377,47 +377,56 @@ body {
     min-width: 0;
 }
 
-.film-title-row {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    margin-bottom: 2px;
-}
-
 .film-title {
     font-family: var(--font-display);
     font-size: 1.0625rem;
     font-weight: 600;
     color: var(--color-white);
+    margin-bottom: 2px;
     transition: color 0.2s ease;
+}
+
+/* Streaming Box */
+.streaming-box {
+    width: 36px;
+    height: 36px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.streaming-box.empty {
+    visibility: hidden;
 }
 
 .streaming-icon {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 22px;
-    height: 22px;
-    padding: 4px;
+    width: 32px;
+    height: 32px;
+    padding: 6px;
     background: rgba(255, 255, 255, 0.9);
-    border-radius: 4px;
+    border-radius: 6px;
     flex-shrink: 0;
     transition: all 0.2s ease;
+    -webkit-tap-highlight-color: transparent;
 }
 
 .streaming-icon img {
-    width: 14px;
-    height: 14px;
+    width: 18px;
+    height: 18px;
     display: block;
 }
 
 .streaming-icon:hover {
     background: #fff;
-    transform: scale(1.1);
+    transform: scale(1.05);
 }
 
-.film:hover .streaming-icon {
-    background: #fff;
+.streaming-icon:active {
+    transform: scale(0.95);
 }
 
 .film-studio {

@@ -442,6 +442,7 @@ function renderNominees() {
 
     filmsList.innerHTML = category.nominees.map(nominee => {
         const streamingIcon = getStreamingIconHtml(nominee.id);
+        const hasStreaming = streamingIcon !== '';
         return `
         <li class="film ${watchedItems.has(nominee.id) ? 'watched' : ''}"
             data-id="${nominee.id}"
@@ -454,11 +455,11 @@ function renderNominees() {
                 </svg>
             </div>
             <div class="film-info">
-                <div class="film-title-row">
-                    <span class="film-title">${nominee.title}</span>
-                    ${streamingIcon}
-                </div>
+                <div class="film-title">${nominee.title}</div>
                 <div class="film-studio">${nominee.subtitle}</div>
+            </div>
+            <div class="streaming-box ${hasStreaming ? '' : 'empty'}">
+                ${streamingIcon}
             </div>
         </li>
     `}).join('');
