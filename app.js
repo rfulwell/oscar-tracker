@@ -389,16 +389,51 @@ function renderCategoryOptions() {
     categorySelectBottom.innerHTML = optionsHtml;
 }
 
-// Generate streaming icon HTML
+// Get the display title for a film (for streaming links)
+function getFilmTitle(nomineeId) {
+    const filmKey = NOMINEE_TO_FILM[nomineeId];
+    if (!filmKey) return null;
+
+    // Map film keys to their display titles
+    const filmTitles = {
+        'sinners': 'Sinners',
+        'one-battle-after-another': 'One Battle After Another',
+        'frankenstein': 'Frankenstein',
+        'train-dreams': 'Train Dreams',
+        'kpop-demon-hunters': 'KPop Demon Hunters'
+    };
+    return filmTitles[filmKey] || null;
+}
+
+// Generate streaming icon HTML with link
 function getStreamingIconHtml(nomineeId) {
     const service = getStreamingService(nomineeId);
     if (!service) return '';
 
-    const icons = {
-        netflix: `<img src="icons/netflix.svg" alt="Netflix" class="streaming-icon" title="Available on Netflix">`,
-        max: `<img src="icons/max.svg" alt="Max" class="streaming-icon" title="Available on Max">`
+    const filmTitle = getFilmTitle(nomineeId);
+    if (!filmTitle) return '';
+
+    const encodedTitle = encodeURIComponent(filmTitle);
+
+    const serviceConfig = {
+        netflix: {
+            url: `https://www.netflix.com/search?q=${encodedTitle}`,
+            icon: 'icons/netflix.svg',
+            name: 'Netflix'
+        },
+        max: {
+            url: `https://www.max.com/search?q=${encodedTitle}`,
+            icon: 'icons/max.svg',
+            name: 'Max'
+        }
     };
-    return icons[service] || '';
+
+    const config = serviceConfig[service];
+    if (!config) return '';
+
+    return `<a href="${config.url}" target="_blank" rel="noopener noreferrer" class="streaming-icon" title="Watch on ${config.name}" onclick="event.stopPropagation()">
+        <img src="${config.icon}" alt="${config.name}">
+    </a>`;
 }
 
 // Render nominees list

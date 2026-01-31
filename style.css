@@ -393,14 +393,31 @@ body {
 }
 
 .streaming-icon {
-    width: 16px;
-    height: 16px;
-    opacity: 0.6;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+    padding: 4px;
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 4px;
     flex-shrink: 0;
+    transition: all 0.2s ease;
+}
+
+.streaming-icon img {
+    width: 14px;
+    height: 14px;
+    display: block;
+}
+
+.streaming-icon:hover {
+    background: #fff;
+    transform: scale(1.1);
 }
 
 .film:hover .streaming-icon {
-    opacity: 0.8;
+    background: #fff;
 }
 
 .film-studio {
