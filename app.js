@@ -317,6 +317,47 @@ const prevBtnBottom = document.getElementById('prev-category-bottom');
 const nextBtnBottom = document.getElementById('next-category-bottom');
 const hardRefreshBtn = document.getElementById('hard-refresh');
 const categoryHeader = document.querySelector('.category-header');
+const tipContent = document.getElementById('tip-content');
+
+// Tips for rotation
+const TIPS = [
+    'Tap a film to mark as watched',
+    'Use arrow keys to navigate categories',
+    'Your progress is saved automatically',
+    'Swipe left/right to change categories',
+    'Films you watch appear across all categories',
+    'Tap streaming icons to find where to watch'
+];
+let currentTipIndex = 0;
+let tipRotationInterval = null;
+
+// Update tip display
+function updateTip() {
+    // Always show first tip if user hasn't watched anything
+    if (watchedItems.size === 0) {
+        tipContent.textContent = TIPS[0];
+        return;
+    }
+
+    tipContent.textContent = TIPS[currentTipIndex];
+}
+
+// Rotate to next tip
+function rotateTip() {
+    // Skip rotation if user hasn't watched anything
+    if (watchedItems.size === 0) {
+        return;
+    }
+
+    currentTipIndex = (currentTipIndex + 1) % TIPS.length;
+    updateTip();
+}
+
+// Start tip rotation
+function startTipRotation() {
+    updateTip();
+    tipRotationInterval = setInterval(rotateTip, 8000);
+}
 
 // Initialize
 function init() {
@@ -327,6 +368,7 @@ function init() {
     updateProgress();
     setupEventListeners();
     registerServiceWorker();
+    startTipRotation();
 }
 
 // Load watched items from localStorage
@@ -507,6 +549,7 @@ function toggleNominee(nomineeId, filmEl) {
 
     saveWatchedItems();
     updateProgress();
+    updateTip();
 }
 
 // Update progress display

@@ -468,6 +468,11 @@ body {
     gap: var(--spacing-md);
 }
 
+.tip-label {
+    color: var(--color-gold-dark);
+    font-weight: 500;
+}
+
 .refresh-btn {
     position: relative;
     width: 36px;
