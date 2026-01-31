@@ -581,7 +581,9 @@ function navigateToCategory(index, scrollToTop = false) {
     renderNominees();
     updateProgress();
     if (scrollToTop) {
-        categoryHeader.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        const headerTop = categoryHeader.getBoundingClientRect().top + window.scrollY;
+        const offset = 16; // Small margin above the header
+        window.scrollTo({ top: headerTop - offset, behavior: 'smooth' });
     }
 }
 
