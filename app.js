@@ -361,9 +361,11 @@ function getCurrentCategory() {
 
 // Render category options in both selects
 function renderCategoryOptions() {
-    const optionsHtml = CATEGORIES.map((cat, index) =>
-        `<option value="${index}" ${index === currentCategoryIndex ? 'selected' : ''}>${cat.name}</option>`
-    ).join('');
+    const optionsHtml = CATEGORIES.map((cat, index) => {
+        // Remove "Best " prefix since it's shown as a separate label
+        const displayName = cat.name.replace(/^Best /, '');
+        return `<option value="${index}" ${index === currentCategoryIndex ? 'selected' : ''}>${displayName}</option>`;
+    }).join('');
     categorySelect.innerHTML = optionsHtml;
     categorySelectBottom.innerHTML = optionsHtml;
 }

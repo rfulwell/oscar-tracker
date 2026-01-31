@@ -162,6 +162,22 @@ body {
     min-width: 0;
 }
 
+.category-select-row {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    width: 100%;
+}
+
+.category-prefix {
+    font-family: var(--font-display);
+    font-size: 0.875rem;
+    font-weight: 400;
+    color: var(--color-white-dim);
+    letter-spacing: 0.05em;
+}
+
 .category-select {
     font-family: var(--font-display);
     font-size: 1.125rem;
@@ -473,11 +489,22 @@ body {
     .title {
         font-size: 2.75rem;
     }
-    
+
+    .category-select-row {
+        flex-direction: row;
+        gap: 6px;
+    }
+
+    .category-prefix {
+        font-size: 1.125rem;
+        font-weight: 600;
+        color: var(--color-white);
+    }
+
     .film {
         padding: var(--spacing-md) var(--spacing-lg);
     }
-    
+
     .film-title {
         font-size: 1.125rem;
     }
