@@ -243,6 +243,45 @@ const CATEGORIES = [
 const STORAGE_KEY = 'oscar-tracker-watched';
 const CATEGORY_KEY = 'oscar-tracker-category';
 
+// Film-to-nominees mapping for cross-category tracking
+// When a film is checked, all related nominees are also checked
+const FILM_NOMINEES = {
+    'sinners': ['sinners', 'dir-coogler', 'actor-jordan', 'supp-actor-lindo', 'supp-actress-mosaku', 'orig-sinners', 'cin-sinners', 'edit-sinners', 'prod-sinners', 'cost-sinners', 'makeup-sinners', 'score-sinners', 'song-ilied', 'sound-sinners', 'vfx-sinners', 'cast-sinners'],
+    'one-battle-after-another': ['one-battle-after-another', 'dir-anderson', 'actor-dicaprio', 'supp-actor-deltoro', 'supp-actor-penn', 'supp-actress-taylor', 'adapt-onebattle', 'cin-onebattle', 'edit-onebattle', 'prod-onebattle', 'score-onebattle', 'sound-onebattle', 'cast-onebattle'],
+    'marty-supreme': ['marty-supreme', 'dir-safdie', 'actor-chalamet', 'supp-actress-paltrow', 'orig-marty', 'cin-marty', 'edit-marty', 'prod-marty', 'cost-marty', 'cast-marty'],
+    'hamnet': ['hamnet', 'dir-zhao', 'actress-buckley', 'adapt-hamnet', 'prod-hamnet', 'cost-hamnet', 'score-hamnet', 'cast-hamnet'],
+    'frankenstein': ['frankenstein', 'supp-actor-elordi', 'adapt-frankenstein', 'cin-frankenstein', 'prod-frankenstein', 'cost-frankenstein', 'makeup-frankenstein', 'score-frankenstein', 'sound-frankenstein'],
+    'sentimental-value': ['sentimental-value', 'dir-trier', 'actress-reinsve', 'supp-actor-skarsgard', 'supp-actress-fanning', 'supp-actress-lilleaas', 'orig-sentimental', 'intl-sentimental', 'edit-sentimental', 'cast-sentimental'],
+    'train-dreams': ['train-dreams', 'adapt-traindreams', 'cin-traindreams', 'song-traindreams'],
+    'bugonia': ['bugonia', 'actress-stone', 'score-bugonia'],
+    'f1': ['f1', 'edit-f1', 'sound-f1', 'vfx-f1'],
+    'secret-agent': ['secret-agent', 'actor-moura', 'adapt-secretagent'],
+    'it-was-just-an-accident': ['orig-accident', 'intl-accident'],
+    'arco': ['anim-arco', 'intl-arco'],
+    'little-amelie': ['anim-amelie', 'intl-amelie'],
+    'kpop-demon-hunters': ['anim-kpop', 'song-golden'],
+    'avatar-fire-and-ash': ['cost-avatar', 'vfx-avatar'],
+    'blue-moon': ['actor-hawke', 'orig-bluemoon'],
+    'im-still-here': ['intl-stillhere']
+};
+
+// Build reverse lookup: nominee ID -> film key
+const NOMINEE_TO_FILM = {};
+for (const [filmKey, nomineeIds] of Object.entries(FILM_NOMINEES)) {
+    for (const nomineeId of nomineeIds) {
+        NOMINEE_TO_FILM[nomineeId] = filmKey;
+    }
+}
+
+// Get all related nominee IDs for a given nominee
+function getRelatedNominees(nomineeId) {
+    const filmKey = NOMINEE_TO_FILM[nomineeId];
+    if (filmKey) {
+        return FILM_NOMINEES[filmKey];
+    }
+    return [nomineeId];
+}
+
 // State
 let watchedItems = new Set();
 let currentCategoryIndex = 0;
@@ -370,12 +409,17 @@ function handleNomineeKeydown(e) {
 
 // Toggle nominee watched state
 function toggleNominee(nomineeId, filmEl) {
-    if (watchedItems.has(nomineeId)) {
-        watchedItems.delete(nomineeId);
+    const relatedNominees = getRelatedNominees(nomineeId);
+    const isCurrentlyWatched = watchedItems.has(nomineeId);
+
+    if (isCurrentlyWatched) {
+        // Uncheck all related nominees
+        relatedNominees.forEach(id => watchedItems.delete(id));
         filmEl.classList.remove('watched');
         filmEl.setAttribute('aria-checked', 'false');
     } else {
-        watchedItems.add(nomineeId);
+        // Check all related nominees
+        relatedNominees.forEach(id => watchedItems.add(id));
         filmEl.classList.add('watched');
         filmEl.setAttribute('aria-checked', 'true');
     }

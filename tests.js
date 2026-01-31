@@ -109,6 +109,34 @@ const categoryKeyMatch = appCode.match(/const CATEGORY_KEY = ['"]([^'"]+)['"]/);
 const STORAGE_KEY = storageKeyMatch ? storageKeyMatch[1] : null;
 const CATEGORY_KEY = categoryKeyMatch ? categoryKeyMatch[1] : null;
 
+// Extract FILM_NOMINEES mapping
+const filmNomineesMatch = appCode.match(/const FILM_NOMINEES = (\{[\s\S]*?\n\});/);
+let FILM_NOMINEES = {};
+if (filmNomineesMatch) {
+    try {
+        FILM_NOMINEES = eval('(' + filmNomineesMatch[1] + ')');
+    } catch (e) {
+        console.error('Could not parse FILM_NOMINEES:', e.message);
+    }
+}
+
+// Build NOMINEE_TO_FILM reverse lookup
+const NOMINEE_TO_FILM = {};
+for (const [filmKey, nomineeIds] of Object.entries(FILM_NOMINEES)) {
+    for (const nomineeId of nomineeIds) {
+        NOMINEE_TO_FILM[nomineeId] = filmKey;
+    }
+}
+
+// getRelatedNominees function
+function getRelatedNominees(nomineeId) {
+    const filmKey = NOMINEE_TO_FILM[nomineeId];
+    if (filmKey) {
+        return FILM_NOMINEES[filmKey];
+    }
+    return [nomineeId];
+}
+
 console.log(`${colors.bold}${colors.yellow}Oscar Tracker Test Suite${colors.reset}\n`);
 
 // Data Structure Tests
@@ -329,6 +357,94 @@ describe('Storage Keys', () => {
 
     test('CATEGORY_KEY is defined correctly', () => {
         expect(CATEGORY_KEY).toBe('oscar-tracker-category');
+    });
+});
+
+// Cross-Category Tracking Tests
+describe('Cross-Category Film Tracking', () => {
+    test('FILM_NOMINEES is defined', () => {
+        expect(typeof FILM_NOMINEES).toBe('object');
+    });
+
+    test('NOMINEE_TO_FILM reverse lookup is defined', () => {
+        expect(typeof NOMINEE_TO_FILM).toBe('object');
+    });
+
+    test('Sinners has 16 related nominees (record-breaking)', () => {
+        expect(FILM_NOMINEES['sinners'].length).toBe(16);
+    });
+
+    test('One Battle After Another has 13 related nominees', () => {
+        expect(FILM_NOMINEES['one-battle-after-another'].length).toBe(13);
+    });
+
+    test('Marty Supreme has 10 related nominees', () => {
+        expect(FILM_NOMINEES['marty-supreme'].length).toBe(10);
+    });
+
+    test('All film nominee arrays contain valid nominee IDs', () => {
+        const allNomineeIds = CATEGORIES.flatMap(c => c.nominees.map(n => n.id));
+        let allValid = true;
+        for (const [filmKey, nomineeIds] of Object.entries(FILM_NOMINEES)) {
+            for (const nomineeId of nomineeIds) {
+                if (!allNomineeIds.includes(nomineeId)) {
+                    console.log(`Invalid nominee ID: ${nomineeId} in film ${filmKey}`);
+                    allValid = false;
+                }
+            }
+        }
+        expect(allValid).toBe(true);
+    });
+
+    test('NOMINEE_TO_FILM maps all nominees back to their films', () => {
+        let count = 0;
+        for (const nomineeIds of Object.values(FILM_NOMINEES)) {
+            count += nomineeIds.length;
+        }
+        expect(Object.keys(NOMINEE_TO_FILM).length).toBe(count);
+    });
+
+    test('getRelatedNominees returns correct nominees for Sinners', () => {
+        const related = getRelatedNominees('sinners');
+        expect(related).toContain('sinners');
+        expect(related).toContain('dir-coogler');
+        expect(related).toContain('actor-jordan');
+        expect(related).toContain('cast-sinners');
+    });
+
+    test('getRelatedNominees returns correct nominees for a technical category', () => {
+        const related = getRelatedNominees('cin-sinners');
+        expect(related).toContain('sinners');
+        expect(related).toContain('cin-sinners');
+        expect(related.length).toBe(16);
+    });
+
+    test('getRelatedNominees returns single item for unmapped nominees', () => {
+        // Nominees that don't share a film with others
+        const related = getRelatedNominees('doc-alabama');
+        expect(related).toEqual(['doc-alabama']);
+    });
+
+    test('Cross-category films are correctly linked', () => {
+        // Test that animated films appearing in international are linked
+        const arcoRelated = getRelatedNominees('anim-arco');
+        expect(arcoRelated).toContain('intl-arco');
+
+        const amelieRelated = getRelatedNominees('intl-amelie');
+        expect(amelieRelated).toContain('anim-amelie');
+    });
+
+    test('KPop Demon Hunters links animated feature to original song', () => {
+        const kpopRelated = getRelatedNominees('anim-kpop');
+        expect(kpopRelated).toContain('song-golden');
+    });
+
+    test('Train Dreams links multiple categories correctly', () => {
+        const trainRelated = getRelatedNominees('train-dreams');
+        expect(trainRelated).toContain('adapt-traindreams');
+        expect(trainRelated).toContain('cin-traindreams');
+        expect(trainRelated).toContain('song-traindreams');
+        expect(trainRelated.length).toBe(4);
     });
 });
 
