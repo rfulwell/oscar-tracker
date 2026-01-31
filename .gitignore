@@ -1,0 +1,25 @@
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editor files
+*.swp
+*.swo
+*~
+.idea/
+.vscode/
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+
+# Generated files that can be recreated
+# (uncomment if you want to regenerate icons/splash each time)
+# icons/*.png
+# splash/*.png
+
+# Logs
+*.log
+npm-debug.log*

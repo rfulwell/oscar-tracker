@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Oscar Tracker</title>
+    
+    <!-- PWA Meta Tags -->
+    <meta name="theme-color" content="#0a0a0a">
+    <meta name="description" content="Track which Oscar-nominated films you've watched">
+    
+    <!-- iOS PWA Support -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Oscar Tracker">
+    
+    <!-- Icons -->
+    <link rel="icon" type="image/png" sizes="32x32" href="icons/icon-32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="icons/icon-16.png">
+    <link rel="apple-touch-icon" href="icons/icon-180.png">
+    
+    <!-- iOS Splash Screens -->
+    <!-- iPhone 15 Pro Max, 14 Pro Max -->
+    <link rel="apple-touch-startup-image" media="screen and (device-width: 430px) and (device-height: 932px) and (-webkit-device-pixel-ratio: 3)" href="splash/splash-1290x2796.png">
+    <!-- iPhone 15 Pro, 15, 14 Pro -->
+    <link rel="apple-touch-startup-image" media="screen and (device-width: 393px) and (device-height: 852px) and (-webkit-device-pixel-ratio: 3)" href="splash/splash-1179x2556.png">
+    <!-- iPhone 14, 13, 12 -->
+    <link rel="apple-touch-startup-image" media="screen and (device-width: 390px) and (device-height: 844px) and (-webkit-device-pixel-ratio: 3)" href="splash/splash-1170x2532.png">
+    <!-- iPhone SE 3rd gen, 8, 7 -->
+    <link rel="apple-touch-startup-image" media="screen and (device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2)" href="splash/splash-750x1334.png">
+    <!-- iPad Pro 12.9" -->
+    <link rel="apple-touch-startup-image" media="screen and (device-width: 1024px) and (device-height: 1366px) and (-webkit-device-pixel-ratio: 2)" href="splash/splash-2048x2732.png">
+    <!-- iPad Pro 11" -->
+    <link rel="apple-touch-startup-image" media="screen and (device-width: 834px) and (device-height: 1194px) and (-webkit-device-pixel-ratio: 2)" href="splash/splash-1668x2388.png">
+    
+    <!-- Web App Manifest -->
+    <link rel="manifest" href="manifest.json">
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Libre+Franklin:wght@300;400;500&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="app">
+        <header class="header">
+            <div class="trophy-icon">
+                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 17C12 17 7 14 7 9V4H17V9C17 14 12 17 12 17Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M7 5H4V7C4 9.5 5.5 11 7 11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M17 5H20V7C20 9.5 18.5 11 17 11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M12 17V20" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                    <path d="M8 22H16" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                    <path d="M9 20H15" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                </svg>
+            </div>
+            <h1 class="title">Oscar Tracker</h1>
+            <p class="subtitle">97th Academy Awards · 2025</p>
+        </header>
+        
+        <main class="main">
+            <section class="category">
+                <div class="category-header">
+                    <h2 class="category-title">Best Picture</h2>
+                    <span class="progress" id="progress">0 / 10</span>
+                </div>
+                
+                <ul class="films" id="films-list">
+                    <!-- Films will be rendered here by JavaScript -->
+                </ul>
+            </section>
+        </main>
+        
+        <footer class="footer">
+            <p>Tap a film to mark as watched</p>
+        </footer>
+    </div>
+    
+    <script src="app.js"></script>
+</body>
+</html>
