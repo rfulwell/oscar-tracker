@@ -102,6 +102,14 @@ body {
     margin-bottom: var(--spacing-xs);
 }
 
+.title sup,
+.subtitle sup {
+    font-size: 0.5em;
+    vertical-align: super;
+    opacity: 0.6;
+    font-weight: 400;
+}
+
 .subtitle {
     font-size: 0.875rem;
     font-weight: 300;
@@ -513,6 +521,14 @@ body {
 .refresh-btn:focus .tooltip {
     opacity: 1;
     visibility: visible;
+}
+
+.legal-disclaimer {
+    font-size: 0.625rem;
+    line-height: 1.4;
+    color: var(--color-black-lighter);
+    max-width: 320px;
+    margin-top: var(--spacing-sm);
 }
 
 /* Animations */
