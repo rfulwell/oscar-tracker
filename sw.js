@@ -1,5 +1,5 @@
 // Service Worker for Oscar Tracker PWA
-const CACHE_NAME = 'oscar-tracker-v9';
+const CACHE_NAME = 'oscar-tracker-v10';
 
 const ASSETS_TO_CACHE = [
     '/',
@@ -8,7 +8,9 @@ const ASSETS_TO_CACHE = [
     '/app.js',
     '/manifest.json',
     '/icons/icon-192.png',
-    '/icons/icon-512.png'
+    '/icons/icon-512.png',
+    '/icons/netflix.svg',
+    '/icons/max.svg'
 ];
 
 // Install event - cache assets

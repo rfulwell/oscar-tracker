@@ -377,13 +377,30 @@ body {
     min-width: 0;
 }
 
+.film-title-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 2px;
+}
+
 .film-title {
     font-family: var(--font-display);
     font-size: 1.0625rem;
     font-weight: 600;
     color: var(--color-white);
-    margin-bottom: 2px;
     transition: color 0.2s ease;
+}
+
+.streaming-icon {
+    width: 16px;
+    height: 16px;
+    opacity: 0.6;
+    flex-shrink: 0;
+}
+
+.film:hover .streaming-icon {
+    opacity: 0.8;
 }
 
 .film-studio {

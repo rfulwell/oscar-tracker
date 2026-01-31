@@ -273,6 +273,25 @@ for (const [filmKey, nomineeIds] of Object.entries(FILM_NOMINEES)) {
     }
 }
 
+// Streaming service availability for films
+// Based on research: Netflix and Max are the top 2 services with Oscar nominees
+const FILM_STREAMING = {
+    'sinners': 'max',
+    'one-battle-after-another': 'max',
+    'frankenstein': 'netflix',
+    'train-dreams': 'netflix',
+    'kpop-demon-hunters': 'netflix'
+};
+
+// Get streaming service for a nominee (if available)
+function getStreamingService(nomineeId) {
+    const filmKey = NOMINEE_TO_FILM[nomineeId];
+    if (filmKey && FILM_STREAMING[filmKey]) {
+        return FILM_STREAMING[filmKey];
+    }
+    return null;
+}
+
 // Get all related nominee IDs for a given nominee
 function getRelatedNominees(nomineeId) {
     const filmKey = NOMINEE_TO_FILM[nomineeId];
@@ -370,11 +389,25 @@ function renderCategoryOptions() {
     categorySelectBottom.innerHTML = optionsHtml;
 }
 
+// Generate streaming icon HTML
+function getStreamingIconHtml(nomineeId) {
+    const service = getStreamingService(nomineeId);
+    if (!service) return '';
+
+    const icons = {
+        netflix: `<img src="icons/netflix.svg" alt="Netflix" class="streaming-icon" title="Available on Netflix">`,
+        max: `<img src="icons/max.svg" alt="Max" class="streaming-icon" title="Available on Max">`
+    };
+    return icons[service] || '';
+}
+
 // Render nominees list
 function renderNominees() {
     const category = getCurrentCategory();
 
-    filmsList.innerHTML = category.nominees.map(nominee => `
+    filmsList.innerHTML = category.nominees.map(nominee => {
+        const streamingIcon = getStreamingIconHtml(nominee.id);
+        return `
         <li class="film ${watchedItems.has(nominee.id) ? 'watched' : ''}"
             data-id="${nominee.id}"
             role="checkbox"
@@ -386,11 +419,14 @@ function renderNominees() {
                 </svg>
             </div>
             <div class="film-info">
-                <div class="film-title">${nominee.title}</div>
+                <div class="film-title-row">
+                    <span class="film-title">${nominee.title}</span>
+                    ${streamingIcon}
+                </div>
                 <div class="film-studio">${nominee.subtitle}</div>
             </div>
         </li>
-    `).join('');
+    `}).join('');
 
     // Add event listeners
     document.querySelectorAll('.film').forEach(el => {
