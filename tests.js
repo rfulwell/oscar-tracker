@@ -118,8 +118,8 @@ describe('Data Structure', () => {
         expect(Array.isArray(CATEGORIES)).toBe(true);
     });
 
-    test('CATEGORIES has 10 award categories', () => {
-        expect(CATEGORIES.length).toBe(10);
+    test('CATEGORIES has 21 award categories', () => {
+        expect(CATEGORIES.length).toBe(21);
     });
 
     test('Each category has required properties (id, name, nominees)', () => {
@@ -141,9 +141,9 @@ describe('Data Structure', () => {
         });
     });
 
-    test('Total nominees count is 55 (10 + 9×5)', () => {
+    test('Total nominees count is 110 (10 + 20×5)', () => {
         const total = CATEGORIES.reduce((sum, cat) => sum + cat.nominees.length, 0);
-        expect(total).toBe(55);
+        expect(total).toBe(110);
     });
 
     test('All nominees have unique IDs', () => {
@@ -271,7 +271,18 @@ describe('Category ID Validation', () => {
         'best-original-screenplay',
         'best-adapted-screenplay',
         'best-animated-feature',
-        'best-international-feature'
+        'best-international-feature',
+        'best-documentary-feature',
+        'best-cinematography',
+        'best-film-editing',
+        'best-production-design',
+        'best-costume-design',
+        'best-makeup-hairstyling',
+        'best-original-score',
+        'best-original-song',
+        'best-sound',
+        'best-visual-effects',
+        'best-casting'
     ];
 
     test('All expected category IDs exist', () => {

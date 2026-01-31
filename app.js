@@ -116,6 +116,127 @@ const CATEGORIES = [
             { id: 'intl-stillhere', title: 'I\'m Still Here', subtitle: 'Brazil' },
             { id: 'intl-arco', title: 'Arco', subtitle: 'France' }
         ]
+    },
+    {
+        id: 'best-documentary-feature',
+        name: 'Best Documentary Feature',
+        nominees: [
+            { id: 'doc-alabama', title: 'The Alabama Solution', subtitle: 'Andrew Jarecki & Charlotte Kaufman' },
+            { id: 'doc-goodlight', title: 'Come See Me in the Good Light', subtitle: 'Ryan White' },
+            { id: 'doc-rocks', title: 'Cutting through Rocks', subtitle: 'Sara Khaki & Mohammadreza Eyni' },
+            { id: 'doc-putin', title: 'Mr. Nobody against Putin', subtitle: 'Vera Krichevskaya' },
+            { id: 'doc-seeds', title: 'Seeds', subtitle: 'Brittany Shyne' }
+        ]
+    },
+    {
+        id: 'best-cinematography',
+        name: 'Best Cinematography',
+        nominees: [
+            { id: 'cin-frankenstein', title: 'Frankenstein', subtitle: 'Dan Laustsen' },
+            { id: 'cin-marty', title: 'Marty Supreme', subtitle: 'Darius Khondji' },
+            { id: 'cin-onebattle', title: 'One Battle After Another', subtitle: 'Ari Wegner' },
+            { id: 'cin-sinners', title: 'Sinners', subtitle: 'Autumn Durald Arkapaw' },
+            { id: 'cin-traindreams', title: 'Train Dreams', subtitle: 'Lol Crawley' }
+        ]
+    },
+    {
+        id: 'best-film-editing',
+        name: 'Best Film Editing',
+        nominees: [
+            { id: 'edit-f1', title: 'F1', subtitle: 'Stephen Mirrione' },
+            { id: 'edit-marty', title: 'Marty Supreme', subtitle: 'Ronald Bronstein & Josh Safdie' },
+            { id: 'edit-onebattle', title: 'One Battle After Another', subtitle: 'Andy Jurgensen' },
+            { id: 'edit-sentimental', title: 'Sentimental Value', subtitle: 'Olivier Bugge Coutté' },
+            { id: 'edit-sinners', title: 'Sinners', subtitle: 'Michael P. Shawver' }
+        ]
+    },
+    {
+        id: 'best-production-design',
+        name: 'Best Production Design',
+        nominees: [
+            { id: 'prod-frankenstein', title: 'Frankenstein', subtitle: 'Tamara Deverell & Shane Vieau' },
+            { id: 'prod-hamnet', title: 'Hamnet', subtitle: 'Fiona Crombie & Alice Felton' },
+            { id: 'prod-marty', title: 'Marty Supreme', subtitle: 'Jack Fisk & Adam Willis' },
+            { id: 'prod-onebattle', title: 'One Battle After Another', subtitle: 'Florencia Martin & Anthony Carlino' },
+            { id: 'prod-sinners', title: 'Sinners', subtitle: 'Hannah Beachler & Monique Champagne' }
+        ]
+    },
+    {
+        id: 'best-costume-design',
+        name: 'Best Costume Design',
+        nominees: [
+            { id: 'cost-avatar', title: 'Avatar: Fire and Ash', subtitle: 'Deborah L. Scott' },
+            { id: 'cost-frankenstein', title: 'Frankenstein', subtitle: 'Luis Sequeira' },
+            { id: 'cost-hamnet', title: 'Hamnet', subtitle: 'Sandy Powell' },
+            { id: 'cost-marty', title: 'Marty Supreme', subtitle: 'Courtney Hoffman' },
+            { id: 'cost-sinners', title: 'Sinners', subtitle: 'Ruth E. Carter' }
+        ]
+    },
+    {
+        id: 'best-makeup-hairstyling',
+        name: 'Best Makeup and Hairstyling',
+        nominees: [
+            { id: 'makeup-frankenstein', title: 'Frankenstein', subtitle: 'Mike Hill, Jordan Samuel & Cliona Furey' },
+            { id: 'makeup-kokuho', title: 'Kokuho', subtitle: 'Kyoko Toyokawa, Naomi Hibino & Tadashi Nishimatsu' },
+            { id: 'makeup-sinners', title: 'Sinners', subtitle: 'Ken Diaz, Mike Fontaine & Shunika Terry' },
+            { id: 'makeup-smashing', title: 'The Smashing Machine', subtitle: 'Kazu Hiro, Glen Griffin & Bjoern Rehbein' },
+            { id: 'makeup-ugly', title: 'The Ugly Stepsister', subtitle: 'Thomas Foldberg & Anne Cathrine Sauerberg' }
+        ]
+    },
+    {
+        id: 'best-original-score',
+        name: 'Best Original Score',
+        nominees: [
+            { id: 'score-bugonia', title: 'Bugonia', subtitle: 'Jerskin Fendrix' },
+            { id: 'score-frankenstein', title: 'Frankenstein', subtitle: 'Alexandre Desplat' },
+            { id: 'score-hamnet', title: 'Hamnet', subtitle: 'Max Richter' },
+            { id: 'score-onebattle', title: 'One Battle After Another', subtitle: 'Jonny Greenwood' },
+            { id: 'score-sinners', title: 'Sinners', subtitle: 'Ludwig Göransson' }
+        ]
+    },
+    {
+        id: 'best-original-song',
+        name: 'Best Original Song',
+        nominees: [
+            { id: 'song-dearme', title: '"Dear Me"', subtitle: 'Diane Warren: Relentless' },
+            { id: 'song-golden', title: '"Golden"', subtitle: 'KPop Demon Hunters' },
+            { id: 'song-ilied', title: '"I Lied to You"', subtitle: 'Sinners' },
+            { id: 'song-sweetdreams', title: '"Sweet Dreams of Joy"', subtitle: 'Viva Verdi!' },
+            { id: 'song-traindreams', title: '"Train Dreams"', subtitle: 'Train Dreams' }
+        ]
+    },
+    {
+        id: 'best-sound',
+        name: 'Best Sound',
+        nominees: [
+            { id: 'sound-f1', title: 'F1', subtitle: 'Mark Weingarten & James H. Mather' },
+            { id: 'sound-frankenstein', title: 'Frankenstein', subtitle: 'Randy Thom & Gary Rydstrom' },
+            { id: 'sound-onebattle', title: 'One Battle After Another', subtitle: 'Richard King' },
+            { id: 'sound-sinners', title: 'Sinners', subtitle: 'Steve Boeddeker & Brandon Proctor' },
+            { id: 'sound-sirat', title: 'Sirât', subtitle: 'Olivier Goinard' }
+        ]
+    },
+    {
+        id: 'best-visual-effects',
+        name: 'Best Visual Effects',
+        nominees: [
+            { id: 'vfx-avatar', title: 'Avatar: Fire and Ash', subtitle: 'Joe Letteri & Eric Saindon' },
+            { id: 'vfx-f1', title: 'F1', subtitle: 'Alex Wuttke' },
+            { id: 'vfx-jurassic', title: 'Jurassic World Rebirth', subtitle: 'David Vickery' },
+            { id: 'vfx-lostbus', title: 'The Lost Bus', subtitle: 'Charmaine Chan' },
+            { id: 'vfx-sinners', title: 'Sinners', subtitle: 'Erik Henry' }
+        ]
+    },
+    {
+        id: 'best-casting',
+        name: 'Best Casting',
+        nominees: [
+            { id: 'cast-hamnet', title: 'Hamnet', subtitle: 'Nina Gold' },
+            { id: 'cast-marty', title: 'Marty Supreme', subtitle: 'Francine Maisler' },
+            { id: 'cast-onebattle', title: 'One Battle After Another', subtitle: 'Cassandra Kulukundis' },
+            { id: 'cast-sentimental', title: 'Sentimental Value', subtitle: 'Kjersti Paulsen' },
+            { id: 'cast-sinners', title: 'Sinners', subtitle: 'Kim Coleman' }
+        ]
     }
 ];
 
