@@ -10,7 +10,7 @@ A lightweight about modal accessible via a discreet link in the footer area. Dis
 
 - **Position**: Below the lower navbar, above the hard refresh button
 - **Style**: Small, subtle link matching existing UI aesthetic
-- **Text**: "About" or "v1.2.3" (showing current version)
+- **Text**: "About" (simple, not version number)
 
 ### Version Numbering
 
@@ -55,12 +55,15 @@ Bump via: `npm version patch|minor|major`
 
 ```
 ┌─────────────────────────────────────┐
-│              Oscar Tracker          │
+│              Oscar Tracker     [×]  │
 │                v1.2.3               │
 │                                     │
 │  Track your Oscar watch progress    │
 │  and make predictions for the       │
-│  98th Academy Awards (2026).        │
+│  98th Academy Awards.               │
+│                                     │
+│  🏆 March 15, 2026                  │
+│     42 days remaining               │
 │                                     │
 │  ─────────────────────────────────  │
 │                                     │
@@ -71,10 +74,19 @@ Bump via: `npm version patch|minor|major`
 │                                     │
 │  ─────────────────────────────────  │
 │                                     │
-│  Created by [Your Name]             │
+│  📋 What's New                      │
+│  ┌───────────────────────────────┐  │
+│  │ v1.2.3 - Bug fixes            │  │
+│  │ v1.2.0 - Share predictions    │  │
+│  │ v1.1.0 - Predictions mode     │  │
+│  │ v1.0.0 - Initial release      │  │
+│  └───────────────────────────────┘  │
+│         (scrollable area)           │
+│                                     │
+│  ─────────────────────────────────  │
+│                                     │
 │  github.com/rfulwell/oscar-tracker  │
 │                                     │
-│            [ Close ]                │
 └─────────────────────────────────────┘
 ```
 
@@ -83,36 +95,42 @@ Bump via: `npm version patch|minor|major`
 #### 1. Header
 - App name: "Oscar Tracker"
 - Version badge: "v1.2.3"
+- Close button (×) in top-right corner
 
 #### 2. Description
 Brief tagline about the app's purpose.
 
-#### 3. Feature Highlights
-Rotating or static list of features:
+#### 3. Oscar Countdown
+- **Date**: March 15, 2026 (98th Academy Awards)
+- **Countdown**: Calculated dynamically in JavaScript
+- **Format**: "42 days remaining" or "Tonight!" on the day
+- **Post-ceremony**: Hide countdown or show "Awards have aired"
+
+#### 4. Feature Highlights
 - **Share Predictions** - Share your picks with friends (coming soon / available now)
-- **Offline Support** - Works without internet once loaded
-- **Cross-Device Sync** - Your data stays in your browser (privacy note)
 
-#### 4. Attribution
-- Creator name with link to GitHub repo
-- Optional: "Built with ❤️ for movie lovers"
+#### 5. Changelog (Embedded)
+- Scrollable container with max-height (~120px)
+- Shows recent versions with brief descriptions
+- Styled to match app aesthetic (dark theme, subtle borders)
+- Format: `v1.2.3 - Brief description`
+- Most recent at top
 
-#### 5. Footer
-- Close button
-- Optional: Links to report issues, view source
+#### 6. Attribution
+- GitHub repo link: `github.com/rfulwell/oscar-tracker`
 
 ### Brainstormed Additional Content
 
-| Content | Priority | Notes |
-|---------|----------|-------|
-| Keyboard shortcuts | Medium | Arrow keys, Enter/Space |
-| Privacy note | Medium | "Data stored locally, never sent to servers" |
-| PWA install hint | Low | "Add to home screen for app-like experience" |
-| Oscar ceremony date | Low | "March 2, 2026" countdown? |
-| Changelog link | Low | Link to GitHub releases |
-| Credits/acknowledgments | Low | Data sources, icon credits |
-| Dark/light mode toggle | Low | If we add theming later |
-| Tip jar / support link | Optional | Ko-fi, GitHub sponsors |
+| Content | Status | Notes |
+|---------|--------|-------|
+| Oscar countdown | ✅ Include | March 15, 2026 with days remaining |
+| Changelog | ✅ Include | Embedded scrollable, matches site aesthetic |
+| Keyboard shortcuts | Maybe later | Arrow keys, Enter/Space |
+| Privacy note | Maybe later | "Data stored locally, never sent to servers" |
+| PWA install hint | Skip | Too technical for most users |
+| Credits/acknowledgments | Skip | Keep it simple |
+| Dark/light mode toggle | Skip | Not implementing theming |
+| Tip jar / support link | Skip | Not needed |
 
 ### UI Design
 
@@ -164,26 +182,116 @@ const APP_VERSION = '1.2.3'; // Update manually with releases
 
 #### Modal HTML Structure
 ```html
-<div id="about-modal" class="modal" hidden>
+<div id="about-modal" class="modal" hidden aria-modal="true" aria-labelledby="about-title">
   <div class="modal-backdrop"></div>
   <div class="modal-content">
     <button class="modal-close" aria-label="Close">×</button>
-    <h2>Oscar Tracker</h2>
+
+    <h2 id="about-title">Oscar Tracker</h2>
     <span class="version-badge">v1.2.3</span>
-    <p>Track your Oscar watch progress...</p>
-    <!-- Feature sections -->
-    <footer>
-      <a href="https://github.com/rfulwell/oscar-tracker">
-        Created by rfulwell
+
+    <p class="about-description">
+      Track your Oscar watch progress and make predictions
+      for the 98th Academy Awards.
+    </p>
+
+    <div class="oscar-countdown">
+      <span class="countdown-icon">🏆</span>
+      <span class="countdown-date">March 15, 2026</span>
+      <span class="countdown-remaining" id="countdown-days">42 days remaining</span>
+    </div>
+
+    <div class="about-section">
+      <h3>📤 Share Predictions</h3>
+      <p>Share your picks with friends via a simple link - no account required!</p>
+    </div>
+
+    <div class="about-section">
+      <h3>📋 What's New</h3>
+      <div class="changelog-scroll">
+        <div class="changelog-entry">
+          <strong>v1.2.3</strong> - Bug fixes and performance improvements
+        </div>
+        <div class="changelog-entry">
+          <strong>v1.2.0</strong> - Share predictions with friends
+        </div>
+        <div class="changelog-entry">
+          <strong>v1.1.0</strong> - Predictions mode added
+        </div>
+        <div class="changelog-entry">
+          <strong>v1.0.0</strong> - Initial release
+        </div>
+      </div>
+    </div>
+
+    <footer class="about-footer">
+      <a href="https://github.com/rfulwell/oscar-tracker" target="_blank" rel="noopener">
+        github.com/rfulwell/oscar-tracker
       </a>
     </footer>
   </div>
 </div>
 ```
 
+#### Changelog Scroll Styles
+```css
+.changelog-scroll {
+  max-height: 120px;
+  overflow-y: auto;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  padding: 0.5rem;
+  background: rgba(0, 0, 0, 0.2);
+}
+
+.changelog-entry {
+  padding: 0.4rem 0;
+  border-bottom: 1px solid var(--color-border);
+  font-size: 0.85rem;
+}
+
+.changelog-entry:last-child {
+  border-bottom: none;
+}
+
+.changelog-entry strong {
+  color: var(--color-gold);
+}
+```
+
+#### Oscar Countdown Styles
+```css
+.oscar-countdown {
+  text-align: center;
+  padding: 1rem;
+  background: rgba(212, 175, 55, 0.1);
+  border-radius: 8px;
+  margin: 1rem 0;
+}
+
+.countdown-icon {
+  font-size: 1.5rem;
+}
+
+.countdown-date {
+  display: block;
+  font-weight: bold;
+  color: var(--color-gold);
+}
+
+.countdown-remaining {
+  display: block;
+  font-size: 0.9rem;
+  opacity: 0.8;
+}
+```
+
 #### Modal JavaScript
 ```javascript
+const OSCAR_DATE = new Date('2026-03-15T19:00:00-05:00'); // 7pm ET
+
 function showAboutModal() {
+  updateCountdown();
   document.getElementById('about-modal').hidden = false;
   document.body.classList.add('modal-open');
 }
@@ -192,6 +300,46 @@ function hideAboutModal() {
   document.getElementById('about-modal').hidden = true;
   document.body.classList.remove('modal-open');
 }
+
+function updateCountdown() {
+  const now = new Date();
+  const diff = OSCAR_DATE - now;
+  const days = Math.ceil(diff / (1000 * 60 * 60 * 24));
+  const el = document.getElementById('countdown-days');
+
+  if (days > 1) {
+    el.textContent = `${days} days remaining`;
+  } else if (days === 1) {
+    el.textContent = 'Tomorrow!';
+  } else if (days === 0) {
+    el.textContent = 'Tonight!';
+  } else {
+    el.textContent = 'The ceremony has aired';
+  }
+}
+
+// Close on Escape key
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape' && !document.getElementById('about-modal').hidden) {
+    hideAboutModal();
+  }
+});
+
+// Close on backdrop click
+document.querySelector('.modal-backdrop')?.addEventListener('click', hideAboutModal);
+```
+
+#### Changelog Data Structure
+```javascript
+// Could be maintained in a separate file or at top of app.js
+const CHANGELOG = [
+  { version: '1.2.3', description: 'Bug fixes and performance improvements' },
+  { version: '1.2.0', description: 'Share predictions with friends' },
+  { version: '1.1.0', description: 'Predictions mode added' },
+  { version: '1.0.0', description: 'Initial release' },
+];
+
+// Or load from CHANGELOG.md / version.json at build time
 ```
 
 ### Accessibility
@@ -263,9 +411,9 @@ jobs:
 - [ ] Create GitHub Action for auto-bump
 - [ ] Inject version into app at build/deploy time
 
-## Open Questions
+## Decisions Made
 
-1. **Version display**: Show "v1.2.3" in the about link itself, or just "About"?
-2. **Changelog**: Link to GitHub releases, or embed recent changes?
-3. **Ceremony countdown**: Include countdown to Oscar night?
-4. **PWA prompt**: Include "Add to Home Screen" instructions?
+1. **Trigger text**: Just "About" (not version number)
+2. **Oscar countdown**: Inline countdown to March 15, 2026 (calculated in JS)
+3. **Changelog**: Embedded in scrollable container, matches site aesthetic
+4. **PWA prompt**: Skip (too technical for most users)
