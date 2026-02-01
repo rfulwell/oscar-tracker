@@ -55,3 +55,14 @@ These scripts measure:
 - Layout/style recalculation counts
 - DOM node creation/destruction
 - Memory usage
+
+## Versioning & Deployment
+
+The app uses automated versioning via GitHub Actions:
+
+- **Version format**: `1.0.{run_number}` (e.g., `1.0.42`)
+- **Location**: `APP_VERSION` constant in `app.js`
+- **Automation**: The deploy workflow (`.github/workflows/deploy.yml`) auto-injects the version at deploy time using the workflow run number
+- **No manual bumping**: Version increments automatically with each deployment
+
+The version is displayed in the About modal and helps identify which build is deployed.

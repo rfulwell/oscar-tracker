@@ -40,16 +40,16 @@ git describe --tags --abbrev=0  # → v1.2.3
 ```
 Bump via: `npm version patch|minor|major`
 
-**Option 3: GitHub Actions automation**
-- On push to main, analyze commit messages
-- `feat:` → minor bump
-- `fix:` → patch bump
-- Auto-create git tag
+**Option 3: GitHub Actions automation** ✅ IMPLEMENTED
+- On deploy, inject version using workflow run number
+- Format: `1.0.{run_number}` (e.g., `1.0.42`)
+- No manual version bumping required
 
-**Recommended**: Option 2 + Option 3 hybrid
-- Store version in `package.json`
-- GitHub Action bumps on merge to main
-- Build injects version into app
+**Current Implementation**:
+- Version stored in `app.js` as `APP_VERSION` constant
+- GitHub Actions workflow injects version at deploy time
+- Each deployment gets a unique, auto-incrementing version
+- See `.github/workflows/deploy.yml` for implementation
 
 ### Modal Content
 
@@ -448,23 +448,24 @@ jobs:
 
 ## Implementation Phases
 
-### Phase 1: Basic Modal
-- [ ] Add about link to footer
-- [ ] Create modal HTML structure
-- [ ] Add modal CSS styles
-- [ ] Implement open/close JavaScript
-- [ ] Add static version number
+### Phase 1: Basic Modal ✅ COMPLETE
+- [x] Add about link to footer
+- [x] Create modal HTML structure
+- [x] Add modal CSS styles
+- [x] Implement open/close JavaScript
+- [x] Add static version number
 
-### Phase 2: Content
-- [ ] Write app description
-- [ ] Add sharing feature teaser
-- [ ] Add GitHub repo link
+### Phase 2: Content ✅ COMPLETE
+- [x] Write app description
+- [x] Add sharing feature teaser
+- [x] Add GitHub repo link
+- [x] Add PWA install hints with authoritative links
 - [ ] Add keyboard shortcuts section (optional)
 
-### Phase 3: Version Automation
-- [ ] Set up package.json version field
-- [ ] Create GitHub Action for auto-bump
-- [ ] Inject version into app at build/deploy time
+### Phase 3: Version Automation ✅ COMPLETE
+- [x] Set up package.json version field
+- [x] Create GitHub Action for auto-bump (uses run_number)
+- [x] Inject version into app at deploy time
 
 ## Decisions Made
 

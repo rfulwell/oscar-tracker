@@ -24,6 +24,21 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Bump version
+        run: |
+          # Generate version: 1.0.{run_number}
+          VERSION="1.0.${{ github.run_number }}"
+          echo "Deploying version: $VERSION"
+
+          # Update APP_VERSION in app.js
+          sed -i "s/const APP_VERSION = '[^']*'/const APP_VERSION = '$VERSION'/" app.js
+
+          # Update version in package.json
+          sed -i "s/\"version\": \"[^\"]*\"/\"version\": \"$VERSION\"/" package.json
+
+          # Verify the update
+          grep "APP_VERSION" app.js
+
       - name: Setup Pages
         uses: actions/configure-pages@v4
 
