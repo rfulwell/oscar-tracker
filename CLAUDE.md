@@ -34,4 +34,22 @@ Tests start a local HTTP server on port 3000 and run against the live app. Each 
 
 ### Coverage
 
-- **predictions.spec.js**: Predictions mode functionality (mode switching, single-select behavior, persistence, progress display)
+- **predictions.spec.js**: Predictions mode functionality (mode switching, single-select behavior, persistence, progress display, performance regression tests)
+
+### Performance Profiling
+
+Performance analysis scripts use Chrome DevTools Protocol (CDP) via Playwright:
+
+```bash
+# Full performance analysis (metrics, profiling, timeline)
+node tests/performance-profile.js
+
+# DOM churn measurement (compares optimized vs full re-render)
+node tests/measure-dom-churn.js
+```
+
+These scripts measure:
+- JavaScript execution time
+- Layout/style recalculation counts
+- DOM node creation/destruction
+- Memory usage
