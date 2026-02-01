@@ -212,12 +212,13 @@ let currentMode = 'watched';   // 'watched' | 'predictions' | 'shared:{id}'
 ### UI Changes
 
 1. **Share Button**: To the right of mode dropdown, visible only in Predictions mode
-2. **Share Modal**: Themed modal matching app design (not browser prompt)
-3. **Duplicate Modal**: Themed modal for overwrite/copy/cancel options
-4. **Mode Dropdown**: Shows separator + all saved shared lists
-5. **Read-Only Banner**: Dismissible banner showing whose predictions are displayed
-6. **Copy Confirmation**: Toast notification when URL copied to clipboard
-7. **Delete Option**: Way to remove saved shared lists (long-press or swipe?)
+2. **Delete Button**: Replaces Share button when viewing a shared list (same position)
+3. **Share Modal**: Themed modal matching app design (not browser prompt)
+4. **Duplicate Modal**: Themed modal for overwrite/copy/cancel options
+5. **Delete Confirmation Modal**: Themed modal confirming deletion of shared list
+6. **Mode Dropdown**: Shows separator + all saved shared lists
+7. **Read-Only Banner**: Dismissible banner showing whose predictions are displayed
+8. **Copy Confirmation**: Toast notification when URL copied to clipboard
 
 ### Visual Treatment for Shared Mode
 
@@ -234,17 +235,38 @@ let currentMode = 'watched';   // 'watched' | 'predictions' | 'shared:{id}'
 4. **Multiple lists**: ✅ Support viewing predictions from multiple friends
 5. **Duplicates**: ✅ Detect by name, prompt to overwrite/copy/cancel
 6. **Share validation**: ✅ Disable share button when no predictions made
+7. **Banner design**: ✅ Dismissible (with `[×]` button)
+8. **Delete shared lists**: ✅ Delete button replaces Share button when viewing shared list
+9. **Delete confirmation**: ✅ Themed confirmation modal before deletion
+10. **Maximum lists**: ✅ No limit for now
+11. **Name matching**: ✅ Case-insensitive (see Future Ideas for improvements)
 
-## Open Questions
+## Future Ideas: Source Identification
 
-1. **Banner design**: Persistent banner or dismissible?
-2. **Delete shared lists**: How to remove a saved shared list? Options:
-   - Long-press on dropdown item
-   - Swipe gesture in a list view
-   - "Manage Lists" option in dropdown
-   - Delete button in the banner when viewing that list
-3. **Maximum shared lists**: Should we limit how many can be saved? (5? 10? unlimited?)
-4. **Name conflicts**: If "Sarah" and "sarah" both share, treat as same person?
+Currently we match duplicates by name (case-insensitive). This has limitations:
+- Two different people named "Sarah" would be treated as duplicates
+- Someone could impersonate another person's name
+
+**Potential future improvements:**
+
+1. **Device fingerprint hash**
+   - Generate a short hash from device characteristics (screen size, timezone, etc.)
+   - Embed in URL: `?p=...&name=Sarah&src=a7b3`
+   - Same name + different source = different people
+
+2. **Random sender ID**
+   - Generate random ID on first share, store in localStorage
+   - Embed in URL: `?p=...&name=Sarah&id=x9k2m`
+   - Persistent per-device, allows tracking updates from same source
+
+3. **Prediction signature**
+   - Hash the predictions + timestamp
+   - Detect if exact same link is being re-shared vs. updated predictions
+
+4. **QR code with embedded metadata**
+   - For in-person sharing, encode additional verification data
+
+**For now**: Simple name matching is sufficient for the friend-sharing use case.
 
 ## Out of Scope
 
@@ -685,34 +707,90 @@ describe('Duplicate Handling', () => {
 });
 
 describe('Removing Shared Lists', () => {
-  test('can remove a shared list from saved lists', async ({ page }) => {
-    // Add shared list
+  test('delete button appears when viewing shared list', async ({ page }) => {
+    await page.goto('/?p=8--------------------&name=Sarah');
+
+    // Should show delete button instead of share button
+    await expect(page.locator('#delete-btn')).toBeVisible();
+    await expect(page.locator('#share-btn')).not.toBeVisible();
+  });
+
+  test('delete button not visible in predictions mode', async ({ page }) => {
     await page.goto('/?p=8--------------------&name=Sarah');
     await page.goto('/');
 
-    // Remove it (implementation TBD - could be button, swipe, etc)
-    await page.click('.remove-shared-list[data-name="sarah"]');
+    // Switch to predictions mode
+    await page.selectOption('#mode-select', 'predictions');
 
-    // Confirm removal
-    await page.click('.confirm-remove-btn');
+    // Should show share button, not delete
+    await expect(page.locator('#share-btn')).toBeVisible();
+    await expect(page.locator('#delete-btn')).not.toBeVisible();
+  });
 
-    // Should no longer be in dropdown
+  test('clicking delete shows confirmation modal', async ({ page }) => {
+    await page.goto('/?p=8--------------------&name=Sarah');
+
+    await page.click('#delete-btn');
+
+    await expect(page.locator('.delete-modal')).toBeVisible();
+    await expect(page.locator('.delete-modal')).toContainText("Sarah's predictions");
+    await expect(page.locator('.delete-modal')).toContainText('Are you sure');
+  });
+
+  test('cancel in delete modal keeps list', async ({ page }) => {
+    await page.goto('/?p=8--------------------&name=Sarah');
+
+    await page.click('#delete-btn');
+    await page.click('.delete-modal button:has-text("Cancel")');
+
+    // Modal should close
+    await expect(page.locator('.delete-modal')).not.toBeVisible();
+
+    // List should still exist
+    const options = await page.locator('#mode-select option').allTextContents();
+    expect(options).toContain("Sarah's Picks");
+  });
+
+  test('confirm delete removes list and switches mode', async ({ page }) => {
+    await page.goto('/?p=8--------------------&name=Sarah');
+
+    await page.click('#delete-btn');
+    await page.click('.delete-modal button:has-text("Remove")');
+
+    // Should switch to watched mode
+    await expect(page.locator('#mode-select')).toHaveValue('watched');
+
+    // Sarah should no longer be in dropdown
     const options = await page.locator('#mode-select option').allTextContents();
     expect(options).not.toContain("Sarah's Picks");
   });
 
-  test('removing shared list clears from localStorage', async ({ page }) => {
+  test('deleting removes from localStorage', async ({ page }) => {
     await page.goto('/?p=8--------------------&name=Sarah');
-    await page.goto('/');
 
-    await page.click('.remove-shared-list[data-name="sarah"]');
-    await page.click('.confirm-remove-btn');
+    await page.click('#delete-btn');
+    await page.click('.delete-modal button:has-text("Remove")');
 
     const stored = await page.evaluate(() =>
       JSON.parse(localStorage.getItem('oscar-tracker-shared-lists'))
     );
 
     expect(stored).toHaveLength(0);
+  });
+
+  test('deleting one list preserves others', async ({ page }) => {
+    // Add two lists
+    await page.goto('/?p=8--------------------&name=Sarah');
+    await page.goto('/?p=0--------------------&name=Mike');
+
+    // Delete Mike's
+    await page.click('#delete-btn');
+    await page.click('.delete-modal button:has-text("Remove")');
+
+    // Sarah should still exist
+    const options = await page.locator('#mode-select option').allTextContents();
+    expect(options).toContain("Sarah's Picks");
+    expect(options).not.toContain("Mike's Picks");
   });
 });
 ```
@@ -934,12 +1012,14 @@ Legend:
 └─────────────────────────────────────────────────────────────────────┘
 ```
 
-### Share Button States
+### Share/Delete Button States
 
 ```
 ┌───────────────────────────────────────────────────────────────┐
-│  SHARE BUTTON STATES                                          │
+│  BUTTON STATES (right of mode dropdown)                       │
 ├───────────────────────────────────────────────────────────────┤
+│                                                               │
+│  PREDICTIONS MODE:                                            │
 │                                                               │
 │  Disabled (no predictions):                                   │
 │  ┌─────────────┐                                              │
@@ -951,10 +1031,42 @@ Legend:
 │  │   SHARE     │  ← gold border, hover highlight             │
 │  └─────────────┘                                              │
 │                                                               │
-│  Hidden (watched or shared mode):                             │
-│  (button not rendered)                                        │
+│  SHARED LIST MODE (viewing someone else's picks):             │
+│  ┌─────────────┐                                              │
+│  │   DELETE    │  ← red/danger style, removes this list      │
+│  └─────────────┘                                              │
+│                                                               │
+│  WATCHED MODE:                                                │
+│  (no button shown)                                            │
 │                                                               │
 └───────────────────────────────────────────────────────────────┘
+```
+
+### Delete Confirmation Modal
+
+```
+┌─────────────────────────────────────────────────────────────────────┐
+│  When user clicks Delete button while viewing a shared list         │
+├─────────────────────────────────────────────────────────────────────┤
+│                                                                     │
+│  ┌─────────────────────────────────────────────────────────────┐   │
+│  │                                                         [×] │   │
+│  │                    Remove Shared List                       │   │
+│  │                                                             │   │
+│  │   Are you sure you want to remove Sarah's predictions?      │   │
+│  │                                                             │   │
+│  │   This will delete them from your saved lists.              │   │
+│  │   You can always add them back by opening the               │   │
+│  │   shared link again.                                        │   │
+│  │                                                             │   │
+│  │   ┌─────────────────┐  ┌────────────────────────────┐     │   │
+│  │   │     Cancel      │  │   🗑 Remove                │     │   │
+│  │   └─────────────────┘  └────────────────────────────┘     │   │
+│  │        (gray)               (red/danger style)              │   │
+│  │                                                             │   │
+│  └─────────────────────────────────────────────────────────────┘   │
+│                                                                     │
+└─────────────────────────────────────────────────────────────────────┘
 ```
 
 ### Shared Banner Design
@@ -1041,6 +1153,38 @@ Legend:
 .share-btn:disabled {
   opacity: 0.4;
   cursor: not-allowed;
+}
+
+/* Delete button (replaces share button in shared view mode) */
+.delete-btn {
+  background: transparent;
+  border: 1px solid var(--color-danger, #dc3545);
+  color: var(--color-danger, #dc3545);
+  padding: 6px 12px;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.delete-btn:hover {
+  background: rgba(220, 53, 69, 0.15);
+}
+
+/* Delete confirmation modal */
+.delete-modal .modal-content {
+  text-align: center;
+}
+
+.delete-modal .btn-danger {
+  background: var(--color-danger, #dc3545);
+  border: none;
+  color: white;
+}
+
+.delete-modal .btn-danger:hover {
+  background: #c82333;
 }
 
 /* Toast notification */
