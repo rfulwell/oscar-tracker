@@ -972,14 +972,15 @@ body.modal-open {
 }
 
 .delete-btn {
-    background: rgba(220, 53, 69, 0.15);
-    border: 1px solid rgba(220, 53, 69, 0.5);
-    color: #dc3545;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--color-black-lighter);
+    color: var(--color-white-dim);
 }
 
 .delete-btn:hover {
-    background: rgba(220, 53, 69, 0.25);
-    border-color: #dc3545;
+    background: rgba(255, 255, 255, 0.1);
+    border-color: var(--color-white-dim);
+    color: var(--color-white);
 }
 
 /* Shared Banner */

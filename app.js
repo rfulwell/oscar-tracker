@@ -549,9 +549,11 @@ function parseShareParams() {
     if (!isValidEncodedString(encoded)) return null;
 
     const preds = decodePredictions(encoded);
+    // Sanitize incoming name - remove non-printing chars and limit length
+    const sanitized = sanitizeName(decodeURIComponent(name || 'Friend')).substring(0, 30) || 'Friend';
     return {
         predictions: preds,
-        name: decodeURIComponent(name || 'Friend').trim().substring(0, 30),
+        name: sanitized,
         encoded: encoded
     };
 }
@@ -561,9 +563,16 @@ function hasAnyPredictions(preds) {
     return Object.keys(preds || predictions).length > 0;
 }
 
-// Normalize name for comparison (lowercase, trimmed)
+// Sanitize name - remove non-printing characters and trim whitespace
+function sanitizeName(name) {
+    if (!name) return '';
+    // Remove non-printing characters (control chars, zero-width chars, etc.)
+    return name.replace(/[\x00-\x1F\x7F-\x9F\u200B-\u200D\uFEFF]/g, '').trim();
+}
+
+// Normalize name for comparison (lowercase + sanitized)
 function normalizeName(name) {
-    return (name || '').toLowerCase().trim();
+    return sanitizeName(name).toLowerCase();
 }
 
 // Check if two prediction objects match
@@ -862,7 +871,7 @@ function canUseWebShare() {
 // Handle share button click
 async function handleShare() {
     const nameInput = document.getElementById('share-name-input');
-    const name = (nameInput?.value || '').trim() || 'Friend';
+    const name = sanitizeName(nameInput?.value) || 'Friend';
 
     saveSharerName(name);
 
