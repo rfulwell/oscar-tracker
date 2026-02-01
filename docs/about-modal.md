@@ -85,6 +85,9 @@ Bump via: `npm version patch|minor|major`
 │                                     │
 │  ─────────────────────────────────  │
 │                                     │
+│  📱 Install as app                   │
+│  iOS · Android · Desktop             │
+│                                     │
 │  github.com/rfulwell/oscar-tracker  │
 │                                     │
 └─────────────────────────────────────┘
@@ -116,7 +119,21 @@ Brief tagline about the app's purpose.
 - Format: `v1.2.3 - Brief description`
 - Most recent at top
 
-#### 6. Attribution
+#### 6. PWA Install Hints
+- **Detection**: Show only when NOT running in standalone mode
+- **Format**: Small text with links to platform-specific instructions
+- **Links**: Authoritative sources (Google, Apple, Microsoft)
+
+| Platform | Detection | Link |
+|----------|-----------|------|
+| iOS Safari | `navigator.standalone === false` and iOS detection | [Apple Support](https://support.apple.com/guide/iphone/bookmark-favorite-webpages-iph42ab2f3a7/ios#iph4f9a47bbc) |
+| Android Chrome | `beforeinstallprompt` event OR manual link | [Google Support](https://support.google.com/chrome/answer/9658361) |
+| Desktop Chrome | `beforeinstallprompt` event OR manual link | [Google Support](https://support.google.com/chrome/answer/9658361) |
+| macOS Safari | Safari-specific detection | [Apple Support](https://support.apple.com/guide/safari/add-websites-to-the-dock-ibrwe76b959b/mac) |
+
+**Display text**: "Install as app: [iOS](link) · [Android](link) · [Desktop](link)"
+
+#### 7. Attribution
 - GitHub repo link: `github.com/rfulwell/oscar-tracker`
 
 ### Brainstormed Additional Content
@@ -127,7 +144,7 @@ Brief tagline about the app's purpose.
 | Changelog | ✅ Include | Embedded scrollable, matches site aesthetic |
 | Keyboard shortcuts | Maybe later | Arrow keys, Enter/Space |
 | Privacy note | Maybe later | "Data stored locally, never sent to servers" |
-| PWA install hint | Skip | Too technical for most users |
+| PWA install hint | ✅ Include | Platform-specific links to authoritative sources |
 | Credits/acknowledgments | Skip | Keep it simple |
 | Dark/light mode toggle | Skip | Not implementing theming |
 | Tip jar / support link | Skip | Not needed |
@@ -224,6 +241,17 @@ const APP_VERSION = '1.2.3'; // Update manually with releases
       </div>
     </div>
 
+    <div class="about-section pwa-hints" id="pwa-hints">
+      <h3>📱 Install as App</h3>
+      <p class="pwa-links">
+        <a href="https://support.apple.com/guide/iphone/bookmark-favorite-webpages-iph42ab2f3a7/ios#iph4f9a47bbc" target="_blank" rel="noopener">iOS</a>
+        ·
+        <a href="https://support.google.com/chrome/answer/9658361" target="_blank" rel="noopener">Android</a>
+        ·
+        <a href="https://support.google.com/chrome/answer/9658361" target="_blank" rel="noopener">Desktop</a>
+      </p>
+    </div>
+
     <footer class="about-footer">
       <a href="https://github.com/rfulwell/oscar-tracker" target="_blank" rel="noopener">
         github.com/rfulwell/oscar-tracker
@@ -283,6 +311,33 @@ const APP_VERSION = '1.2.3'; // Update manually with releases
   display: block;
   font-size: 0.9rem;
   opacity: 0.8;
+}
+```
+
+#### PWA Hints Styles
+```css
+.pwa-hints {
+  text-align: center;
+}
+
+.pwa-links {
+  font-size: 0.85rem;
+}
+
+.pwa-links a {
+  color: var(--color-gold);
+  text-decoration: none;
+}
+
+.pwa-links a:hover {
+  text-decoration: underline;
+}
+
+/* Hide PWA hints when already installed as standalone */
+@media (display-mode: standalone) {
+  .pwa-hints {
+    display: none;
+  }
 }
 ```
 

@@ -1,5 +1,7 @@
 # Oscar Tracker - Project Notes
 
+> **Note**: Keep this document updated with learnings from development sessions. Document important decisions, patterns, gotchas, and configuration details discovered during implementation.
+
 ## UI Design
 
 The current UI design is polished and should be preserved. Avoid making unnecessary visual changes. Only modify styles when strictly required for a specific feature request.

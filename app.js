@@ -1,6 +1,15 @@
 // Oscar Tracker App
 // 98th Academy Awards (2026)
 
+// Version and Changelog
+const APP_VERSION = '1.0.0';
+const CHANGELOG = [
+    { version: '1.0.0', description: 'Initial release - track watched films and make predictions' }
+];
+
+// Oscar ceremony date (March 15, 2026, 7pm ET)
+const OSCAR_DATE = new Date('2026-03-15T19:00:00-05:00');
+
 const CATEGORIES = [
     {
         id: 'best-picture',
@@ -349,6 +358,13 @@ const allFilmsList = document.getElementById('all-films-list');
 const browseByCategory = document.getElementById('browse-by-category');
 const tipContent = document.getElementById('tip-content');
 const modeSelect = document.getElementById('mode-select');
+const aboutLink = document.getElementById('about-link');
+const aboutModal = document.getElementById('about-modal');
+const aboutClose = document.getElementById('about-close');
+const modalBackdrop = aboutModal?.querySelector('.modal-backdrop');
+const versionBadge = document.getElementById('version-badge');
+const countdownDays = document.getElementById('countdown-days');
+const changelogList = document.getElementById('changelog-list');
 
 // Tips for rotation
 const TIPS = [
@@ -867,6 +883,12 @@ function setupEventListeners() {
 
     // Keyboard navigation
     document.addEventListener('keydown', (e) => {
+        // Close modal on Escape
+        if (e.key === 'Escape' && aboutModal && !aboutModal.hidden) {
+            hideAboutModal();
+            return;
+        }
+
         if (e.target.tagName === 'SELECT') return;
 
         if (e.key === 'ArrowLeft') {
@@ -875,6 +897,22 @@ function setupEventListeners() {
             nextCategory(false);
         }
     });
+
+    // About modal event listeners
+    if (aboutLink) {
+        aboutLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            showAboutModal();
+        });
+    }
+
+    if (aboutClose) {
+        aboutClose.addEventListener('click', hideAboutModal);
+    }
+
+    if (modalBackdrop) {
+        modalBackdrop.addEventListener('click', hideAboutModal);
+    }
 }
 
 // Register service worker for PWA
@@ -912,6 +950,52 @@ async function hardRefresh() {
         console.warn('Hard refresh failed:', e);
         window.location.reload(true);
     }
+}
+
+// About Modal Functions
+function showAboutModal() {
+    updateCountdown();
+    renderChangelog();
+    if (versionBadge) versionBadge.textContent = `v${APP_VERSION}`;
+    if (aboutModal) {
+        aboutModal.hidden = false;
+        document.body.classList.add('modal-open');
+    }
+}
+
+function hideAboutModal() {
+    if (aboutModal) {
+        aboutModal.hidden = true;
+        document.body.classList.remove('modal-open');
+    }
+}
+
+function updateCountdown() {
+    if (!countdownDays) return;
+
+    const now = new Date();
+    const diff = OSCAR_DATE - now;
+    const days = Math.ceil(diff / (1000 * 60 * 60 * 24));
+
+    if (days > 1) {
+        countdownDays.textContent = `${days} days remaining`;
+    } else if (days === 1) {
+        countdownDays.textContent = 'Tomorrow!';
+    } else if (days === 0) {
+        countdownDays.textContent = 'Tonight!';
+    } else {
+        countdownDays.textContent = 'The ceremony has aired';
+    }
+}
+
+function renderChangelog() {
+    if (!changelogList) return;
+
+    changelogList.innerHTML = CHANGELOG.map(entry => `
+        <div class="changelog-entry">
+            <strong>v${entry.version}</strong> - ${entry.description}
+        </div>
+    `).join('');
 }
 
 // Initialize when DOM is ready

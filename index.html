@@ -136,6 +136,7 @@
         
         <footer class="footer">
             <p id="tip-text"><span class="tip-label">Tip:</span> <span id="tip-content">Tap a film to mark as watched</span></p>
+            <a href="#" class="about-link" id="about-link">About</a>
             <button class="refresh-btn" id="hard-refresh" aria-label="Clear cache and reload">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M21 2v6h-6"></path>
@@ -148,7 +149,57 @@
             <p class="legal-disclaimer">OSCAR®, OSCARS®, and ACADEMY AWARDS® are registered trademarks of the Academy of Motion Picture Arts and Sciences. This app is not affiliated with or endorsed by the Academy.</p>
         </footer>
     </div>
-    
+
+    <!-- About Modal -->
+    <div id="about-modal" class="modal" hidden aria-modal="true" aria-labelledby="about-title">
+        <div class="modal-backdrop"></div>
+        <div class="modal-content">
+            <button class="modal-close" id="about-close" aria-label="Close">&times;</button>
+
+            <h2 id="about-title">Oscar Tracker</h2>
+            <span class="version-badge" id="version-badge">v1.0.0</span>
+
+            <p class="about-description">
+                Track your Oscar watch progress and make predictions for the 98th Academy Awards.
+            </p>
+
+            <div class="oscar-countdown">
+                <span class="countdown-icon">🏆</span>
+                <span class="countdown-date">March 15, 2026</span>
+                <span class="countdown-remaining" id="countdown-days"></span>
+            </div>
+
+            <div class="about-section">
+                <h3>📤 Share Predictions</h3>
+                <p>Share your picks with friends via a simple link - no account required!</p>
+            </div>
+
+            <div class="about-section">
+                <h3>📋 What's New</h3>
+                <div class="changelog-scroll" id="changelog-list">
+                    <!-- Changelog entries will be rendered by JavaScript -->
+                </div>
+            </div>
+
+            <div class="about-section pwa-hints" id="pwa-hints">
+                <h3>📱 Install as App</h3>
+                <p class="pwa-links">
+                    <a href="https://support.apple.com/guide/iphone/bookmark-favorite-webpages-iph42ab2f3a7/ios#iph4f9a47bbc" target="_blank" rel="noopener">iOS</a>
+                    ·
+                    <a href="https://support.google.com/chrome/answer/9658361" target="_blank" rel="noopener">Android</a>
+                    ·
+                    <a href="https://support.google.com/chrome/answer/9658361" target="_blank" rel="noopener">Desktop</a>
+                </p>
+            </div>
+
+            <footer class="about-footer">
+                <a href="https://github.com/rfulwell/oscar-tracker" target="_blank" rel="noopener">
+                    github.com/rfulwell/oscar-tracker
+                </a>
+            </footer>
+        </div>
+    </div>
+
     <script src="/app.js"></script>
 </body>
 </html>
