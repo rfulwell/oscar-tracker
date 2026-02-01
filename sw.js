@@ -1,5 +1,5 @@
 // Service Worker for Awards Tracker PWA
-const CACHE_NAME = 'awards-tracker-v2';
+const CACHE_NAME = 'awards-tracker-v3';
 
 const ASSETS_TO_CACHE = [
     '/',
@@ -10,7 +10,8 @@ const ASSETS_TO_CACHE = [
     '/icons/icon-192.png',
     '/icons/icon-512.png',
     '/icons/netflix.svg',
-    '/icons/max.svg'
+    '/icons/max.svg',
+    '/icons/appletv.svg'
 ];
 
 // Install event - cache assets

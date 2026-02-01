@@ -295,13 +295,14 @@ const ALL_FILMS = [
 ].sort((a, b) => b.nominations - a.nominations);
 
 // Streaming service availability for films
-// Based on research: Netflix and Max are the top 2 services with Oscar nominees
+// Based on research: Netflix, Max, and Apple TV+ are top services with Oscar nominees
 const FILM_STREAMING = {
     'sinners': 'max',
     'one-battle-after-another': 'max',
     'frankenstein': 'netflix',
     'train-dreams': 'netflix',
-    'kpop-demon-hunters': 'netflix'
+    'kpop-demon-hunters': 'netflix',
+    'f1': 'appletv'
 };
 
 // Get streaming service for a nominee (if available)
@@ -554,7 +555,8 @@ function getFilmTitle(nomineeId) {
         'one-battle-after-another': 'One Battle After Another',
         'frankenstein': 'Frankenstein',
         'train-dreams': 'Train Dreams',
-        'kpop-demon-hunters': 'KPop Demon Hunters'
+        'kpop-demon-hunters': 'KPop Demon Hunters',
+        'f1': 'F1'
     };
     return filmTitles[filmKey] || null;
 }
@@ -572,13 +574,18 @@ function getStreamingIconHtml(nomineeId) {
     const serviceConfig = {
         netflix: {
             url: `https://www.netflix.com/search?q=${encodedTitle}`,
-            icon: 'icons/netflix.svg',
+            icon: '/icons/netflix.svg',
             name: 'Netflix'
         },
         max: {
             url: `https://play.max.com/search?q=${encodedTitle}`,
-            icon: 'icons/max.svg',
+            icon: '/icons/max.svg',
             name: 'Max'
+        },
+        appletv: {
+            url: `https://tv.apple.com/search?term=${encodedTitle}`,
+            icon: '/icons/appletv.svg',
+            name: 'Apple TV+'
         }
     };
 
