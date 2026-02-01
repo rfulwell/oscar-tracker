@@ -823,8 +823,10 @@ function updateSharedBanner() {
     if (isSharedMode()) {
         const list = getCurrentSharedList();
         if (list) {
-            const nameSpan = banner.querySelector('.shared-banner-name');
-            if (nameSpan) nameSpan.textContent = list.name;
+            const textSpan = document.getElementById('shared-banner-text');
+            if (textSpan) {
+                textSpan.textContent = `👁 Viewing ${list.name}'s predictions (read-only)`;
+            }
             banner.style.display = '';
         }
     } else {

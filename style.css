@@ -1069,19 +1069,9 @@ body.modal-open {
 }
 
 .shared-banner-text {
-    display: flex;
-    align-items: center;
-    gap: 8px;
     font-size: 0.8125rem;
     color: var(--color-gold);
-}
-
-.shared-banner-icon {
-    font-size: 1rem;
-}
-
-.shared-banner-name {
-    font-weight: 600;
+    line-height: 1.4;
 }
 
 .shared-banner-close {
