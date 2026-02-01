@@ -538,4 +538,91 @@ test.describe('Predictions Mode', () => {
             await expect(page).toHaveTitle(/Oscar Tracker \(21\/21\)/);
         });
     });
+
+    test.describe('Performance', () => {
+
+        test('should NOT re-render entire list when selecting a prediction', async ({ page }) => {
+            await goToCategoryScreen(page);
+            await page.locator('#mode-select').selectOption('predictions');
+
+            // Mark all film elements with a unique data attribute to detect re-rendering
+            // If the list is re-rendered via innerHTML, these markers will be lost
+            await page.evaluate(() => {
+                document.querySelectorAll('#films-list .film').forEach((el, i) => {
+                    el.dataset.testMarker = `original-${i}`;
+                });
+            });
+
+            // Select the first film as a prediction
+            await page.locator('#films-list .film').first().click();
+            await expect(page.locator('#films-list .film').first()).toHaveClass(/predicted/);
+
+            // Verify ALL film elements still have their original markers
+            // This proves the DOM wasn't re-rendered - only classes were updated
+            const markersPreserved = await page.evaluate(() => {
+                const films = document.querySelectorAll('#films-list .film');
+                return Array.from(films).every((el, i) => el.dataset.testMarker === `original-${i}`);
+            });
+
+            expect(markersPreserved).toBe(true);
+        });
+
+        test('should NOT re-render list when changing prediction within same category', async ({ page }) => {
+            await goToCategoryScreen(page);
+            await page.locator('#mode-select').selectOption('predictions');
+
+            // Select first film
+            await page.locator('#films-list .film').first().click();
+
+            // Mark all elements after first selection
+            await page.evaluate(() => {
+                document.querySelectorAll('#films-list .film').forEach((el, i) => {
+                    el.dataset.testMarker = `marked-${i}`;
+                });
+            });
+
+            // Change prediction to second film
+            await page.locator('#films-list .film').nth(1).click();
+
+            // First should lose predicted, second should gain it
+            await expect(page.locator('#films-list .film').first()).not.toHaveClass(/predicted/);
+            await expect(page.locator('#films-list .film').nth(1)).toHaveClass(/predicted/);
+
+            // Verify markers are still present (no re-render)
+            const markersPreserved = await page.evaluate(() => {
+                const films = document.querySelectorAll('#films-list .film');
+                return Array.from(films).every((el, i) => el.dataset.testMarker === `marked-${i}`);
+            });
+
+            expect(markersPreserved).toBe(true);
+        });
+
+        test('should NOT re-render list when clearing a prediction', async ({ page }) => {
+            await goToCategoryScreen(page);
+            await page.locator('#mode-select').selectOption('predictions');
+
+            // Select first film
+            await page.locator('#films-list .film').first().click();
+            await expect(page.locator('#films-list .film').first()).toHaveClass(/predicted/);
+
+            // Mark elements
+            await page.evaluate(() => {
+                document.querySelectorAll('#films-list .film').forEach((el, i) => {
+                    el.dataset.testMarker = `clear-test-${i}`;
+                });
+            });
+
+            // Click again to clear prediction
+            await page.locator('#films-list .film').first().click();
+            await expect(page.locator('#films-list .film').first()).not.toHaveClass(/predicted/);
+
+            // Verify no re-render occurred
+            const markersPreserved = await page.evaluate(() => {
+                const films = document.querySelectorAll('#films-list .film');
+                return Array.from(films).every((el, i) => el.dataset.testMarker === `clear-test-${i}`);
+            });
+
+            expect(markersPreserved).toBe(true);
+        });
+    });
 });
