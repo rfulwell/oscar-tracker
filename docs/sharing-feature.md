@@ -12,41 +12,78 @@ Enable users to share their Oscar predictions with friends via URL. This is a cl
 2. **URL Encoding**: Predictions encoded as compact query parameters
 3. **Name Parameter**: Sharer's name included in URL for attribution
 4. **Read-Only Viewing**: Recipients view shared predictions without editing
-5. **Separate Mode**: Shared predictions appear as a new entry in the mode dropdown
+5. **Separate Mode**: Shared predictions appear as new entries in the mode dropdown
+6. **Persistence**: Incoming shared lists are saved to localStorage
+7. **Multiple Lists**: Support viewing predictions from multiple friends
+8. **Duplicate Handling**: Detect when same person shares updated predictions
 
 ### User Experience
 
 #### Sharing Flow (Sender)
 1. User makes predictions in "Predictions" mode
-2. User clicks "Share" button
-3. Prompt asks for their name (optional, default "Friend")
-4. URL is generated and copied to clipboard
-5. User shares URL via text/email/social
+2. User clicks "Share" button (to the right of mode dropdown)
+3. **Themed modal** opens asking for their name (optional, default "Friend")
+4. User clicks "Copy Link" button in modal
+5. URL is generated and copied to clipboard
+6. Success toast confirms link copied
+7. User shares URL via text/email/social
+
+**Share Button State**:
+- **Disabled** (grayed out): When no predictions have been made
+- **Enabled** (gold): When at least one prediction exists
+- **Hidden**: When not in "Predictions" mode
 
 #### Viewing Flow (Recipient)
 1. Recipient opens shared URL
 2. App detects `?p=` and `&name=` parameters
-3. Mode dropdown shows new option: "[Name]'s Predictions"
-4. App automatically switches to this view mode
-5. Predictions displayed read-only (no click interaction)
-6. User can switch to their own "Watched" or "Predictions" modes anytime
+3. App checks if this person's predictions already exist in localStorage:
+   - **New person**: Save to localStorage, add to dropdown
+   - **Same person, same predictions**: Load existing (no action needed)
+   - **Same person, different predictions**: Show duplicate modal (see below)
+4. Mode dropdown shows new option: "[Name]'s Picks"
+5. App automatically switches to this view mode
+6. Predictions displayed read-only (no click interaction)
+7. User can switch to their own modes or other shared lists anytime
+
+#### Duplicate Handling Flow
+When receiving updated predictions from someone already in the list:
+
+1. Modal appears: "You already have Sarah's predictions saved"
+2. Options:
+   - **Update**: Replace existing with new predictions
+   - **Keep Both**: Save as "Sarah (2)" or similar
+   - **Cancel**: Ignore incoming, keep existing
 
 ### Mode Dropdown States
 
-**Without shared link:**
+**Without shared lists:**
 ```
-[ Watched        ▼]
+[ Watched        ▼]  [SHARE]
   Watched
   Predictions
 ```
 
-**With shared link (`?p=...&name=Sarah`):**
+**With one shared list:**
 ```
-[ Sarah's Picks  ▼]
+[ Sarah's Picks  ▼]  [SHARE]
   Watched
   Predictions
-  Sarah's Picks    ← new, read-only
+  ──────────────
+  Sarah's Picks    ← read-only
 ```
+
+**With multiple shared lists:**
+```
+[ Watched        ▼]  [SHARE]
+  Watched
+  Predictions
+  ──────────────
+  Sarah's Picks    ← read-only
+  Mike's Picks     ← read-only
+  Jordan's Picks   ← read-only
+```
+
+**Share button location**: Immediately to the right of the mode dropdown
 
 ## Technical Design
 
@@ -110,36 +147,77 @@ Encoded: "80-..."
 ### Functions to Implement
 
 ```javascript
-// Encode predictions object to URL string
+// Encoding/Decoding
 function encodePredictions(predictions) → string
-
-// Decode URL string to predictions object
 function decodePredictions(encoded) → object
-
-// Generate full share URL with name
 function generateShareURL(predictions, name) → string
-
-// Parse URL parameters on page load
 function parseShareParams() → { predictions, name } | null
+
+// Persistence
+function loadSharedLists() → array
+function saveSharedLists(lists) → void
+function addSharedList(name, predictions) → { id, isDuplicate, existingId }
+function removeSharedList(id) → void
+function updateSharedList(id, predictions) → void
+
+// Duplicate Detection
+function findExistingByName(name) → sharedList | null
+function normalizeName(name) → string  // lowercase, trimmed
+function predictionsMatch(a, b) → boolean
+
+// Validation
+function hasAnyPredictions() → boolean
+function isValidEncodedString(str) → boolean
 ```
 
 ### State Management
 
 **New state variables:**
 ```javascript
-let sharedPredictions = null;  // { name: string, predictions: object }
-let currentMode = 'watched';   // 'watched' | 'predictions' | 'shared'
+let sharedLists = [];  // Array of { id: string, name: string, predictions: object }
+let currentMode = 'watched';   // 'watched' | 'predictions' | 'shared:{id}'
 ```
 
-**LocalStorage**: Shared predictions are NOT saved to localStorage (ephemeral, URL-only)
+**LocalStorage**:
+- Key: `oscar-tracker-shared-lists`
+- Format: Array of shared list objects
+- Persisted across sessions
+
+```javascript
+// localStorage structure
+{
+  "oscar-tracker-shared-lists": [
+    {
+      "id": "sarah-1706123456789",  // name + timestamp for uniqueness
+      "name": "Sarah",
+      "predictions": { "best-picture": "sinners", ... },
+      "receivedAt": "2026-01-25T10:30:00Z"
+    },
+    {
+      "id": "mike-1706123456790",
+      "name": "Mike",
+      "predictions": { ... },
+      "receivedAt": "2026-01-26T14:00:00Z"
+    }
+  ]
+}
+```
+
+**Duplicate Detection**:
+- Match by normalized name (case-insensitive, trimmed)
+- Compare prediction strings to detect if content changed
+- Same name + same predictions = no action needed
+- Same name + different predictions = show duplicate modal
 
 ### UI Changes
 
-1. **Share Button**: Add to predictions mode UI (location TBD)
-2. **Name Prompt**: Simple browser `prompt()` or inline input
-3. **Mode Dropdown**: Dynamically add shared option when URL params present
-4. **Read-Only Indicator**: Visual cue that shared view cannot be edited
-5. **Copy Confirmation**: Toast/feedback when URL copied to clipboard
+1. **Share Button**: To the right of mode dropdown, visible only in Predictions mode
+2. **Share Modal**: Themed modal matching app design (not browser prompt)
+3. **Duplicate Modal**: Themed modal for overwrite/copy/cancel options
+4. **Mode Dropdown**: Shows separator + all saved shared lists
+5. **Read-Only Banner**: Dismissible banner showing whose predictions are displayed
+6. **Copy Confirmation**: Toast notification when URL copied to clipboard
+7. **Delete Option**: Way to remove saved shared lists (long-press or swipe?)
 
 ### Visual Treatment for Shared Mode
 
@@ -148,12 +226,25 @@ let currentMode = 'watched';   // 'watched' | 'predictions' | 'shared'
 - Optional banner: "Viewing [Name]'s predictions"
 - Items not clickable (or clicks do nothing)
 
+## Decisions Made
+
+1. **Share button location**: ✅ To the right of mode dropdown
+2. **Name prompt UX**: ✅ Themed modal (not browser prompt)
+3. **Persistence**: ✅ Save shared lists to localStorage
+4. **Multiple lists**: ✅ Support viewing predictions from multiple friends
+5. **Duplicates**: ✅ Detect by name, prompt to overwrite/copy/cancel
+6. **Share validation**: ✅ Disable share button when no predictions made
+
 ## Open Questions
 
-1. **Share button location**: In header? Footer? Floating action button?
-2. **Name prompt UX**: Browser prompt vs inline input vs modal?
-3. **Banner design**: Persistent banner or dismissible?
-4. **Empty states**: What if shared link has no predictions?
+1. **Banner design**: Persistent banner or dismissible?
+2. **Delete shared lists**: How to remove a saved shared list? Options:
+   - Long-press on dropdown item
+   - Swipe gesture in a list view
+   - "Manage Lists" option in dropdown
+   - Delete button in the banner when viewing that list
+3. **Maximum shared lists**: Should we limit how many can be saved? (5? 10? unlimited?)
+4. **Name conflicts**: If "Sarah" and "sarah" both share, treat as same person?
 
 ## Out of Scope
 
@@ -431,6 +522,199 @@ describe('Share with No Predictions', () => {
     await expect(page.locator('#share-btn')).toBeEnabled();
   });
 });
+
+describe('Persistence', () => {
+  test('saves shared list to localStorage on first visit', async ({ page }) => {
+    await page.goto('/?p=8--------------------&name=Sarah');
+
+    const stored = await page.evaluate(() =>
+      JSON.parse(localStorage.getItem('oscar-tracker-shared-lists'))
+    );
+
+    expect(stored).toHaveLength(1);
+    expect(stored[0].name).toBe('Sarah');
+  });
+
+  test('persists shared lists across page reloads', async ({ page }) => {
+    // First visit with shared URL
+    await page.goto('/?p=8--------------------&name=Sarah');
+
+    // Reload without URL params
+    await page.goto('/');
+
+    // Sarah should still be in dropdown
+    await expect(page.locator('#mode-select option')).toContainText("Sarah's Picks");
+  });
+
+  test('supports multiple shared lists from different people', async ({ page }) => {
+    // Add first person
+    await page.goto('/?p=8--------------------&name=Sarah');
+    await page.goto('/');
+
+    // Add second person
+    await page.goto('/?p=0--------------------&name=Mike');
+    await page.goto('/');
+
+    // Both should be in dropdown
+    const options = await page.locator('#mode-select option').allTextContents();
+    expect(options).toContain("Sarah's Picks");
+    expect(options).toContain("Mike's Picks");
+  });
+
+  test('loads correct predictions when switching between shared lists', async ({ page }) => {
+    // Add Sarah's predictions (index 8 = Sinners)
+    await page.goto('/?p=8--------------------&name=Sarah');
+    await page.goto('/');
+
+    // Add Mike's predictions (index 0 = Bugonia)
+    await page.goto('/?p=0--------------------&name=Mike');
+    await page.goto('/');
+
+    // View Sarah's
+    await page.selectOption('#mode-select', 'shared:sarah');
+    const sarahFirst = page.locator('#films-list .film:nth-child(9)'); // Sinners is 9th
+    await expect(sarahFirst).toHaveClass(/predicted/);
+
+    // View Mike's
+    await page.selectOption('#mode-select', 'shared:mike');
+    const mikeFirst = page.locator('#films-list .film:first-child'); // Bugonia is 1st
+    await expect(mikeFirst).toHaveClass(/predicted/);
+  });
+});
+
+describe('Duplicate Handling', () => {
+  test('shows duplicate modal when same person shares again with different predictions', async ({ page }) => {
+    // First visit from Sarah
+    await page.goto('/?p=8--------------------&name=Sarah');
+    await page.goto('/');
+
+    // Second visit from Sarah with different predictions
+    await page.goto('/?p=0--------------------&name=Sarah');
+
+    // Duplicate modal should appear
+    await expect(page.locator('.duplicate-modal')).toBeVisible();
+    await expect(page.locator('.duplicate-modal')).toContainText("Sarah's predictions");
+  });
+
+  test('duplicate modal Update replaces existing predictions', async ({ page }) => {
+    // First visit - Sarah picks index 8
+    await page.goto('/?p=8--------------------&name=Sarah');
+    await page.goto('/');
+
+    // Second visit - Sarah picks index 0
+    await page.goto('/?p=0--------------------&name=Sarah');
+
+    // Click Update
+    await page.click('.duplicate-modal button:has-text("Update")');
+
+    // View Sarah's - should show new prediction (index 0)
+    await page.selectOption('#mode-select', 'shared:sarah');
+    const firstFilm = page.locator('#films-list .film:first-child');
+    await expect(firstFilm).toHaveClass(/predicted/);
+  });
+
+  test('duplicate modal Keep Both creates copy with numbered name', async ({ page }) => {
+    // First visit from Sarah
+    await page.goto('/?p=8--------------------&name=Sarah');
+    await page.goto('/');
+
+    // Second visit from Sarah
+    await page.goto('/?p=0--------------------&name=Sarah');
+
+    // Click Keep Both
+    await page.click('.duplicate-modal button:has-text("Keep Both")');
+
+    // Should have both versions
+    const options = await page.locator('#mode-select option').allTextContents();
+    expect(options).toContain("Sarah's Picks");
+    expect(options).toContain("Sarah (2)'s Picks");
+  });
+
+  test('duplicate modal Cancel ignores incoming predictions', async ({ page }) => {
+    // First visit - Sarah picks index 8
+    await page.goto('/?p=8--------------------&name=Sarah');
+    await page.goto('/');
+
+    // Second visit - Sarah picks index 0
+    await page.goto('/?p=0--------------------&name=Sarah');
+
+    // Click Cancel
+    await page.click('.duplicate-modal button:has-text("Cancel")');
+
+    // Sarah's predictions should still be index 8
+    await page.selectOption('#mode-select', 'shared:sarah');
+    const ninthFilm = page.locator('#films-list .film:nth-child(9)');
+    await expect(ninthFilm).toHaveClass(/predicted/);
+  });
+
+  test('does not show duplicate modal when predictions are identical', async ({ page }) => {
+    // First visit from Sarah
+    await page.goto('/?p=8--------------------&name=Sarah');
+    await page.goto('/');
+
+    // Second visit with identical predictions
+    await page.goto('/?p=8--------------------&name=Sarah');
+
+    // No modal should appear
+    await expect(page.locator('.duplicate-modal')).not.toBeVisible();
+  });
+
+  test('name matching is case-insensitive', async ({ page }) => {
+    // First visit from "Sarah"
+    await page.goto('/?p=8--------------------&name=Sarah');
+    await page.goto('/');
+
+    // Second visit from "sarah" (lowercase)
+    await page.goto('/?p=0--------------------&name=sarah');
+
+    // Should show duplicate modal (same person)
+    await expect(page.locator('.duplicate-modal')).toBeVisible();
+  });
+
+  test('name matching trims whitespace', async ({ page }) => {
+    // First visit from "Sarah"
+    await page.goto('/?p=8--------------------&name=Sarah');
+    await page.goto('/');
+
+    // Second visit with trailing space
+    await page.goto('/?p=0--------------------&name=Sarah%20');
+
+    // Should show duplicate modal (same person)
+    await expect(page.locator('.duplicate-modal')).toBeVisible();
+  });
+});
+
+describe('Removing Shared Lists', () => {
+  test('can remove a shared list from saved lists', async ({ page }) => {
+    // Add shared list
+    await page.goto('/?p=8--------------------&name=Sarah');
+    await page.goto('/');
+
+    // Remove it (implementation TBD - could be button, swipe, etc)
+    await page.click('.remove-shared-list[data-name="sarah"]');
+
+    // Confirm removal
+    await page.click('.confirm-remove-btn');
+
+    // Should no longer be in dropdown
+    const options = await page.locator('#mode-select option').allTextContents();
+    expect(options).not.toContain("Sarah's Picks");
+  });
+
+  test('removing shared list clears from localStorage', async ({ page }) => {
+    await page.goto('/?p=8--------------------&name=Sarah');
+    await page.goto('/');
+
+    await page.click('.remove-shared-list[data-name="sarah"]');
+    await page.click('.confirm-remove-btn');
+
+    const stored = await page.evaluate(() =>
+      JSON.parse(localStorage.getItem('oscar-tracker-shared-lists'))
+    );
+
+    expect(stored).toHaveLength(0);
+  });
+});
 ```
 
 ### Performance Tests
@@ -562,9 +846,8 @@ Legend:
 │  STEP 1: User in Predictions Mode                                   │
 ├─────────────────────────────────────────────────────────────────────┤
 │                                                                     │
-│  Mode: [ Predictions        ▼]              [SHARE]                 │
-│                                              ↑                      │
-│                                         Share button                │
+│  Mode: [ Predictions        ▼] [SHARE]     ← button right of dropdown│
+│                                                                     │
 │  ┌─────────────────────────────────────────────────────────────┐   │
 │  │  ★  Sinners (selected)                                      │   │
 │  │  ☆  Bugonia                                                 │   │
@@ -574,18 +857,29 @@ Legend:
                                     │
                                     ▼
 ┌─────────────────────────────────────────────────────────────────────┐
-│  STEP 2: Name Prompt                                                │
+│  STEP 2: Share Modal (themed to match app)                          │
 ├─────────────────────────────────────────────────────────────────────┤
 │                                                                     │
 │  ┌─────────────────────────────────────────────────────────────┐   │
+│  │                                                         [×] │   │
+│  │                    Share Your Picks                         │   │
 │  │                                                             │   │
-│  │   Share your predictions                                    │   │
+│  │   Your friends will see your predictions for                │   │
+│  │   all 21 categories.                                        │   │
 │  │                                                             │   │
-│  │   Your name: [Sarah____________]                            │   │
+│  │   Your name                                                 │   │
+│  │   ┌───────────────────────────────────────────────────┐    │   │
+│  │   │ Sarah                                             │    │   │
+│  │   └───────────────────────────────────────────────────┘    │   │
 │  │                                                             │   │
-│  │              [Cancel]  [Copy Link]                          │   │
-│  │                                                             │   │
+│  │   ┌─────────────────┐  ┌────────────────────────────┐     │   │
+│  │   │     Cancel      │  │   📋 Copy Link             │     │   │
+│  │   └─────────────────┘  └────────────────────────────┘     │   │
+│  │        (gray)               (gold, primary action)          │   │
 │  └─────────────────────────────────────────────────────────────┘   │
+│                                                                     │
+│   Modal style: Dark background (#1a1a1a), gold accents,            │
+│   rounded corners, matches About modal design                       │
 │                                                                     │
 └─────────────────────────────────────────────────────────────────────┘
                                     │
@@ -599,7 +893,43 @@ Legend:
 │  └─────────────────────────────────────────────────────────────┘   │
 │                                                                     │
 │  URL in clipboard:                                                  │
-│  https://awardstracker.app/?p=8--------------------&name=Sarah      │
+│  https://oscartracker.app/?p=8--------------------&name=Sarah       │
+│                                                                     │
+└─────────────────────────────────────────────────────────────────────┘
+```
+
+### Duplicate Modal Mock-up
+
+```
+┌─────────────────────────────────────────────────────────────────────┐
+│  When user opens URL from someone already in their saved lists      │
+├─────────────────────────────────────────────────────────────────────┤
+│                                                                     │
+│  ┌─────────────────────────────────────────────────────────────┐   │
+│  │                                                         [×] │   │
+│  │                   Updated Predictions                       │   │
+│  │                                                             │   │
+│  │   You already have Sarah's predictions saved.               │   │
+│  │   These new predictions are different.                      │   │
+│  │                                                             │   │
+│  │   What would you like to do?                                │   │
+│  │                                                             │   │
+│  │   ┌─────────────────────────────────────────────────────┐  │   │
+│  │   │  🔄  Update                                         │  │   │
+│  │   │      Replace saved predictions with new ones        │  │   │
+│  │   └─────────────────────────────────────────────────────┘  │   │
+│  │                                                             │   │
+│  │   ┌─────────────────────────────────────────────────────┐  │   │
+│  │   │  📋  Keep Both                                      │  │   │
+│  │   │      Save as "Sarah (2)"                            │  │   │
+│  │   └─────────────────────────────────────────────────────┘  │   │
+│  │                                                             │   │
+│  │   ┌─────────────────────────────────────────────────────┐  │   │
+│  │   │  ✕   Cancel                                         │  │   │
+│  │   │      Ignore and keep existing predictions           │  │   │
+│  │   └─────────────────────────────────────────────────────┘  │   │
+│  │                                                             │   │
+│  └─────────────────────────────────────────────────────────────┘   │
 │                                                                     │
 └─────────────────────────────────────────────────────────────────────┘
 ```
