@@ -242,6 +242,8 @@ const CATEGORIES = [
 
 const STORAGE_KEY = 'oscar-tracker-watched';
 const CATEGORY_KEY = 'oscar-tracker-category';
+const PREDICTIONS_KEY = 'oscar-tracker-predictions';
+const MODE_KEY = 'oscar-tracker-mode';
 
 // Film-to-nominees mapping for cross-category tracking
 // When a film is checked, all related nominees are also checked
@@ -326,6 +328,8 @@ function getRelatedNominees(nomineeId) {
 // State
 let watchedItems = new Set();
 let currentCategoryIndex = 0;
+let predictions = {}; // { categoryId: nomineeId }
+let currentMode = 'watched'; // 'watched' or 'predictions'
 
 // DOM Elements
 const filmsList = document.getElementById('films-list');
@@ -344,6 +348,7 @@ const categoryScreen = document.getElementById('category-screen');
 const allFilmsList = document.getElementById('all-films-list');
 const browseByCategory = document.getElementById('browse-by-category');
 const tipContent = document.getElementById('tip-content');
+const modeSelect = document.getElementById('mode-select');
 
 // Tips for rotation
 const TIPS = [
@@ -469,14 +474,16 @@ function showCategoryScreen() {
 // Initialize
 function init() {
     loadWatchedItems();
+    loadPredictions();
     loadCurrentCategory();
+    loadMode();
     renderCategoryOptions();
     setupEventListeners();
     registerServiceWorker();
     startTipRotation();
 
-    // Show onboarding if no films watched, otherwise show category view
-    if (watchedItems.size === 0) {
+    // Show onboarding if no films watched and in watched mode, otherwise show category view
+    if (currentMode === 'watched' && watchedItems.size === 0) {
         showOnboardingScreen();
     } else {
         showCategoryScreen();
@@ -525,6 +532,49 @@ function saveCurrentCategory() {
         localStorage.setItem(CATEGORY_KEY, CATEGORIES[currentCategoryIndex].id);
     } catch (e) {
         console.warn('Could not save category:', e);
+    }
+}
+
+// Load predictions from localStorage
+function loadPredictions() {
+    try {
+        const stored = localStorage.getItem(PREDICTIONS_KEY);
+        if (stored) {
+            predictions = JSON.parse(stored);
+        }
+    } catch (e) {
+        console.warn('Could not load predictions:', e);
+    }
+}
+
+// Save predictions to localStorage
+function savePredictions() {
+    try {
+        localStorage.setItem(PREDICTIONS_KEY, JSON.stringify(predictions));
+    } catch (e) {
+        console.warn('Could not save predictions:', e);
+    }
+}
+
+// Load current mode from localStorage
+function loadMode() {
+    try {
+        const stored = localStorage.getItem(MODE_KEY);
+        if (stored && (stored === 'watched' || stored === 'predictions')) {
+            currentMode = stored;
+            modeSelect.value = currentMode;
+        }
+    } catch (e) {
+        console.warn('Could not load mode:', e);
+    }
+}
+
+// Save current mode to localStorage
+function saveMode() {
+    try {
+        localStorage.setItem(MODE_KEY, currentMode);
+    } catch (e) {
+        console.warn('Could not save mode:', e);
     }
 }
 
@@ -600,20 +650,37 @@ function getStreamingIconHtml(nomineeId) {
 // Render nominees list
 function renderNominees() {
     const category = getCurrentCategory();
+    const isPredictionsMode = currentMode === 'predictions';
+    const predictedNominee = predictions[category.id];
 
     filmsList.innerHTML = category.nominees.map(nominee => {
         const streamingIcon = getStreamingIconHtml(nominee.id);
         const hasStreaming = streamingIcon !== '';
+
+        // Determine state based on mode
+        const isSelected = isPredictionsMode
+            ? predictedNominee === nominee.id
+            : watchedItems.has(nominee.id);
+        const stateClass = isPredictionsMode ? 'predicted' : 'watched';
+        const role = isPredictionsMode ? 'radio' : 'checkbox';
+
+        // Icon: star for predictions, checkmark for watched
+        const iconSvg = isPredictionsMode
+            ? `<svg viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round">
+                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+               </svg>`
+            : `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="20 6 9 17 4 12"></polyline>
+               </svg>`;
+
         return `
-        <li class="film ${watchedItems.has(nominee.id) ? 'watched' : ''}"
+        <li class="film ${isSelected ? stateClass : ''}"
             data-id="${nominee.id}"
-            role="checkbox"
-            aria-checked="${watchedItems.has(nominee.id)}"
+            role="${role}"
+            aria-checked="${isSelected}"
             tabindex="0">
             <div class="checkbox">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
-                    <polyline points="20 6 9 17 4 12"></polyline>
-                </svg>
+                ${iconSvg}
             </div>
             <div class="film-info">
                 <div class="film-title">${nominee.title}</div>
@@ -635,9 +702,13 @@ function renderNominees() {
 // Handle nominee click
 function handleNomineeClick(e) {
     const filmEl = e.currentTarget;
-    const filmId = filmEl.dataset.id;
+    const nomineeId = filmEl.dataset.id;
 
-    toggleNominee(filmId, filmEl);
+    if (currentMode === 'predictions') {
+        togglePrediction(nomineeId);
+    } else {
+        toggleNominee(nomineeId, filmEl);
+    }
 }
 
 // Handle keyboard interaction
@@ -670,23 +741,56 @@ function toggleNominee(nomineeId, filmEl) {
     updateTip();
 }
 
+// Toggle prediction for a nominee (single-select per category)
+function togglePrediction(nomineeId) {
+    const category = getCurrentCategory();
+    const currentPrediction = predictions[category.id];
+
+    if (currentPrediction === nomineeId) {
+        // Clicking the same nominee clears the prediction
+        delete predictions[category.id];
+    } else {
+        // Set new prediction
+        predictions[category.id] = nomineeId;
+    }
+
+    savePredictions();
+    renderNominees();
+    updateProgress();
+}
+
 // Update progress display
 function updateProgress() {
     const category = getCurrentCategory();
-    const watched = category.nominees.filter(n => watchedItems.has(n.id)).length;
-    const total = category.nominees.length;
-    const progressText = `${watched} / ${total}`;
+    let progressText;
+    let titleProgress;
+
+    if (currentMode === 'predictions') {
+        // For predictions: show how many categories have predictions
+        const predictedCount = Object.keys(predictions).length;
+        const totalCategories = CATEGORIES.length;
+        const hasPrediction = predictions[category.id] ? '✓' : '○';
+        progressText = hasPrediction;
+        titleProgress = predictedCount > 0 ? `${predictedCount}/${totalCategories}` : null;
+    } else {
+        // For watched: show watched count for this category
+        const watched = category.nominees.filter(n => watchedItems.has(n.id)).length;
+        const total = category.nominees.length;
+        progressText = `${watched} / ${total}`;
+
+        const totalWatched = CATEGORIES.reduce((sum, cat) =>
+            sum + cat.nominees.filter(n => watchedItems.has(n.id)).length, 0
+        );
+        const totalNominees = CATEGORIES.reduce((sum, cat) => sum + cat.nominees.length, 0);
+        titleProgress = totalWatched > 0 ? `${totalWatched}/${totalNominees}` : null;
+    }
+
     progressEl.textContent = progressText;
     progressElBottom.textContent = progressText;
 
-    // Update document title with total progress
-    const totalWatched = CATEGORIES.reduce((sum, cat) =>
-        sum + cat.nominees.filter(n => watchedItems.has(n.id)).length, 0
-    );
-    const totalNominees = CATEGORIES.reduce((sum, cat) => sum + cat.nominees.length, 0);
-
-    document.title = totalWatched > 0
-        ? `Oscar Tracker (${totalWatched}/${totalNominees})`
+    // Update document title with progress
+    document.title = titleProgress
+        ? `Oscar Tracker (${titleProgress})`
         : 'Oscar Tracker';
 }
 
@@ -721,6 +825,14 @@ function nextCategory(scrollToTop = false) {
     navigateToCategory(newIndex, scrollToTop);
 }
 
+// Handle mode change
+function handleModeChange(e) {
+    currentMode = e.target.value;
+    saveMode();
+    renderNominees();
+    updateProgress();
+}
+
 // Setup event listeners
 function setupEventListeners() {
     categorySelect.addEventListener('change', (e) => {
@@ -737,6 +849,7 @@ function setupEventListeners() {
     nextBtnBottom.addEventListener('click', () => nextCategory(true));
     hardRefreshBtn.addEventListener('click', hardRefresh);
     browseByCategory.addEventListener('click', showCategoryScreen);
+    modeSelect.addEventListener('change', handleModeChange);
 
     // Keyboard navigation
     document.addEventListener('keydown', (e) => {

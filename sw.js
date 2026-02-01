@@ -1,5 +1,5 @@
 // Service Worker for Awards Tracker PWA
-const CACHE_NAME = 'awards-tracker-v3';
+const CACHE_NAME = 'awards-tracker-v4';
 
 const ASSETS_TO_CACHE = [
     '/',
