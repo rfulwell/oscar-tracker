@@ -825,7 +825,7 @@ function updateSharedBanner() {
         if (list) {
             const textSpan = document.getElementById('shared-banner-text');
             if (textSpan) {
-                textSpan.textContent = `👁 Viewing ${list.name}'s predictions (read-only)`;
+                textSpan.textContent = `Viewing ${list.name}'s predictions (read-only)`;
             }
             banner.style.display = '';
         }
