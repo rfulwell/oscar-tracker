@@ -65,6 +65,8 @@
                     <option value="watched">Watched</option>
                     <option value="predictions">Predictions</option>
                 </select>
+                <button class="share-btn" id="share-btn" style="display: none;" disabled>Share</button>
+                <button class="delete-btn" id="delete-btn" style="display: none;">Delete</button>
             </div>
         </header>
 
@@ -104,6 +106,15 @@
                             <polyline points="9 18 15 12 9 6"></polyline>
                         </svg>
                     </button>
+                </div>
+
+                <!-- Shared view banner -->
+                <div class="shared-banner" id="shared-banner" style="display: none;">
+                    <span class="shared-banner-text">
+                        <span class="shared-banner-icon">👁</span>
+                        Viewing <span class="shared-banner-name"></span>'s predictions (read-only)
+                    </span>
+                    <button class="shared-banner-close" aria-label="Dismiss">&times;</button>
                 </div>
 
                 <ul class="films" id="films-list">
@@ -198,6 +209,70 @@
                 </a>
             </footer>
         </div>
+    </div>
+
+    <!-- Share Modal -->
+    <div id="share-modal" class="modal" hidden aria-modal="true" aria-labelledby="share-title">
+        <div class="modal-backdrop"></div>
+        <div class="modal-content modal-content-share">
+            <button class="modal-close" id="share-close" aria-label="Close">&times;</button>
+
+            <h2 id="share-title">Share Predictions</h2>
+            <p class="modal-description">Enter your name so others know whose predictions they're viewing.</p>
+
+            <div class="share-form">
+                <input type="text"
+                    id="share-name-input"
+                    class="share-input"
+                    placeholder="Your name"
+                    maxlength="30"
+                    autocomplete="off">
+                <p class="share-input-hint">This will be visible to anyone you share with</p>
+            </div>
+
+            <div class="modal-actions">
+                <button class="btn btn-secondary" id="share-cancel">Cancel</button>
+                <button class="btn btn-primary" id="share-copy" disabled>Copy Link</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div id="delete-modal" class="modal" hidden aria-modal="true" aria-labelledby="delete-title">
+        <div class="modal-backdrop"></div>
+        <div class="modal-content modal-content-delete">
+            <button class="modal-close" id="delete-close" aria-label="Close">&times;</button>
+
+            <h2 id="delete-title">Remove Shared List</h2>
+            <p class="modal-description">Are you sure you want to remove <strong id="delete-name"></strong>'s predictions? This cannot be undone.</p>
+
+            <div class="modal-actions">
+                <button class="btn btn-secondary" id="delete-cancel">Cancel</button>
+                <button class="btn btn-danger" id="delete-confirm">Remove</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Duplicate Handling Modal -->
+    <div id="duplicate-modal" class="modal" hidden aria-modal="true" aria-labelledby="duplicate-title">
+        <div class="modal-backdrop"></div>
+        <div class="modal-content modal-content-duplicate">
+            <button class="modal-close" id="duplicate-close" aria-label="Close">&times;</button>
+
+            <h2 id="duplicate-title">Already Have This List</h2>
+            <p class="modal-description">You already have predictions from <strong id="duplicate-name"></strong>. What would you like to do?</p>
+
+            <div class="modal-actions modal-actions-stacked">
+                <button class="btn btn-primary" id="duplicate-update">Update Existing</button>
+                <button class="btn btn-secondary" id="duplicate-keep-both">Keep Both</button>
+                <button class="btn btn-tertiary" id="duplicate-cancel">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="toast" hidden>
+        <span id="toast-message"></span>
     </div>
 
     <script src="/app.js"></script>

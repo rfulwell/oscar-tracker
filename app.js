@@ -2,8 +2,9 @@
 // 98th Academy Awards (2026)
 
 // Version and Changelog
-const APP_VERSION = '1.0.0';
+const APP_VERSION = '1.1.0';
 const CHANGELOG = [
+    { version: '1.1.0', description: 'Share predictions with friends via URL' },
     { version: '1.0.0', description: 'Initial release - track watched films and make predictions' }
 ];
 
@@ -253,6 +254,8 @@ const STORAGE_KEY = 'oscar-tracker-watched';
 const CATEGORY_KEY = 'oscar-tracker-category';
 const PREDICTIONS_KEY = 'oscar-tracker-predictions';
 const MODE_KEY = 'oscar-tracker-mode';
+const SHARED_LISTS_KEY = 'oscar-tracker-shared-lists';
+const SHARER_NAME_KEY = 'oscar-tracker-sharer-name';
 
 // Film-to-nominees mapping for cross-category tracking
 // When a film is checked, all related nominees are also checked
@@ -338,7 +341,10 @@ function getRelatedNominees(nomineeId) {
 let watchedItems = new Set();
 let currentCategoryIndex = 0;
 let predictions = {}; // { categoryId: nomineeId }
-let currentMode = 'watched'; // 'watched' or 'predictions'
+let currentMode = 'watched'; // 'watched' | 'predictions' | 'shared:{id}'
+let sharedLists = []; // Array of { id, name, predictions, receivedAt }
+let currentSharedId = null; // ID of currently viewed shared list
+let pendingSharedData = null; // Temp storage for duplicate handling
 
 // DOM Elements
 const filmsList = document.getElementById('films-list');
@@ -487,16 +493,516 @@ function showCategoryScreen() {
     updateProgress();
 }
 
+// ============================================
+// SHARING FEATURE
+// ============================================
+
+// Encode predictions to compact string (21 chars, one per category)
+function encodePredictions(preds) {
+    return CATEGORIES.map(cat => {
+        const nomineeId = preds[cat.id];
+        if (!nomineeId) return '-';
+        const index = cat.nominees.findIndex(n => n.id === nomineeId);
+        return index >= 0 && index <= 9 ? index.toString() : '-';
+    }).join('');
+}
+
+// Decode compact string to predictions object
+function decodePredictions(encoded) {
+    if (!encoded || typeof encoded !== 'string' || encoded.length !== 21) {
+        return {};
+    }
+    const preds = {};
+    for (let i = 0; i < CATEGORIES.length && i < encoded.length; i++) {
+        const char = encoded[i];
+        if (char !== '-' && char >= '0' && char <= '9') {
+            const index = parseInt(char, 10);
+            const category = CATEGORIES[i];
+            if (category && category.nominees[index]) {
+                preds[category.id] = category.nominees[index].id;
+            }
+        }
+    }
+    return preds;
+}
+
+// Check if encoded string is valid
+function isValidEncodedString(str) {
+    if (!str || typeof str !== 'string' || str.length !== 21) return false;
+    return /^[0-9\-]{21}$/.test(str);
+}
+
+// Generate full share URL
+function generateShareURL(preds, name) {
+    const encoded = encodePredictions(preds);
+    const encodedName = encodeURIComponent(name || 'Friend');
+    return `${window.location.origin}${window.location.pathname}?p=${encoded}&name=${encodedName}`;
+}
+
+// Parse URL parameters for shared predictions
+function parseShareParams() {
+    const params = new URLSearchParams(window.location.search);
+    const encoded = params.get('p');
+    const name = params.get('name');
+
+    if (!encoded) return null;
+    if (!isValidEncodedString(encoded)) return null;
+
+    const preds = decodePredictions(encoded);
+    return {
+        predictions: preds,
+        name: decodeURIComponent(name || 'Friend').trim().substring(0, 30),
+        encoded: encoded
+    };
+}
+
+// Check if predictions have any selections
+function hasAnyPredictions(preds) {
+    return Object.keys(preds || predictions).length > 0;
+}
+
+// Normalize name for comparison (lowercase, trimmed)
+function normalizeName(name) {
+    return (name || '').toLowerCase().trim();
+}
+
+// Check if two prediction objects match
+function predictionsMatch(a, b) {
+    const encodedA = encodePredictions(a || {});
+    const encodedB = encodePredictions(b || {});
+    return encodedA === encodedB;
+}
+
+// Find existing shared list by name
+function findExistingByName(name) {
+    const normalized = normalizeName(name);
+    return sharedLists.find(list => normalizeName(list.name) === normalized);
+}
+
+// Load shared lists from localStorage
+function loadSharedLists() {
+    try {
+        const stored = localStorage.getItem(SHARED_LISTS_KEY);
+        if (stored) {
+            sharedLists = JSON.parse(stored);
+        }
+    } catch (e) {
+        console.warn('Could not load shared lists:', e);
+        sharedLists = [];
+    }
+}
+
+// Save shared lists to localStorage
+function saveSharedLists() {
+    try {
+        localStorage.setItem(SHARED_LISTS_KEY, JSON.stringify(sharedLists));
+    } catch (e) {
+        console.warn('Could not save shared lists:', e);
+    }
+}
+
+// Add a new shared list
+function addSharedList(name, preds) {
+    const id = normalizeName(name) + '-' + Date.now();
+    const newList = {
+        id: id,
+        name: name,
+        predictions: preds,
+        receivedAt: new Date().toISOString()
+    };
+    sharedLists.push(newList);
+    saveSharedLists();
+    return newList;
+}
+
+// Update an existing shared list
+function updateSharedList(id, preds) {
+    const list = sharedLists.find(l => l.id === id);
+    if (list) {
+        list.predictions = preds;
+        list.receivedAt = new Date().toISOString();
+        saveSharedLists();
+    }
+}
+
+// Remove a shared list
+function removeSharedList(id) {
+    sharedLists = sharedLists.filter(l => l.id !== id);
+    saveSharedLists();
+}
+
+// Get next available name with number suffix
+function getNextAvailableName(baseName) {
+    let count = 2;
+    let newName = `${baseName} (${count})`;
+    while (findExistingByName(newName)) {
+        count++;
+        newName = `${baseName} (${count})`;
+    }
+    return newName;
+}
+
+// Load saved sharer name
+function loadSharerName() {
+    try {
+        return localStorage.getItem(SHARER_NAME_KEY) || '';
+    } catch (e) {
+        return '';
+    }
+}
+
+// Save sharer name
+function saveSharerName(name) {
+    try {
+        localStorage.setItem(SHARER_NAME_KEY, name);
+    } catch (e) {
+        console.warn('Could not save sharer name:', e);
+    }
+}
+
+// Show toast notification
+function showToast(message) {
+    // Remove existing toast
+    const existing = document.querySelector('.toast');
+    if (existing) existing.remove();
+
+    const toast = document.createElement('div');
+    toast.className = 'toast';
+    toast.textContent = message;
+    document.body.appendChild(toast);
+
+    setTimeout(() => toast.remove(), 3000);
+}
+
+// Copy text to clipboard
+async function copyToClipboard(text) {
+    try {
+        await navigator.clipboard.writeText(text);
+        return true;
+    } catch (e) {
+        // Fallback for older browsers
+        const textarea = document.createElement('textarea');
+        textarea.value = text;
+        textarea.style.position = 'fixed';
+        textarea.style.opacity = '0';
+        document.body.appendChild(textarea);
+        textarea.select();
+        try {
+            document.execCommand('copy');
+            document.body.removeChild(textarea);
+            return true;
+        } catch (e2) {
+            document.body.removeChild(textarea);
+            return false;
+        }
+    }
+}
+
+// Check if currently in a shared view mode
+function isSharedMode() {
+    return currentMode.startsWith('shared:');
+}
+
+// Get current shared list (if viewing one)
+function getCurrentSharedList() {
+    if (!isSharedMode()) return null;
+    const id = currentMode.substring(7); // Remove 'shared:' prefix
+    return sharedLists.find(l => l.id === id);
+}
+
+// Switch to shared list view
+function switchToSharedList(id) {
+    currentMode = `shared:${id}`;
+    currentSharedId = id;
+    saveMode();
+    updateModeDropdown();
+    renderNominees();
+    updateProgress();
+    updateShareDeleteButton();
+    updateSharedBanner();
+}
+
+// Handle incoming shared URL
+function handleIncomingShare(shareData) {
+    const existing = findExistingByName(shareData.name);
+
+    if (!existing) {
+        // New person - add and switch
+        const newList = addSharedList(shareData.name, shareData.predictions);
+        updateModeDropdown();
+        switchToSharedList(newList.id);
+        // Clear URL params
+        window.history.replaceState({}, '', window.location.pathname);
+    } else if (predictionsMatch(existing.predictions, shareData.predictions)) {
+        // Same predictions - just switch to existing
+        switchToSharedList(existing.id);
+        window.history.replaceState({}, '', window.location.pathname);
+    } else {
+        // Different predictions - show duplicate modal
+        pendingSharedData = shareData;
+        pendingSharedData.existingId = existing.id;
+        showDuplicateModal(shareData.name);
+    }
+}
+
+// Update mode dropdown with shared lists
+function updateModeDropdown() {
+    const select = modeSelect;
+    if (!select) return;
+
+    // Clear existing options
+    select.innerHTML = '';
+
+    // Add base options
+    const watchedOpt = document.createElement('option');
+    watchedOpt.value = 'watched';
+    watchedOpt.textContent = 'Watched';
+    select.appendChild(watchedOpt);
+
+    const predictionsOpt = document.createElement('option');
+    predictionsOpt.value = 'predictions';
+    predictionsOpt.textContent = 'Predictions';
+    select.appendChild(predictionsOpt);
+
+    // Add separator and shared lists if any
+    if (sharedLists.length > 0) {
+        const separator = document.createElement('option');
+        separator.disabled = true;
+        separator.textContent = '──────────';
+        select.appendChild(separator);
+
+        sharedLists.forEach(list => {
+            const opt = document.createElement('option');
+            opt.value = `shared:${list.id}`;
+            opt.textContent = `${list.name}'s Picks`;
+            select.appendChild(opt);
+        });
+    }
+
+    // Set current value
+    select.value = currentMode;
+}
+
+// Update share/delete button visibility and state
+function updateShareDeleteButton() {
+    const shareBtn = document.getElementById('share-btn');
+    const deleteBtn = document.getElementById('delete-btn');
+
+    if (currentMode === 'predictions') {
+        // Show share button
+        if (shareBtn) {
+            shareBtn.style.display = '';
+            shareBtn.disabled = !hasAnyPredictions(predictions);
+        }
+        if (deleteBtn) deleteBtn.style.display = 'none';
+    } else if (isSharedMode()) {
+        // Show delete button
+        if (shareBtn) shareBtn.style.display = 'none';
+        if (deleteBtn) deleteBtn.style.display = '';
+    } else {
+        // Watched mode - hide both
+        if (shareBtn) shareBtn.style.display = 'none';
+        if (deleteBtn) deleteBtn.style.display = 'none';
+    }
+}
+
+// Update shared banner visibility
+function updateSharedBanner() {
+    const banner = document.getElementById('shared-banner');
+    if (!banner) return;
+
+    if (isSharedMode()) {
+        const list = getCurrentSharedList();
+        if (list) {
+            const nameSpan = banner.querySelector('.shared-banner-name');
+            if (nameSpan) nameSpan.textContent = list.name;
+            banner.style.display = '';
+        }
+    } else {
+        banner.style.display = 'none';
+    }
+}
+
+// Show share modal
+function showShareModal() {
+    const modal = document.getElementById('share-modal');
+    if (!modal) return;
+
+    const nameInput = document.getElementById('share-name-input');
+    if (nameInput) {
+        nameInput.value = loadSharerName() || '';
+    }
+
+    modal.hidden = false;
+    document.body.classList.add('modal-open');
+
+    if (nameInput) nameInput.focus();
+}
+
+// Hide share modal
+function hideShareModal() {
+    const modal = document.getElementById('share-modal');
+    if (modal) {
+        modal.hidden = true;
+        document.body.classList.remove('modal-open');
+    }
+}
+
+// Handle share copy link
+async function handleShareCopyLink() {
+    const nameInput = document.getElementById('share-name-input');
+    const name = (nameInput?.value || '').trim() || 'Friend';
+
+    saveSharerName(name);
+
+    const url = generateShareURL(predictions, name);
+    const success = await copyToClipboard(url);
+
+    hideShareModal();
+
+    if (success) {
+        showToast('Link copied! Share it with your friends.');
+    } else {
+        showToast('Could not copy link. Please try again.');
+    }
+}
+
+// Show duplicate modal
+function showDuplicateModal(name) {
+    const modal = document.getElementById('duplicate-modal');
+    if (!modal) return;
+
+    const nameSpan = modal.querySelector('.duplicate-name');
+    if (nameSpan) nameSpan.textContent = name;
+
+    modal.hidden = false;
+    document.body.classList.add('modal-open');
+}
+
+// Hide duplicate modal
+function hideDuplicateModal() {
+    const modal = document.getElementById('duplicate-modal');
+    if (modal) {
+        modal.hidden = true;
+        document.body.classList.remove('modal-open');
+    }
+    pendingSharedData = null;
+}
+
+// Handle duplicate update action
+function handleDuplicateUpdate() {
+    if (!pendingSharedData) return;
+
+    updateSharedList(pendingSharedData.existingId, pendingSharedData.predictions);
+    switchToSharedList(pendingSharedData.existingId);
+    window.history.replaceState({}, '', window.location.pathname);
+    hideDuplicateModal();
+}
+
+// Handle duplicate keep both action
+function handleDuplicateKeepBoth() {
+    if (!pendingSharedData) return;
+
+    const newName = getNextAvailableName(pendingSharedData.name);
+    const newList = addSharedList(newName, pendingSharedData.predictions);
+    updateModeDropdown();
+    switchToSharedList(newList.id);
+    window.history.replaceState({}, '', window.location.pathname);
+    hideDuplicateModal();
+}
+
+// Handle duplicate cancel action
+function handleDuplicateCancel() {
+    if (pendingSharedData) {
+        // Switch to existing list instead
+        switchToSharedList(pendingSharedData.existingId);
+    }
+    window.history.replaceState({}, '', window.location.pathname);
+    hideDuplicateModal();
+}
+
+// Show delete confirmation modal
+function showDeleteModal() {
+    const modal = document.getElementById('delete-modal');
+    if (!modal) return;
+
+    const list = getCurrentSharedList();
+    if (!list) return;
+
+    const nameSpan = modal.querySelector('.delete-name');
+    if (nameSpan) nameSpan.textContent = list.name;
+
+    modal.hidden = false;
+    document.body.classList.add('modal-open');
+}
+
+// Hide delete modal
+function hideDeleteModal() {
+    const modal = document.getElementById('delete-modal');
+    if (modal) {
+        modal.hidden = true;
+        document.body.classList.remove('modal-open');
+    }
+}
+
+// Handle delete confirm
+function handleDeleteConfirm() {
+    const list = getCurrentSharedList();
+    if (!list) return;
+
+    removeSharedList(list.id);
+
+    // Switch to watched mode
+    currentMode = 'watched';
+    currentSharedId = null;
+    saveMode();
+
+    updateModeDropdown();
+    renderNominees();
+    updateProgress();
+    updateShareDeleteButton();
+    updateSharedBanner();
+
+    hideDeleteModal();
+    showToast('Shared list removed');
+}
+
 // Initialize
+
+
 function init() {
     loadWatchedItems();
     loadPredictions();
     loadCurrentCategory();
+    loadSharedLists();
     loadMode();
     renderCategoryOptions();
+    updateModeDropdown();
     setupEventListeners();
     registerServiceWorker();
     startTipRotation();
+
+    // Check for incoming shared URL
+    const shareData = parseShareParams();
+    if (shareData) {
+        // Always show category screen for shared links
+        showCategoryScreen();
+        handleIncomingShare(shareData);
+        return;
+    }
+
+    // Validate current mode (shared list might have been deleted)
+    if (isSharedMode()) {
+        const list = getCurrentSharedList();
+        if (!list) {
+            currentMode = 'watched';
+            saveMode();
+        }
+    }
+
+    updateModeDropdown();
+    updateShareDeleteButton();
+    updateSharedBanner();
 
     // Show onboarding if no films watched and in watched mode, otherwise show category view
     if (currentMode === 'watched' && watchedItems.size === 0) {
@@ -667,21 +1173,37 @@ function getStreamingIconHtml(nomineeId) {
 function renderNominees() {
     const category = getCurrentCategory();
     const isPredictionsMode = currentMode === 'predictions';
-    const predictedNominee = predictions[category.id];
+    const isSharedView = isSharedMode();
+    const sharedList = isSharedView ? getCurrentSharedList() : null;
+
+    // Get the predictions to display
+    let displayPredictions = predictions;
+    if (isSharedView && sharedList) {
+        displayPredictions = sharedList.predictions;
+    }
+    const predictedNominee = displayPredictions[category.id];
 
     filmsList.innerHTML = category.nominees.map(nominee => {
         const streamingIcon = getStreamingIconHtml(nominee.id);
         const hasStreaming = streamingIcon !== '';
 
         // Determine state based on mode
-        const isSelected = isPredictionsMode
-            ? predictedNominee === nominee.id
-            : watchedItems.has(nominee.id);
-        const stateClass = isPredictionsMode ? 'predicted' : 'watched';
-        const role = isPredictionsMode ? 'radio' : 'checkbox';
+        let isSelected, stateClass, role;
+        if (isPredictionsMode || isSharedView) {
+            isSelected = predictedNominee === nominee.id;
+            stateClass = 'predicted';
+            role = 'radio';
+        } else {
+            isSelected = watchedItems.has(nominee.id);
+            stateClass = 'watched';
+            role = 'checkbox';
+        }
 
-        // Icon: star for predictions, checkmark for watched
-        const iconSvg = isPredictionsMode
+        // Add shared-view class for read-only styling
+        const sharedViewClass = isSharedView ? ' shared-view' : '';
+
+        // Icon: star for predictions/shared, checkmark for watched
+        const iconSvg = (isPredictionsMode || isSharedView)
             ? `<svg viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round">
                 <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
                </svg>`
@@ -690,11 +1212,11 @@ function renderNominees() {
                </svg>`;
 
         return `
-        <li class="film ${isSelected ? stateClass : ''}"
+        <li class="film ${isSelected ? stateClass : ''}${sharedViewClass}"
             data-id="${nominee.id}"
             role="${role}"
             aria-checked="${isSelected}"
-            tabindex="0">
+            tabindex="${isSharedView ? -1 : 0}">
             <div class="checkbox">
                 ${iconSvg}
             </div>
@@ -708,11 +1230,13 @@ function renderNominees() {
         </li>
     `}).join('');
 
-    // Add event listeners
-    document.querySelectorAll('.film').forEach(el => {
-        el.addEventListener('click', handleNomineeClick);
-        el.addEventListener('keydown', handleNomineeKeydown);
-    });
+    // Add event listeners (only for non-shared modes)
+    if (!isSharedView) {
+        document.querySelectorAll('#films-list .film').forEach(el => {
+            el.addEventListener('click', handleNomineeClick);
+            el.addEventListener('keydown', handleNomineeKeydown);
+        });
+    }
 }
 
 // Handle nominee click
@@ -787,6 +1311,7 @@ function togglePrediction(nomineeId) {
 
     savePredictions();
     updateProgress();
+    updateShareDeleteButton();
 }
 
 // Update progress display
@@ -802,6 +1327,19 @@ function updateProgress() {
         const hasPrediction = predictions[category.id] ? '✓' : '○';
         progressText = hasPrediction;
         titleProgress = predictedCount > 0 ? `${predictedCount}/${totalCategories}` : null;
+    } else if (isSharedMode()) {
+        // For shared view: show progress for shared predictions
+        const sharedList = getCurrentSharedList();
+        if (sharedList) {
+            const predictedCount = Object.keys(sharedList.predictions).length;
+            const totalCategories = CATEGORIES.length;
+            const hasPrediction = sharedList.predictions[category.id] ? '✓' : '○';
+            progressText = hasPrediction;
+            titleProgress = `${predictedCount}/${totalCategories}`;
+        } else {
+            progressText = '○';
+            titleProgress = null;
+        }
     } else {
         // For watched: show watched count for this category
         const watched = category.nominees.filter(n => watchedItems.has(n.id)).length;
@@ -858,9 +1396,12 @@ function nextCategory(scrollToTop = false) {
 // Handle mode change
 function handleModeChange(e) {
     currentMode = e.target.value;
+    currentSharedId = isSharedMode() ? currentMode.substring(7) : null;
     saveMode();
     renderNominees();
     updateProgress();
+    updateShareDeleteButton();
+    updateSharedBanner();
 }
 
 // Setup event listeners
@@ -883,13 +1424,30 @@ function setupEventListeners() {
 
     // Keyboard navigation
     document.addEventListener('keydown', (e) => {
-        // Close modal on Escape
-        if (e.key === 'Escape' && aboutModal && !aboutModal.hidden) {
-            hideAboutModal();
-            return;
+        // Close modals on Escape
+        if (e.key === 'Escape') {
+            if (aboutModal && !aboutModal.hidden) {
+                hideAboutModal();
+                return;
+            }
+            const shareModal = document.getElementById('share-modal');
+            if (shareModal && !shareModal.hidden) {
+                hideShareModal();
+                return;
+            }
+            const deleteModal = document.getElementById('delete-modal');
+            if (deleteModal && !deleteModal.hidden) {
+                hideDeleteModal();
+                return;
+            }
+            const duplicateModal = document.getElementById('duplicate-modal');
+            if (duplicateModal && !duplicateModal.hidden) {
+                hideDuplicateModal();
+                return;
+            }
         }
 
-        if (e.target.tagName === 'SELECT') return;
+        if (e.target.tagName === 'SELECT' || e.target.tagName === 'INPUT') return;
 
         if (e.key === 'ArrowLeft') {
             prevCategory(false);
@@ -912,6 +1470,95 @@ function setupEventListeners() {
 
     if (modalBackdrop) {
         modalBackdrop.addEventListener('click', hideAboutModal);
+    }
+
+    // Share button
+    const shareBtn = document.getElementById('share-btn');
+    if (shareBtn) {
+        shareBtn.addEventListener('click', showShareModal);
+    }
+
+    // Share modal events
+    const shareModalClose = document.querySelector('#share-modal .modal-close');
+    if (shareModalClose) {
+        shareModalClose.addEventListener('click', hideShareModal);
+    }
+
+    const shareModalBackdrop = document.querySelector('#share-modal .modal-backdrop');
+    if (shareModalBackdrop) {
+        shareModalBackdrop.addEventListener('click', hideShareModal);
+    }
+
+    const shareCancelBtn = document.getElementById('share-cancel-btn');
+    if (shareCancelBtn) {
+        shareCancelBtn.addEventListener('click', hideShareModal);
+    }
+
+    const shareCopyBtn = document.getElementById('share-copy-btn');
+    if (shareCopyBtn) {
+        shareCopyBtn.addEventListener('click', handleShareCopyLink);
+    }
+
+    // Delete button
+    const deleteBtn = document.getElementById('delete-btn');
+    if (deleteBtn) {
+        deleteBtn.addEventListener('click', showDeleteModal);
+    }
+
+    // Delete modal events
+    const deleteModalClose = document.querySelector('#delete-modal .modal-close');
+    if (deleteModalClose) {
+        deleteModalClose.addEventListener('click', hideDeleteModal);
+    }
+
+    const deleteModalBackdrop = document.querySelector('#delete-modal .modal-backdrop');
+    if (deleteModalBackdrop) {
+        deleteModalBackdrop.addEventListener('click', hideDeleteModal);
+    }
+
+    const deleteCancelBtn = document.getElementById('delete-cancel-btn');
+    if (deleteCancelBtn) {
+        deleteCancelBtn.addEventListener('click', hideDeleteModal);
+    }
+
+    const deleteConfirmBtn = document.getElementById('delete-confirm-btn');
+    if (deleteConfirmBtn) {
+        deleteConfirmBtn.addEventListener('click', handleDeleteConfirm);
+    }
+
+    // Duplicate modal events
+    const duplicateModalClose = document.querySelector('#duplicate-modal .modal-close');
+    if (duplicateModalClose) {
+        duplicateModalClose.addEventListener('click', handleDuplicateCancel);
+    }
+
+    const duplicateModalBackdrop = document.querySelector('#duplicate-modal .modal-backdrop');
+    if (duplicateModalBackdrop) {
+        duplicateModalBackdrop.addEventListener('click', handleDuplicateCancel);
+    }
+
+    const duplicateUpdateBtn = document.getElementById('duplicate-update-btn');
+    if (duplicateUpdateBtn) {
+        duplicateUpdateBtn.addEventListener('click', handleDuplicateUpdate);
+    }
+
+    const duplicateKeepBothBtn = document.getElementById('duplicate-keepboth-btn');
+    if (duplicateKeepBothBtn) {
+        duplicateKeepBothBtn.addEventListener('click', handleDuplicateKeepBoth);
+    }
+
+    const duplicateCancelBtn = document.getElementById('duplicate-cancel-btn');
+    if (duplicateCancelBtn) {
+        duplicateCancelBtn.addEventListener('click', handleDuplicateCancel);
+    }
+
+    // Shared banner close button
+    const sharedBannerClose = document.querySelector('#shared-banner .shared-banner-close');
+    if (sharedBannerClose) {
+        sharedBannerClose.addEventListener('click', () => {
+            const banner = document.getElementById('shared-banner');
+            if (banner) banner.style.display = 'none';
+        });
     }
 }
 
