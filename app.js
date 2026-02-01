@@ -746,16 +746,30 @@ function togglePrediction(nomineeId) {
     const category = getCurrentCategory();
     const currentPrediction = predictions[category.id];
 
+    // Remove predicted state from previous selection
+    if (currentPrediction) {
+        const prevEl = document.querySelector(`.film[data-id="${currentPrediction}"]`);
+        if (prevEl) {
+            prevEl.classList.remove('predicted');
+            prevEl.setAttribute('aria-checked', 'false');
+        }
+    }
+
     if (currentPrediction === nomineeId) {
         // Clicking the same nominee clears the prediction
         delete predictions[category.id];
     } else {
         // Set new prediction
         predictions[category.id] = nomineeId;
+        // Add predicted state to new selection
+        const newEl = document.querySelector(`.film[data-id="${nomineeId}"]`);
+        if (newEl) {
+            newEl.classList.add('predicted');
+            newEl.setAttribute('aria-checked', 'true');
+        }
     }
 
     savePredictions();
-    renderNominees();
     updateProgress();
 }
 
