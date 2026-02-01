@@ -173,6 +173,19 @@ test.describe('Sharing Predictions', () => {
             await expect(page.locator('#delete-btn')).not.toBeVisible();
         });
 
+        test('should show correct name in delete confirmation modal', async ({ page }) => {
+            await page.goto('/?p=8--------------------&name=Sarah');
+            await completeOnboarding(page);
+
+            // Click delete
+            await page.locator('#delete-btn').click();
+
+            // Modal should show Sarah's name
+            const deleteModal = page.locator('#delete-modal');
+            await expect(deleteModal).toBeVisible();
+            await expect(deleteModal.locator('#delete-name')).toHaveText('Sarah');
+        });
+
         test('should remove shared list when delete confirmed', async ({ page }) => {
             await page.goto('/?p=8--------------------&name=Sarah');
             await completeOnboarding(page);

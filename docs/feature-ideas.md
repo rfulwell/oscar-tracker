@@ -240,18 +240,11 @@ Allow users to "lock" their predictions before the ceremony.
 
 ## Data & Privacy
 
-### Privacy Note
+### ~~Privacy Note~~ ✅ IMPLEMENTED
 
-**Priority**: Low
-**Complexity**: Low
-
-Add a note in the About modal or footer explaining data handling.
+Added in About modal with lock emoji icon.
 
 **Text:** "Your data is stored locally on your device and never sent to any server."
-
-**Benefits:**
-- Reassures privacy-conscious users
-- Differentiates from apps that require accounts
 
 ---
 

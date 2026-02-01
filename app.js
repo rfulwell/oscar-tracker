@@ -974,7 +974,7 @@ function showDeleteModal() {
     const list = getCurrentSharedList();
     if (!list) return;
 
-    const nameSpan = modal.querySelector('.delete-name');
+    const nameSpan = document.getElementById('delete-name');
     if (nameSpan) nameSpan.textContent = list.name;
 
     modal.hidden = false;
