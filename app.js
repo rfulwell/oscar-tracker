@@ -273,6 +273,27 @@ for (const [filmKey, nomineeIds] of Object.entries(FILM_NOMINEES)) {
     }
 }
 
+// All unique films with titles and nomination counts (sorted by nominations desc)
+const ALL_FILMS = [
+    { key: 'sinners', title: 'Sinners', nominations: 16 },
+    { key: 'one-battle-after-another', title: 'One Battle After Another', nominations: 13 },
+    { key: 'marty-supreme', title: 'Marty Supreme', nominations: 10 },
+    { key: 'frankenstein', title: 'Frankenstein', nominations: 9 },
+    { key: 'sentimental-value', title: 'Sentimental Value', nominations: 10 },
+    { key: 'hamnet', title: 'Hamnet', nominations: 8 },
+    { key: 'train-dreams', title: 'Train Dreams', nominations: 4 },
+    { key: 'f1', title: 'F1', nominations: 4 },
+    { key: 'bugonia', title: 'Bugonia', nominations: 3 },
+    { key: 'secret-agent', title: 'The Secret Agent', nominations: 3 },
+    { key: 'blue-moon', title: 'Blue Moon', nominations: 2 },
+    { key: 'it-was-just-an-accident', title: 'It Was Just an Accident', nominations: 2 },
+    { key: 'arco', title: 'Arco', nominations: 2 },
+    { key: 'little-amelie', title: 'The Little Amelie', nominations: 2 },
+    { key: 'kpop-demon-hunters', title: 'KPop Demon Hunters', nominations: 2 },
+    { key: 'avatar-fire-and-ash', title: 'Avatar: Fire and Ash', nominations: 2 },
+    { key: 'im-still-here', title: "I'm Still Here", nominations: 1 }
+].sort((a, b) => b.nominations - a.nominations);
+
 // Streaming service availability for films
 // Based on research: Netflix and Max are the top 2 services with Oscar nominees
 const FILM_STREAMING = {
@@ -317,6 +338,10 @@ const prevBtnBottom = document.getElementById('prev-category-bottom');
 const nextBtnBottom = document.getElementById('next-category-bottom');
 const hardRefreshBtn = document.getElementById('hard-refresh');
 const categoryHeader = document.querySelector('.category-header');
+const onboardingScreen = document.getElementById('onboarding-screen');
+const categoryScreen = document.getElementById('category-screen');
+const allFilmsList = document.getElementById('all-films-list');
+const browseByCategory = document.getElementById('browse-by-category');
 const tipContent = document.getElementById('tip-content');
 
 // Tips for rotation
@@ -359,16 +384,102 @@ function startTipRotation() {
     tipRotationInterval = setInterval(rotateTip, 8000);
 }
 
+// Check if a film is watched (by checking any of its nominees)
+function isFilmWatched(filmKey) {
+    const nominees = FILM_NOMINEES[filmKey];
+    return nominees && nominees.some(id => watchedItems.has(id));
+}
+
+// Toggle film watched state (for all-films view)
+function toggleFilmWatched(filmKey, filmEl) {
+    const nominees = FILM_NOMINEES[filmKey];
+    if (!nominees) return;
+
+    const isCurrentlyWatched = isFilmWatched(filmKey);
+
+    if (isCurrentlyWatched) {
+        nominees.forEach(id => watchedItems.delete(id));
+        filmEl.classList.remove('watched');
+        filmEl.setAttribute('aria-checked', 'false');
+    } else {
+        nominees.forEach(id => watchedItems.add(id));
+        filmEl.classList.add('watched');
+        filmEl.setAttribute('aria-checked', 'true');
+    }
+
+    saveWatchedItems();
+    updateTip();
+}
+
+// Render all films list (for onboarding screen)
+function renderAllFilms() {
+    allFilmsList.innerHTML = ALL_FILMS.map(film => {
+        const watched = isFilmWatched(film.key);
+        const nomText = film.nominations === 1 ? '1 nom' : `${film.nominations} noms`;
+        return `
+        <li class="film ${watched ? 'watched' : ''}"
+            data-film-key="${film.key}"
+            role="checkbox"
+            aria-checked="${watched}"
+            tabindex="0">
+            <div class="checkbox">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="20 6 9 17 4 12"></polyline>
+                </svg>
+            </div>
+            <div class="film-info">
+                <div class="film-title">${film.title}</div>
+            </div>
+            <span class="nomination-badge">${nomText}</span>
+        </li>
+    `}).join('');
+
+    // Add event listeners
+    allFilmsList.querySelectorAll('.film').forEach(el => {
+        el.addEventListener('click', (e) => {
+            const filmKey = el.dataset.filmKey;
+            toggleFilmWatched(filmKey, el);
+        });
+        el.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                const filmKey = el.dataset.filmKey;
+                toggleFilmWatched(filmKey, el);
+            }
+        });
+    });
+}
+
+// Show onboarding screen
+function showOnboardingScreen() {
+    onboardingScreen.style.display = '';
+    categoryScreen.style.display = 'none';
+    renderAllFilms();
+}
+
+// Show category screen
+function showCategoryScreen() {
+    onboardingScreen.style.display = 'none';
+    categoryScreen.style.display = '';
+    renderNominees();
+    updateProgress();
+}
+
 // Initialize
 function init() {
     loadWatchedItems();
     loadCurrentCategory();
     renderCategoryOptions();
-    renderNominees();
-    updateProgress();
     setupEventListeners();
     registerServiceWorker();
     startTipRotation();
+
+    // Show onboarding if no films watched, otherwise show category view
+    if (watchedItems.size === 0) {
+        showOnboardingScreen();
+    } else {
+        showCategoryScreen();
+    }
 }
 
 // Load watched items from localStorage
@@ -618,6 +729,7 @@ function setupEventListeners() {
     prevBtnBottom.addEventListener('click', () => prevCategory(true));
     nextBtnBottom.addEventListener('click', () => nextCategory(true));
     hardRefreshBtn.addEventListener('click', hardRefresh);
+    browseByCategory.addEventListener('click', showCategoryScreen);
 
     // Keyboard navigation
     document.addEventListener('keydown', (e) => {

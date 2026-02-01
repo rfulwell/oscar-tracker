@@ -67,8 +67,22 @@
                 </select>
             </div>
         </header>
-        
-        <main class="main">
+
+        <!-- First-time experience screen -->
+        <main class="main onboarding-screen" id="onboarding-screen" style="display: none;">
+            <p class="onboarding-prompt">Check off films you've already seen</p>
+            <ul class="films" id="all-films-list">
+                <!-- All films will be rendered here by JavaScript -->
+            </ul>
+            <button class="browse-btn" id="browse-by-category">
+                Browse by Category
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="9 18 15 12 9 6"></polyline>
+                </svg>
+            </button>
+        </main>
+
+        <main class="main category-screen" id="category-screen">
             <section class="category">
                 <div class="category-header">
                     <button class="nav-btn nav-prev" id="prev-category" aria-label="Previous category">
