@@ -833,6 +833,12 @@ function showShareModal() {
         nameInput.value = loadSharerName() || '';
     }
 
+    // Enable the share button (we have a default of "Friend" if empty)
+    const shareBtn = document.getElementById('share-copy');
+    if (shareBtn) {
+        shareBtn.disabled = false;
+    }
+
     modal.hidden = false;
     document.body.classList.add('modal-open');
 
@@ -848,17 +854,45 @@ function hideShareModal() {
     }
 }
 
-// Handle share copy link
-async function handleShareCopyLink() {
+// Check if Web Share API is available
+function canUseWebShare() {
+    return typeof navigator.share === 'function';
+}
+
+// Handle share button click
+async function handleShare() {
     const nameInput = document.getElementById('share-name-input');
     const name = (nameInput?.value || '').trim() || 'Friend';
 
     saveSharerName(name);
 
     const url = generateShareURL(predictions, name);
-    const success = await copyToClipboard(url);
 
     hideShareModal();
+
+    // Try native share first (Android, iOS, some desktop browsers)
+    if (canUseWebShare()) {
+        try {
+            await navigator.share({
+                title: 'Oscar Predictions',
+                text: `Check out ${name}'s Oscar predictions for the 98th Academy Awards!`,
+                url: url
+            });
+            // Native share was successful (user may have shared or cancelled)
+            return;
+        } catch (e) {
+            // User cancelled or share failed - fall back to clipboard
+            if (e.name === 'AbortError') {
+                // User cancelled - don't show toast
+                return;
+            }
+            // Other error - fall through to clipboard copy
+            console.warn('Web Share failed, falling back to clipboard:', e);
+        }
+    }
+
+    // Fallback: copy to clipboard
+    const success = await copyToClipboard(url);
 
     if (success) {
         showToast('Link copied! Share it with your friends.');
@@ -1489,14 +1523,14 @@ function setupEventListeners() {
         shareModalBackdrop.addEventListener('click', hideShareModal);
     }
 
-    const shareCancelBtn = document.getElementById('share-cancel-btn');
+    const shareCancelBtn = document.getElementById('share-cancel');
     if (shareCancelBtn) {
         shareCancelBtn.addEventListener('click', hideShareModal);
     }
 
-    const shareCopyBtn = document.getElementById('share-copy-btn');
-    if (shareCopyBtn) {
-        shareCopyBtn.addEventListener('click', handleShareCopyLink);
+    const shareBtn2 = document.getElementById('share-copy');
+    if (shareBtn2) {
+        shareBtn2.addEventListener('click', handleShare);
     }
 
     // Delete button
@@ -1516,12 +1550,12 @@ function setupEventListeners() {
         deleteModalBackdrop.addEventListener('click', hideDeleteModal);
     }
 
-    const deleteCancelBtn = document.getElementById('delete-cancel-btn');
+    const deleteCancelBtn = document.getElementById('delete-cancel');
     if (deleteCancelBtn) {
         deleteCancelBtn.addEventListener('click', hideDeleteModal);
     }
 
-    const deleteConfirmBtn = document.getElementById('delete-confirm-btn');
+    const deleteConfirmBtn = document.getElementById('delete-confirm');
     if (deleteConfirmBtn) {
         deleteConfirmBtn.addEventListener('click', handleDeleteConfirm);
     }
@@ -1537,17 +1571,17 @@ function setupEventListeners() {
         duplicateModalBackdrop.addEventListener('click', handleDuplicateCancel);
     }
 
-    const duplicateUpdateBtn = document.getElementById('duplicate-update-btn');
+    const duplicateUpdateBtn = document.getElementById('duplicate-update');
     if (duplicateUpdateBtn) {
         duplicateUpdateBtn.addEventListener('click', handleDuplicateUpdate);
     }
 
-    const duplicateKeepBothBtn = document.getElementById('duplicate-keepboth-btn');
+    const duplicateKeepBothBtn = document.getElementById('duplicate-keep-both');
     if (duplicateKeepBothBtn) {
         duplicateKeepBothBtn.addEventListener('click', handleDuplicateKeepBoth);
     }
 
-    const duplicateCancelBtn = document.getElementById('duplicate-cancel-btn');
+    const duplicateCancelBtn = document.getElementById('duplicate-cancel');
     if (duplicateCancelBtn) {
         duplicateCancelBtn.addEventListener('click', handleDuplicateCancel);
     }

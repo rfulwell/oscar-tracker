@@ -22,11 +22,19 @@ Enable users to share their Oscar predictions with friends via URL. This is a cl
 #### Sharing Flow (Sender)
 1. User makes predictions in "Predictions" mode
 2. User clicks "Share" button (to the right of mode dropdown)
-3. **Themed modal** opens asking for their name (optional, default "Friend")
-4. User clicks "Copy Link" button in modal
-5. URL is generated and copied to clipboard
-6. Success toast confirms link copied
-7. User shares URL via text/email/social
+3. **Themed modal** opens with title "Share Your Picks!" asking for their name (optional, default "Friend")
+4. User clicks "Share" button in modal
+5. **Platform-specific behavior**:
+   - **Mobile (Android/iOS)**: Uses native Web Share API to open OS share sheet
+   - **Desktop (no Web Share API)**: Falls back to copying URL to clipboard
+6. Success toast confirms action ("Link copied!" on desktop)
+7. User shares URL via native share options or pastes copied link
+
+**Web Share API**:
+- Available on Android Chrome, iOS Safari, and some desktop browsers
+- Detected via `navigator.share` availability
+- Provides native share experience with all installed apps (Messages, WhatsApp, Email, etc.)
+- Falls back gracefully to clipboard copy when unavailable
 
 **Share Button State**:
 - **Disabled** (grayed out): When no predictions have been made
@@ -940,7 +948,7 @@ Legend:
 │                                                                     │
 │  ┌─────────────────────────────────────────────────────────────┐   │
 │  │                                                         [×] │   │
-│  │                    Share Your Picks                         │   │
+│  │                  Share Your Picks!                          │   │
 │  │                                                             │   │
 │  │   Your friends will see your predictions for                │   │
 │  │   all 21 categories.                                        │   │
@@ -951,7 +959,7 @@ Legend:
 │  │   └───────────────────────────────────────────────────┘    │   │
 │  │                                                             │   │
 │  │   ┌─────────────────┐  ┌────────────────────────────┐     │   │
-│  │   │     Cancel      │  │   📋 Copy Link             │     │   │
+│  │   │     Cancel      │  │   📤 Share                 │     │   │
 │  │   └─────────────────┘  └────────────────────────────┘     │   │
 │  │        (gray)               (gold, primary action)          │   │
 │  └─────────────────────────────────────────────────────────────┘   │
@@ -959,18 +967,29 @@ Legend:
 │   Modal style: Dark background (#1a1a1a), gold accents,            │
 │   rounded corners, matches About modal design                       │
 │                                                                     │
+│   Share button behavior:                                            │
+│   - Mobile: Opens native OS share sheet (Web Share API)            │
+│   - Desktop: Copies URL to clipboard (fallback)                    │
+│                                                                     │
 └─────────────────────────────────────────────────────────────────────┘
                                     │
                                     ▼
 ┌─────────────────────────────────────────────────────────────────────┐
-│  STEP 3: Success Toast                                              │
+│  STEP 3: Result                                                     │
 ├─────────────────────────────────────────────────────────────────────┤
 │                                                                     │
+│  MOBILE (Web Share API available):                                  │
+│  ┌─────────────────────────────────────────────────────────────┐   │
+│  │  Native OS share sheet appears with options:                 │   │
+│  │  - Messages, WhatsApp, Email, Copy Link, etc.               │   │
+│  └─────────────────────────────────────────────────────────────┘   │
+│                                                                     │
+│  DESKTOP (Clipboard fallback):                                      │
 │  ┌─────────────────────────────────────────────────────────────┐   │
 │  │  ✓ Link copied! Share it with your friends.                 │   │
 │  └─────────────────────────────────────────────────────────────┘   │
 │                                                                     │
-│  URL in clipboard:                                                  │
+│  URL format:                                                        │
 │  https://oscartracker.app/?p=8--------------------&name=Sarah       │
 │                                                                     │
 └─────────────────────────────────────────────────────────────────────┘
