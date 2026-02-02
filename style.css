@@ -791,7 +791,7 @@ body {
 
     /* Wider modals on desktop */
     .modal-content {
-        max-width: 480px;
+        max-width: 600px;
     }
 }
 
