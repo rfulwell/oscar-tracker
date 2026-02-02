@@ -788,11 +788,6 @@ body {
         border-color: var(--color-gold);
         box-shadow: 0 0 0 2px rgba(212, 175, 55, 0.2);
     }
-
-    /* Wider modals on desktop */
-    .modal-content {
-        max-width: 600px;
-    }
 }
 
 /* About Link */
@@ -854,6 +849,13 @@ body {
 
 .modal-content::-webkit-scrollbar {
     display: none; /* Chrome, Safari, Opera */
+}
+
+/* Wider modals on desktop */
+@media (min-width: 768px) {
+    .modal-content {
+        max-width: 600px;
+    }
 }
 
 .modal-close {
