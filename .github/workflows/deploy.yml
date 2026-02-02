@@ -3,7 +3,9 @@ name: Deploy to GitHub Pages
 on:
   push:
     branches:
+      - main
       - claude/update-2026-Z1D9s
+  workflow_dispatch:  # Allow manual triggering
 
 permissions:
   contents: read
@@ -15,10 +17,8 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  deploy:
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
+  # Build job - runs on every push
+  build:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -47,6 +47,14 @@ jobs:
         with:
           path: '.'
 
+  # Deploy job - requires manual approval via environment protection rules
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: production
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
