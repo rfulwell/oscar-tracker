@@ -121,10 +121,10 @@ const CATEGORIES = [
         name: 'Best International Feature',
         nominees: [
             { id: 'intl-sentimental', title: 'Sentimental Value', subtitle: 'Norway' },
-            { id: 'intl-amelie', title: 'Little Amélie or the Character of Rain', subtitle: 'France' },
-            { id: 'intl-accident', title: 'It Was Just an Accident', subtitle: 'Iran' },
-            { id: 'intl-stillhere', title: 'I\'m Still Here', subtitle: 'Brazil' },
-            { id: 'intl-arco', title: 'Arco', subtitle: 'France' }
+            { id: 'intl-secretagent', title: 'The Secret Agent', subtitle: 'Brazil' },
+            { id: 'intl-sirat', title: 'Sirât', subtitle: 'Spain' },
+            { id: 'intl-hind', title: 'The Voice of Hind Rajab', subtitle: 'Tunisia' },
+            { id: 'intl-accident', title: 'It Was Just an Accident', subtitle: 'France' }
         ]
     },
     {
@@ -135,7 +135,7 @@ const CATEGORIES = [
             { id: 'doc-goodlight', title: 'Come See Me in the Good Light', subtitle: 'Ryan White' },
             { id: 'doc-rocks', title: 'Cutting through Rocks', subtitle: 'Sara Khaki & Mohammadreza Eyni' },
             { id: 'doc-putin', title: 'Mr. Nobody against Putin', subtitle: 'Vera Krichevskaya' },
-            { id: 'doc-seeds', title: 'Seeds', subtitle: 'Brittany Shyne' }
+            { id: 'doc-neighbor', title: 'The Perfect Neighbor', subtitle: 'Geeta Gandbhir & Alison Payne' }
         ]
     },
     {
@@ -272,14 +272,15 @@ const FILM_NOMINEES = {
     'train-dreams': ['train-dreams', 'adapt-traindreams', 'cin-traindreams', 'song-traindreams'],
     'bugonia': ['bugonia', 'actress-stone', 'score-bugonia'],
     'f1': ['f1', 'edit-f1', 'sound-f1', 'vfx-f1'],
-    'secret-agent': ['secret-agent', 'actor-moura', 'adapt-secretagent'],
+    'secret-agent': ['secret-agent', 'actor-moura', 'adapt-secretagent', 'intl-secretagent'],
     'it-was-just-an-accident': ['orig-accident', 'intl-accident'],
-    'arco': ['anim-arco', 'intl-arco'],
-    'little-amelie': ['anim-amelie', 'intl-amelie'],
+    'arco': ['anim-arco'],
+    'little-amelie': ['anim-amelie'],
     'kpop-demon-hunters': ['anim-kpop', 'song-golden'],
     'avatar-fire-and-ash': ['cost-avatar', 'vfx-avatar'],
     'blue-moon': ['actor-hawke', 'orig-bluemoon'],
-    'im-still-here': ['intl-stillhere']
+    'sirat': ['intl-sirat', 'sound-sirat'],
+    'voice-of-hind-rajab': ['intl-hind']
 };
 
 // Build reverse lookup: nominee ID -> film key
@@ -295,20 +296,21 @@ const ALL_FILMS = [
     { key: 'sinners', title: 'Sinners', nominations: 16 },
     { key: 'one-battle-after-another', title: 'One Battle After Another', nominations: 13 },
     { key: 'marty-supreme', title: 'Marty Supreme', nominations: 10 },
-    { key: 'frankenstein', title: 'Frankenstein', nominations: 9 },
     { key: 'sentimental-value', title: 'Sentimental Value', nominations: 10 },
+    { key: 'frankenstein', title: 'Frankenstein', nominations: 9 },
     { key: 'hamnet', title: 'Hamnet', nominations: 8 },
     { key: 'train-dreams', title: 'Train Dreams', nominations: 4 },
     { key: 'f1', title: 'F1', nominations: 4 },
+    { key: 'secret-agent', title: 'The Secret Agent', nominations: 4 },
     { key: 'bugonia', title: 'Bugonia', nominations: 3 },
-    { key: 'secret-agent', title: 'The Secret Agent', nominations: 3 },
+    { key: 'sirat', title: 'Sirât', nominations: 2 },
     { key: 'blue-moon', title: 'Blue Moon', nominations: 2 },
     { key: 'it-was-just-an-accident', title: 'It Was Just an Accident', nominations: 2 },
-    { key: 'arco', title: 'Arco', nominations: 2 },
-    { key: 'little-amelie', title: 'The Little Amelie', nominations: 2 },
     { key: 'kpop-demon-hunters', title: 'KPop Demon Hunters', nominations: 2 },
     { key: 'avatar-fire-and-ash', title: 'Avatar: Fire and Ash', nominations: 2 },
-    { key: 'im-still-here', title: "I'm Still Here", nominations: 1 }
+    { key: 'arco', title: 'Arco', nominations: 1 },
+    { key: 'little-amelie', title: 'Little Amélie or the Character of Rain', nominations: 1 },
+    { key: 'voice-of-hind-rajab', title: 'The Voice of Hind Rajab', nominations: 1 }
 ].sort((a, b) => b.nominations - a.nominations);
 
 // Streaming service availability for films
