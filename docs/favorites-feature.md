@@ -98,6 +98,7 @@ Filled heart (selected):   ♥  (solid fill)
 │                                                         [×] │
 │                                                              │
 │              Start with your predictions?                    │
+│          (You can change them later anytime.)                │
 │                                                              │
 │     You have predictions in 12 categories.                   │
 │     Would you like to use them as your favorites?            │
@@ -115,6 +116,7 @@ Filled heart (selected):   ♥  (solid fill)
 │                                                         [×] │
 │                                                              │
 │               Start with your favorites?                     │
+│          (You can change them later anytime.)                │
 │                                                              │
 │     You have favorites in 8 categories.                      │
 │     Would you like to use them as your predictions?          │

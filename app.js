@@ -253,9 +253,12 @@ const CATEGORIES = [
 const STORAGE_KEY = 'oscar-tracker-watched';
 const CATEGORY_KEY = 'oscar-tracker-category';
 const PREDICTIONS_KEY = 'oscar-tracker-predictions';
+const FAVORITES_KEY = 'oscar-tracker-favorites';
 const MODE_KEY = 'oscar-tracker-mode';
 const SHARED_LISTS_KEY = 'oscar-tracker-shared-lists';
 const SHARER_NAME_KEY = 'oscar-tracker-sharer-name';
+const FAVORITES_COPY_DISMISSED_KEY = 'oscar-tracker-favorites-copy-dismissed';
+const PREDICTIONS_COPY_DISMISSED_KEY = 'oscar-tracker-predictions-copy-dismissed';
 
 // Film-to-nominees mapping for cross-category tracking
 // When a film is checked, all related nominees are also checked
@@ -345,6 +348,8 @@ let currentMode = 'watched'; // 'watched' | 'predictions' | 'shared:{id}'
 let sharedLists = []; // Array of { id, name, predictions, receivedAt }
 let currentSharedId = null; // ID of currently viewed shared list
 let pendingSharedData = null; // Temp storage for duplicate handling
+let favorites = {}; // { categoryId: nomineeId }
+let pendingCopyTarget = null; // 'favorites' | 'predictions' - for copy modal
 
 // DOM Elements
 const filmsList = document.getElementById('films-list');
@@ -768,6 +773,11 @@ function updateModeDropdown() {
     watchedOpt.textContent = 'Watched';
     select.appendChild(watchedOpt);
 
+    const favoritesOpt = document.createElement('option');
+    favoritesOpt.value = 'favorites';
+    favoritesOpt.textContent = 'Favorites';
+    select.appendChild(favoritesOpt);
+
     const predictionsOpt = document.createElement('option');
     predictionsOpt.value = 'predictions';
     predictionsOpt.textContent = 'Predictions';
@@ -990,6 +1000,77 @@ function hideDeleteModal() {
     }
 }
 
+// Show copy modal
+function showCopyModal(source, count) {
+    const modal = document.getElementById('copy-modal');
+    if (!modal) return;
+
+    const title = document.getElementById('copy-title');
+    const countSpan = document.getElementById('copy-count');
+
+    if (title) {
+        title.textContent = source === 'predictions'
+            ? 'Start with your predictions?'
+            : 'Start with your favorites?';
+    }
+    if (countSpan) {
+        countSpan.textContent = count;
+    }
+
+    modal.hidden = false;
+    document.body.classList.add('modal-open');
+}
+
+// Hide copy modal
+function hideCopyModal() {
+    const modal = document.getElementById('copy-modal');
+    if (modal) {
+        modal.hidden = true;
+        document.body.classList.remove('modal-open');
+    }
+    pendingCopyTarget = null;
+}
+
+// Handle copy yes
+function handleCopyYes() {
+    if (pendingCopyTarget === 'favorites') {
+        copyPredictionsToFavorites();
+        dismissCopyModal('favorites');
+        currentMode = 'favorites';
+    } else if (pendingCopyTarget === 'predictions') {
+        copyFavoritesToPredictions();
+        dismissCopyModal('predictions');
+        currentMode = 'predictions';
+    }
+
+    hideCopyModal();
+    modeSelect.value = currentMode;
+    saveMode();
+    renderNominees();
+    updateProgress();
+    updateShareDeleteButton();
+    updateSharedBanner();
+}
+
+// Handle copy no
+function handleCopyNo() {
+    if (pendingCopyTarget === 'favorites') {
+        dismissCopyModal('favorites');
+        currentMode = 'favorites';
+    } else if (pendingCopyTarget === 'predictions') {
+        dismissCopyModal('predictions');
+        currentMode = 'predictions';
+    }
+
+    hideCopyModal();
+    modeSelect.value = currentMode;
+    saveMode();
+    renderNominees();
+    updateProgress();
+    updateShareDeleteButton();
+    updateSharedBanner();
+}
+
 // Handle delete confirm
 function handleDeleteConfirm() {
     const list = getCurrentSharedList();
@@ -1018,6 +1099,7 @@ function handleDeleteConfirm() {
 function init() {
     loadWatchedItems();
     loadPredictions();
+    loadFavorites();
     loadCurrentCategory();
     loadSharedLists();
     loadMode();
@@ -1123,11 +1205,113 @@ function savePredictions() {
     }
 }
 
+// Load favorites from localStorage
+function loadFavorites() {
+    try {
+        const stored = localStorage.getItem(FAVORITES_KEY);
+        if (stored) {
+            favorites = JSON.parse(stored);
+        }
+    } catch (e) {
+        console.warn('Could not load favorites:', e);
+        favorites = {};
+    }
+}
+
+// Save favorites to localStorage
+function saveFavorites() {
+    try {
+        localStorage.setItem(FAVORITES_KEY, JSON.stringify(favorites));
+    } catch (e) {
+        console.warn('Could not save favorites:', e);
+    }
+}
+
+// Toggle favorite for a category
+function toggleFavorite(categoryId, nomineeId) {
+    if (favorites[categoryId] === nomineeId) {
+        delete favorites[categoryId];
+    } else {
+        favorites[categoryId] = nomineeId;
+    }
+    saveFavorites();
+}
+
+// Count favorites
+function countFavorites() {
+    return Object.keys(favorites).length;
+}
+
+// Check if favorites copy modal was dismissed
+function wasFavoritesCopyDismissed() {
+    try {
+        return localStorage.getItem(FAVORITES_COPY_DISMISSED_KEY) === 'true';
+    } catch (e) {
+        return false;
+    }
+}
+
+// Check if predictions copy modal was dismissed
+function wasPredictionsCopyDismissed() {
+    try {
+        return localStorage.getItem(PREDICTIONS_COPY_DISMISSED_KEY) === 'true';
+    } catch (e) {
+        return false;
+    }
+}
+
+// Dismiss copy modal for a target
+function dismissCopyModal(target) {
+    try {
+        if (target === 'favorites') {
+            localStorage.setItem(FAVORITES_COPY_DISMISSED_KEY, 'true');
+        } else if (target === 'predictions') {
+            localStorage.setItem(PREDICTIONS_COPY_DISMISSED_KEY, 'true');
+        }
+    } catch (e) {
+        console.warn('Could not save copy dismissal:', e);
+    }
+}
+
+// Check if should show copy to favorites modal
+function shouldShowCopyToFavoritesModal() {
+    // Show if: entering favorites, have predictions, no favorites yet, not dismissed
+    return countPredictions() > 0 && countFavorites() === 0 && !wasFavoritesCopyDismissed();
+}
+
+// Check if should show copy to predictions modal
+function shouldShowCopyToPredictionsModal() {
+    // Show if: entering predictions, have favorites, no predictions yet, not dismissed
+    return countFavorites() > 0 && countPredictions() === 0 && !wasPredictionsCopyDismissed();
+}
+
+// Count predictions
+function countPredictions() {
+    return Object.keys(predictions).length;
+}
+
+// Copy predictions to favorites
+function copyPredictionsToFavorites() {
+    favorites = { ...predictions };
+    saveFavorites();
+}
+
+// Copy favorites to predictions
+function copyFavoritesToPredictions() {
+    predictions = { ...favorites };
+    savePredictions();
+}
+
+// Check if in favorites mode
+function isFavoritesMode() {
+    return currentMode === 'favorites';
+}
+
 // Load current mode from localStorage
 function loadMode() {
     try {
         const stored = localStorage.getItem(MODE_KEY);
-        if (stored && (stored === 'watched' || stored === 'predictions')) {
+        if (stored && (stored === 'watched' || stored === 'favorites' || stored === 'predictions')) {
             currentMode = stored;
             modeSelect.value = currentMode;
         }
@@ -1218,15 +1402,17 @@ function getStreamingIconHtml(nomineeId) {
 function renderNominees() {
     const category = getCurrentCategory();
     const isPredictionsMode = currentMode === 'predictions';
+    const isFavMode = isFavoritesMode();
     const isSharedView = isSharedMode();
     const sharedList = isSharedView ? getCurrentSharedList() : null;
 
-    // Get the predictions to display
+    // Get the data to display based on mode
     let displayPredictions = predictions;
     if (isSharedView && sharedList) {
         displayPredictions = sharedList.predictions;
     }
     const predictedNominee = displayPredictions[category.id];
+    const favoritedNominee = favorites[category.id];
 
     filmsList.innerHTML = category.nominees.map(nominee => {
         const streamingIcon = getStreamingIconHtml(nominee.id);
@@ -1234,7 +1420,11 @@ function renderNominees() {
 
         // Determine state based on mode
         let isSelected, stateClass, role;
-        if (isPredictionsMode || isSharedView) {
+        if (isFavMode) {
+            isSelected = favoritedNominee === nominee.id;
+            stateClass = 'favorited';
+            role = 'radio';
+        } else if (isPredictionsMode || isSharedView) {
             isSelected = predictedNominee === nominee.id;
             stateClass = 'predicted';
             role = 'radio';
@@ -1247,14 +1437,24 @@ function renderNominees() {
         // Add shared-view class for read-only styling
         const sharedViewClass = isSharedView ? ' shared-view' : '';
 
-        // Icon: star for predictions/shared, checkmark for watched
-        const iconSvg = (isPredictionsMode || isSharedView)
-            ? `<svg viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round">
+        // Icon based on mode: heart for favorites, star for predictions/shared, checkmark for watched
+        let iconSvg;
+        if (isFavMode) {
+            // Heart icon
+            iconSvg = `<svg viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+               </svg>`;
+        } else if (isPredictionsMode || isSharedView) {
+            // Star icon
+            iconSvg = `<svg viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round">
                 <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
-               </svg>`
-            : `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+               </svg>`;
+        } else {
+            // Checkmark icon
+            iconSvg = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
                 <polyline points="20 6 9 17 4 12"></polyline>
                </svg>`;
+        }
 
         return `
         <li class="film ${isSelected ? stateClass : ''}${sharedViewClass}"
@@ -1291,6 +1491,8 @@ function handleNomineeClick(e) {
 
     if (currentMode === 'predictions') {
         togglePrediction(nomineeId);
+    } else if (currentMode === 'favorites') {
+        toggleFavoriteNominee(nomineeId);
     } else {
         toggleNominee(nomineeId, filmEl);
     }
@@ -1359,13 +1561,52 @@ function togglePrediction(nomineeId) {
     updateShareDeleteButton();
 }
 
+// Toggle favorite for current category
+function toggleFavoriteNominee(nomineeId) {
+    const category = getCurrentCategory();
+    const currentFavorite = favorites[category.id];
+
+    // Remove favorited state from previous selection
+    if (currentFavorite) {
+        const prevEl = document.querySelector(`.film[data-id="${currentFavorite}"]`);
+        if (prevEl) {
+            prevEl.classList.remove('favorited');
+            prevEl.setAttribute('aria-checked', 'false');
+        }
+    }
+
+    if (currentFavorite === nomineeId) {
+        // Clicking the same nominee clears the favorite
+        delete favorites[category.id];
+    } else {
+        // Set new favorite
+        favorites[category.id] = nomineeId;
+        // Add favorited state to new selection
+        const newEl = document.querySelector(`.film[data-id="${nomineeId}"]`);
+        if (newEl) {
+            newEl.classList.add('favorited');
+            newEl.setAttribute('aria-checked', 'true');
+        }
+    }
+
+    saveFavorites();
+    updateProgress();
+}
+
 // Update progress display
 function updateProgress() {
     const category = getCurrentCategory();
     let progressText;
     let titleProgress;
 
-    if (currentMode === 'predictions') {
+    if (currentMode === 'favorites') {
+        // For favorites: show how many categories have favorites
+        const favoritedCount = Object.keys(favorites).length;
+        const totalCategories = CATEGORIES.length;
+        const hasFavorite = favorites[category.id] ? '♥' : '♡';
+        progressText = hasFavorite;
+        titleProgress = favoritedCount > 0 ? `${favoritedCount}/${totalCategories}` : null;
+    } else if (currentMode === 'predictions') {
         // For predictions: show how many categories have predictions
         const predictedCount = Object.keys(predictions).length;
         const totalCategories = CATEGORIES.length;
@@ -1440,7 +1681,24 @@ function nextCategory(scrollToTop = false) {
 
 // Handle mode change
 function handleModeChange(e) {
-    currentMode = e.target.value;
+    const newMode = e.target.value;
+
+    // Check if we should show copy modal before switching
+    if (newMode === 'favorites' && shouldShowCopyToFavoritesModal()) {
+        pendingCopyTarget = 'favorites';
+        showCopyModal('predictions', countPredictions());
+        // Don't switch mode yet - wait for modal response
+        modeSelect.value = currentMode;
+        return;
+    } else if (newMode === 'predictions' && shouldShowCopyToPredictionsModal()) {
+        pendingCopyTarget = 'predictions';
+        showCopyModal('favorites', countFavorites());
+        // Don't switch mode yet - wait for modal response
+        modeSelect.value = currentMode;
+        return;
+    }
+
+    currentMode = newMode;
     currentSharedId = isSharedMode() ? currentMode.substring(7) : null;
     saveMode();
     renderNominees();
@@ -1595,6 +1853,27 @@ function setupEventListeners() {
     const duplicateCancelBtn = document.getElementById('duplicate-cancel');
     if (duplicateCancelBtn) {
         duplicateCancelBtn.addEventListener('click', handleDuplicateCancel);
+    }
+
+    // Copy modal events
+    const copyModalClose = document.querySelector('#copy-modal .modal-close');
+    if (copyModalClose) {
+        copyModalClose.addEventListener('click', handleCopyNo);
+    }
+
+    const copyModalBackdrop = document.querySelector('#copy-modal .modal-backdrop');
+    if (copyModalBackdrop) {
+        copyModalBackdrop.addEventListener('click', handleCopyNo);
+    }
+
+    const copyYesBtn = document.getElementById('copy-yes');
+    if (copyYesBtn) {
+        copyYesBtn.addEventListener('click', handleCopyYes);
+    }
+
+    const copyNoBtn = document.getElementById('copy-no');
+    if (copyNoBtn) {
+        copyNoBtn.addEventListener('click', handleCopyNo);
     }
 
     // Shared banner close button

@@ -63,6 +63,7 @@
                 <span class="separator">|</span>
                 <select class="mode-select" id="mode-select" aria-label="Select tracking mode">
                     <option value="watched">Watched</option>
+                    <option value="favorites">Favorites</option>
                     <option value="predictions">Predictions</option>
                 </select>
                 <button class="share-btn" id="share-btn" style="display: none;" disabled>Share</button>
@@ -268,6 +269,23 @@
                 <button class="btn btn-primary" id="duplicate-update">Update Existing</button>
                 <button class="btn btn-secondary" id="duplicate-keep-both">Keep Both</button>
                 <button class="btn btn-tertiary" id="duplicate-cancel">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Copy Modal (for cross-populating favorites/predictions) -->
+    <div id="copy-modal" class="modal" hidden aria-modal="true" aria-labelledby="copy-title">
+        <div class="modal-backdrop"></div>
+        <div class="modal-content modal-content-copy">
+            <button class="modal-close" id="copy-close" aria-label="Close">&times;</button>
+
+            <h2 id="copy-title">Start with your predictions?</h2>
+            <p class="copy-subtitle">(You can change them later anytime.)</p>
+            <p class="modal-description">You have selections in <strong id="copy-count">0</strong> categories. Would you like to use them as a starting point?</p>
+
+            <div class="modal-actions">
+                <button class="btn btn-secondary" id="copy-no">No</button>
+                <button class="btn btn-primary" id="copy-yes">Yes</button>
             </div>
         </div>
     </div>

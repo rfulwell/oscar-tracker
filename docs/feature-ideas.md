@@ -100,6 +100,33 @@ Better messaging when viewing shared predictions with no selections.
 
 ---
 
+### Expanded Tips Rotation
+
+**Priority**: Medium
+**Complexity**: Low
+
+Add more tips to the rotating tip display at the bottom of the main screen.
+
+**Current tips:**
+- "Tap a film to mark it as watched"
+
+**Proposed additional tips:**
+- "Switch to Predictions mode to pick your winners"
+- "Switch to Favorites mode to mark your personal favorites"
+- "Share your predictions with friends via the Share button"
+- "Swipe left/right to browse categories"
+- "Install the app for offline access"
+- "Your data is stored locally and never leaves your device"
+- "Tap a predicted film again to deselect it"
+- "You can save predictions from multiple friends"
+
+**Implementation:**
+- Add tips array in JavaScript
+- Rotate tips on each page load or on a timer
+- Consider showing mode-specific tips
+
+---
+
 ## Sharing Enhancements
 
 ### Source Identification
