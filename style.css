@@ -851,8 +851,8 @@ body {
     display: none; /* Chrome, Safari, Opera */
 }
 
-/* Wider modals on desktop */
-@media (min-width: 768px) {
+/* Wider modals on tablets and desktop */
+@media (min-width: 600px) {
     .modal-content {
         max-width: 600px;
     }
