@@ -15,33 +15,33 @@
     <meta name="apple-mobile-web-app-title" content="Oscar Tracker">
     
     <!-- Icons -->
-    <link rel="icon" type="image/png" sizes="32x32" href="icons/icon-32.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="icons/icon-16.png">
-    <link rel="apple-touch-icon" href="icons/icon-180.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/icons/icon-32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/icons/icon-16.png">
+    <link rel="apple-touch-icon" href="/icons/icon-180.png">
     
     <!-- iOS Splash Screens -->
     <!-- iPhone 15 Pro Max, 14 Pro Max -->
-    <link rel="apple-touch-startup-image" media="screen and (device-width: 430px) and (device-height: 932px) and (-webkit-device-pixel-ratio: 3)" href="splash/splash-1290x2796.png">
+    <link rel="apple-touch-startup-image" media="screen and (device-width: 430px) and (device-height: 932px) and (-webkit-device-pixel-ratio: 3)" href="/splash/splash-1290x2796.png">
     <!-- iPhone 15 Pro, 15, 14 Pro -->
-    <link rel="apple-touch-startup-image" media="screen and (device-width: 393px) and (device-height: 852px) and (-webkit-device-pixel-ratio: 3)" href="splash/splash-1179x2556.png">
+    <link rel="apple-touch-startup-image" media="screen and (device-width: 393px) and (device-height: 852px) and (-webkit-device-pixel-ratio: 3)" href="/splash/splash-1179x2556.png">
     <!-- iPhone 14, 13, 12 -->
-    <link rel="apple-touch-startup-image" media="screen and (device-width: 390px) and (device-height: 844px) and (-webkit-device-pixel-ratio: 3)" href="splash/splash-1170x2532.png">
+    <link rel="apple-touch-startup-image" media="screen and (device-width: 390px) and (device-height: 844px) and (-webkit-device-pixel-ratio: 3)" href="/splash/splash-1170x2532.png">
     <!-- iPhone SE 3rd gen, 8, 7 -->
-    <link rel="apple-touch-startup-image" media="screen and (device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2)" href="splash/splash-750x1334.png">
+    <link rel="apple-touch-startup-image" media="screen and (device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2)" href="/splash/splash-750x1334.png">
     <!-- iPad Pro 12.9" -->
-    <link rel="apple-touch-startup-image" media="screen and (device-width: 1024px) and (device-height: 1366px) and (-webkit-device-pixel-ratio: 2)" href="splash/splash-2048x2732.png">
+    <link rel="apple-touch-startup-image" media="screen and (device-width: 1024px) and (device-height: 1366px) and (-webkit-device-pixel-ratio: 2)" href="/splash/splash-2048x2732.png">
     <!-- iPad Pro 11" -->
-    <link rel="apple-touch-startup-image" media="screen and (device-width: 834px) and (device-height: 1194px) and (-webkit-device-pixel-ratio: 2)" href="splash/splash-1668x2388.png">
-    
+    <link rel="apple-touch-startup-image" media="screen and (device-width: 834px) and (device-height: 1194px) and (-webkit-device-pixel-ratio: 2)" href="/splash/splash-1668x2388.png">
+
     <!-- Web App Manifest -->
-    <link rel="manifest" href="manifest.json">
+    <link rel="manifest" href="/manifest.json">
     
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Libre+Franklin:wght@300;400;500&display=swap" rel="stylesheet">
     
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="/style.css">
 </head>
 <body>
     <div class="app">
@@ -56,28 +56,247 @@
                     <path d="M9 20H15" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
                 </svg>
             </div>
-            <h1 class="title">Oscar Tracker</h1>
-            <p class="subtitle">97th Academy Awards · 2025</p>
+            <h1 class="title">Oscar<sup>®</sup> Tracker</h1>
+            <p class="subtitle">98th <a href="https://www.oscars.org/" target="_blank" rel="noopener noreferrer" class="subtitle-link">Academy Awards<sup>®</sup></a> · 2026</p>
+            <div class="ceremony-info">
+                <span>March 15 on ABC</span>
+                <span class="separator">|</span>
+                <select class="mode-select" id="mode-select" aria-label="Select tracking mode">
+                    <option value="watched">Watched</option>
+                    <option value="favorites">Favorites</option>
+                    <option value="predictions">Predictions</option>
+                </select>
+                <button class="share-btn" id="share-btn" style="display: none;" disabled>Share</button>
+                <button class="delete-btn" id="delete-btn" style="display: none;">Delete</button>
+            </div>
         </header>
-        
-        <main class="main">
+
+        <!-- First-time experience screen -->
+        <main class="main onboarding-screen" id="onboarding-screen" style="display: none;">
+            <p class="onboarding-prompt">Check off films you've already seen</p>
+            <ul class="films" id="all-films-list">
+                <!-- All films will be rendered here by JavaScript -->
+            </ul>
+            <div class="browse-btn-wrapper">
+                <button class="browse-btn" id="browse-by-category">
+                    Browse by Category
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="9 18 15 12 9 6"></polyline>
+                    </svg>
+                </button>
+            </div>
+        </main>
+
+        <main class="main category-screen" id="category-screen">
             <section class="category">
                 <div class="category-header">
-                    <h2 class="category-title">Best Picture</h2>
-                    <span class="progress" id="progress">0 / 10</span>
+                    <button class="nav-btn nav-prev" id="prev-category" aria-label="Previous category">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="15 18 9 12 15 6"></polyline>
+                        </svg>
+                    </button>
+                    <div class="category-selector">
+                        <div class="category-select-row">
+                            <span class="category-prefix">Best</span>
+                            <select class="category-select" id="category-select" aria-label="Select award category">
+                                <!-- Options will be rendered by JavaScript -->
+                            </select>
+                        </div>
+                        <span class="progress" id="progress">0 / 10</span>
+                    </div>
+                    <button class="nav-btn nav-next" id="next-category" aria-label="Next category">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="9 18 15 12 9 6"></polyline>
+                        </svg>
+                    </button>
                 </div>
-                
+
+                <!-- Shared view banner -->
+                <div class="shared-banner" id="shared-banner" style="display: none;">
+                    <span class="shared-banner-text" id="shared-banner-text"></span>
+                    <button class="shared-banner-close" aria-label="Dismiss">&times;</button>
+                </div>
+
                 <ul class="films" id="films-list">
                     <!-- Films will be rendered here by JavaScript -->
                 </ul>
+
+                <div class="category-footer">
+                    <button class="nav-btn nav-prev" id="prev-category-bottom" aria-label="Previous category">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="15 18 9 12 15 6"></polyline>
+                        </svg>
+                    </button>
+                    <div class="category-selector">
+                        <div class="category-select-row">
+                            <span class="category-prefix">Best</span>
+                            <select class="category-select" id="category-select-bottom" aria-label="Select award category">
+                                <!-- Options will be rendered by JavaScript -->
+                            </select>
+                        </div>
+                        <span class="progress" id="progress-bottom">0 / 10</span>
+                    </div>
+                    <button class="nav-btn nav-next" id="next-category-bottom" aria-label="Next category">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="9 18 15 12 9 6"></polyline>
+                        </svg>
+                    </button>
+                </div>
             </section>
         </main>
         
         <footer class="footer">
-            <p>Tap a film to mark as watched</p>
+            <p id="tip-text"><span class="tip-label">Tip:</span> <span id="tip-content">Tap a film to mark as watched</span></p>
+            <a href="#" class="about-link" id="about-link">About</a>
+            <p class="legal-disclaimer">OSCAR®, OSCARS®, and ACADEMY AWARDS® are registered trademarks of the Academy of Motion Picture Arts and Sciences. This app is not affiliated with or endorsed by the Academy.</p>
+            <button class="refresh-btn" id="hard-refresh" aria-label="Clear cache and reload">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 2v6h-6"></path>
+                    <path d="M3 12a9 9 0 0 1 15-6.7L21 8"></path>
+                    <path d="M3 22v-6h6"></path>
+                    <path d="M21 12a9 9 0 0 1-15 6.7L3 16"></path>
+                </svg>
+                <span class="tooltip">Clear cache &amp; reload</span>
+            </button>
         </footer>
     </div>
-    
-    <script src="app.js"></script>
+
+    <!-- About Modal -->
+    <div id="about-modal" class="modal" hidden aria-modal="true" aria-labelledby="about-title">
+        <div class="modal-backdrop"></div>
+        <div class="modal-content">
+            <button class="modal-close" id="about-close" aria-label="Close">&times;</button>
+
+            <h2 id="about-title">Oscar Tracker</h2>
+            <span class="version-badge" id="version-badge">v1.0.0</span>
+
+            <p class="about-description">
+                Track your Oscar watch progress and make predictions for the 98th Academy Awards.
+            </p>
+
+            <div class="oscar-countdown">
+                <span class="countdown-icon">🏆</span>
+                <span class="countdown-date">March 15, 2026</span>
+                <span class="countdown-remaining" id="countdown-days"></span>
+            </div>
+
+            <div class="about-section">
+                <h3>📤 Share Predictions</h3>
+                <p>Share your picks with friends via a simple link - no account required!</p>
+            </div>
+
+            <div class="about-section">
+                <h3>📋 What's New</h3>
+                <div class="changelog-scroll" id="changelog-list">
+                    <!-- Changelog entries will be rendered by JavaScript -->
+                </div>
+            </div>
+
+            <div class="about-section pwa-hints" id="pwa-hints">
+                <h3>📱 Install as App</h3>
+                <p class="pwa-links">
+                    <a href="https://support.apple.com/guide/iphone/bookmark-favorite-webpages-iph42ab2f3a7/ios#iph4f9a47bbc" target="_blank" rel="noopener">iOS</a>
+                    ·
+                    <a href="https://support.google.com/chrome/answer/9658361" target="_blank" rel="noopener">Android</a>
+                    ·
+                    <a href="https://support.google.com/chrome/answer/9658361" target="_blank" rel="noopener">Desktop</a>
+                </p>
+            </div>
+
+            <div class="about-section privacy-note">
+                <h3>🔒 Privacy</h3>
+                <p>Your data is stored locally on your device and never sent to any server.</p>
+            </div>
+
+            <footer class="about-footer">
+                <a href="https://github.com/rfulwell/oscar-tracker" target="_blank" rel="noopener">
+                    github.com/rfulwell/oscar-tracker
+                </a>
+            </footer>
+        </div>
+    </div>
+
+    <!-- Share Modal -->
+    <div id="share-modal" class="modal" hidden aria-modal="true" aria-labelledby="share-title">
+        <div class="modal-backdrop"></div>
+        <div class="modal-content modal-content-share">
+            <button class="modal-close" id="share-close" aria-label="Close">&times;</button>
+
+            <h2 id="share-title">Share Your Picks!</h2>
+            <p class="modal-description">Your friends will see your predictions for all 21 categories.</p>
+
+            <div class="share-form">
+                <input type="text"
+                    id="share-name-input"
+                    class="share-input"
+                    placeholder="Your name"
+                    maxlength="30"
+                    autocomplete="off">
+                <p class="share-input-hint">This will be visible to anyone you share with</p>
+            </div>
+
+            <div class="modal-actions">
+                <button class="btn btn-secondary" id="share-cancel">Cancel</button>
+                <button class="btn btn-primary" id="share-copy" disabled>Share</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div id="delete-modal" class="modal" hidden aria-modal="true" aria-labelledby="delete-title">
+        <div class="modal-backdrop"></div>
+        <div class="modal-content modal-content-delete">
+            <button class="modal-close" id="delete-close" aria-label="Close">&times;</button>
+
+            <h2 id="delete-title">Remove Shared List</h2>
+            <p class="modal-description">Are you sure you want to remove <strong id="delete-name"></strong>'s predictions? You can add this list again later by following the sharing link you received.</p>
+
+            <div class="modal-actions">
+                <button class="btn btn-secondary" id="delete-cancel">Cancel</button>
+                <button class="btn btn-danger" id="delete-confirm">Remove</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Duplicate Handling Modal -->
+    <div id="duplicate-modal" class="modal" hidden aria-modal="true" aria-labelledby="duplicate-title">
+        <div class="modal-backdrop"></div>
+        <div class="modal-content modal-content-duplicate">
+            <button class="modal-close" id="duplicate-close" aria-label="Close">&times;</button>
+
+            <h2 id="duplicate-title">Already Have This List</h2>
+            <p class="modal-description">You already have predictions from <strong id="duplicate-name"></strong>. What would you like to do?</p>
+
+            <div class="modal-actions modal-actions-stacked">
+                <button class="btn btn-primary" id="duplicate-update">Update Existing</button>
+                <button class="btn btn-secondary" id="duplicate-keep-both">Keep Both</button>
+                <button class="btn btn-tertiary" id="duplicate-cancel">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Copy Modal (for cross-populating favorites/predictions) -->
+    <div id="copy-modal" class="modal" hidden aria-modal="true" aria-labelledby="copy-title">
+        <div class="modal-backdrop"></div>
+        <div class="modal-content modal-content-copy">
+            <button class="modal-close" id="copy-close" aria-label="Close">&times;</button>
+
+            <h2 id="copy-title">Start with your predictions?</h2>
+            <p class="copy-subtitle">(You can change them later anytime.)</p>
+            <p class="modal-description">You have selections in <strong id="copy-count">0</strong> categories. Would you like to use them as a starting point?</p>
+
+            <div class="modal-actions">
+                <button class="btn btn-secondary" id="copy-no">No</button>
+                <button class="btn btn-primary" id="copy-yes">Yes</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="toast" hidden>
+        <span id="toast-message"></span>
+    </div>
+
+    <script src="/app.js"></script>
 </body>
 </html>

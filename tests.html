@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Oscar Tracker Tests</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #1a1a1a;
+            color: #fff;
+            padding: 2rem;
+            line-height: 1.6;
+        }
+        h1 { margin-bottom: 1rem; color: #d4af37; }
+        h2 { margin: 1.5rem 0 0.5rem; font-size: 1.1rem; color: #888; }
+        .test { padding: 0.5rem 1rem; margin: 0.25rem 0; border-radius: 4px; }
+        .pass { background: rgba(34, 197, 94, 0.2); border-left: 3px solid #22c55e; }
+        .fail { background: rgba(239, 68, 68, 0.2); border-left: 3px solid #ef4444; }
+        .summary {
+            margin-top: 2rem;
+            padding: 1rem;
+            background: #2a2a2a;
+            border-radius: 8px;
+            font-size: 1.1rem;
+        }
+        .summary.all-pass { border: 1px solid #22c55e; }
+        .summary.has-fail { border: 1px solid #ef4444; }
+        .error { color: #ef4444; font-size: 0.875rem; margin-top: 0.25rem; }
+    </style>
+</head>
+<body>
+    <h1>Oscar Tracker Test Suite</h1>
+    <div id="results"></div>
+    <div id="summary" class="summary"></div>
+
+    <script>
+        // Simple test framework
+        const results = [];
+        const resultsEl = document.getElementById('results');
+        const summaryEl = document.getElementById('summary');
+
+        function describe(name, fn) {
+            const section = document.createElement('div');
+            section.innerHTML = `<h2>${name}</h2>`;
+            resultsEl.appendChild(section);
+            fn();
+        }
+
+        function test(name, fn) {
+            const testEl = document.createElement('div');
+            testEl.className = 'test';
+            try {
+                fn();
+                testEl.className += ' pass';
+                testEl.textContent = `✓ ${name}`;
+                results.push({ name, passed: true });
+            } catch (e) {
+                testEl.className += ' fail';
+                testEl.innerHTML = `✗ ${name}<div class="error">${e.message}</div>`;
+                results.push({ name, passed: false, error: e.message });
+            }
+            resultsEl.appendChild(testEl);
+        }
+
+        function expect(value) {
+            return {
+                toBe(expected) {
+                    if (value !== expected) {
+                        throw new Error(`Expected ${JSON.stringify(expected)}, got ${JSON.stringify(value)}`);
+                    }
+                },
+                toEqual(expected) {
+                    if (JSON.stringify(value) !== JSON.stringify(expected)) {
+                        throw new Error(`Expected ${JSON.stringify(expected)}, got ${JSON.stringify(value)}`);
+                    }
+                },
+                toBeTruthy() {
+                    if (!value) {
+                        throw new Error(`Expected truthy value, got ${JSON.stringify(value)}`);
+                    }
+                },
+                toBeFalsy() {
+                    if (value) {
+                        throw new Error(`Expected falsy value, got ${JSON.stringify(value)}`);
+                    }
+                },
+                toBeGreaterThan(expected) {
+                    if (value <= expected) {
+                        throw new Error(`Expected ${value} to be greater than ${expected}`);
+                    }
+                },
+                toContain(expected) {
+                    if (Array.isArray(value)) {
+                        if (!value.includes(expected)) {
+                            throw new Error(`Expected array to contain ${JSON.stringify(expected)}`);
+                        }
+                    } else if (typeof value === 'string') {
+                        if (!value.includes(expected)) {
+                            throw new Error(`Expected string to contain "${expected}"`);
+                        }
+                    }
+                },
+                toHaveLength(expected) {
+                    if (value.length !== expected) {
+                        throw new Error(`Expected length ${expected}, got ${value.length}`);
+                    }
+                }
+            };
+        }
+
+        // Mock localStorage
+        const mockStorage = {};
+        const originalLocalStorage = window.localStorage;
+        Object.defineProperty(window, 'localStorage', {
+            value: {
+                getItem: (key) => mockStorage[key] || null,
+                setItem: (key, value) => { mockStorage[key] = value; },
+                removeItem: (key) => { delete mockStorage[key]; },
+                clear: () => { Object.keys(mockStorage).forEach(k => delete mockStorage[k]); }
+            }
+        });
+
+        // Load the app script to test
+        const script = document.createElement('script');
+        script.src = 'app.js';
+        script.onload = runTests;
+        document.body.appendChild(script);
+
+        function runTests() {
+            // Data Structure Tests
+            describe('Data Structure', () => {
+                test('CATEGORIES is defined and is an array', () => {
+                    expect(typeof CATEGORIES).toBe('object');
+                    expect(Array.isArray(CATEGORIES)).toBe(true);
+                });
+
+                test('CATEGORIES has 10 award categories', () => {
+                    expect(CATEGORIES.length).toBe(10);
+                });
+
+                test('Each category has required properties', () => {
+                    CATEGORIES.forEach(cat => {
+                        expect(typeof cat.id).toBe('string');
+                        expect(typeof cat.name).toBe('string');
+                        expect(Array.isArray(cat.nominees)).toBe(true);
+                    });
+                });
+
+                test('Best Picture has 10 nominees', () => {
+                    const bestPicture = CATEGORIES.find(c => c.id === 'best-picture');
+                    expect(bestPicture.nominees.length).toBe(10);
+                });
+
+                test('Other categories have 5 nominees each', () => {
+                    CATEGORIES.filter(c => c.id !== 'best-picture').forEach(cat => {
+                        expect(cat.nominees.length).toBe(5);
+                    });
+                });
+
+                test('All nominees have unique IDs', () => {
+                    const allIds = CATEGORIES.flatMap(c => c.nominees.map(n => n.id));
+                    const uniqueIds = new Set(allIds);
+                    expect(uniqueIds.size).toBe(allIds.length);
+                });
+
+                test('All nominees have title and subtitle', () => {
+                    CATEGORIES.forEach(cat => {
+                        cat.nominees.forEach(nominee => {
+                            expect(typeof nominee.id).toBe('string');
+                            expect(typeof nominee.title).toBe('string');
+                            expect(typeof nominee.subtitle).toBe('string');
+                            expect(nominee.title.length).toBeGreaterThan(0);
+                        });
+                    });
+                });
+            });
+
+            // Category Content Tests
+            describe('Category Content Verification', () => {
+                test('Best Picture contains Sinners', () => {
+                    const bestPicture = CATEGORIES.find(c => c.id === 'best-picture');
+                    const titles = bestPicture.nominees.map(n => n.title);
+                    expect(titles).toContain('Sinners');
+                });
+
+                test('Best Director contains Ryan Coogler', () => {
+                    const bestDirector = CATEGORIES.find(c => c.id === 'best-director');
+                    const titles = bestDirector.nominees.map(n => n.title);
+                    expect(titles).toContain('Ryan Coogler');
+                });
+
+                test('Best Actor contains Timothée Chalamet', () => {
+                    const bestActor = CATEGORIES.find(c => c.id === 'best-actor');
+                    const titles = bestActor.nominees.map(n => n.title);
+                    expect(titles).toContain('Timothée Chalamet');
+                });
+
+                test('Best Actress contains Emma Stone', () => {
+                    const bestActress = CATEGORIES.find(c => c.id === 'best-actress');
+                    const titles = bestActress.nominees.map(n => n.title);
+                    expect(titles).toContain('Emma Stone');
+                });
+
+                test('Best Animated Feature contains 5 films', () => {
+                    const animated = CATEGORIES.find(c => c.id === 'best-animated-feature');
+                    expect(animated.nominees.length).toBe(5);
+                    const titles = animated.nominees.map(n => n.title);
+                    expect(titles).toContain('Elio');
+                    expect(titles).toContain('Zootopia 2');
+                });
+
+                test('Best International Feature contains correct countries', () => {
+                    const intl = CATEGORIES.find(c => c.id === 'best-international-feature');
+                    const subtitles = intl.nominees.map(n => n.subtitle);
+                    expect(subtitles).toContain('Norway');
+                    expect(subtitles).toContain('France');
+                    expect(subtitles).toContain('Brazil');
+                });
+            });
+
+            // Navigation Tests
+            describe('Navigation Functions', () => {
+                test('getCurrentCategory returns correct category', () => {
+                    currentCategoryIndex = 0;
+                    expect(getCurrentCategory().id).toBe('best-picture');
+
+                    currentCategoryIndex = 1;
+                    expect(getCurrentCategory().id).toBe('best-director');
+                });
+
+                test('prevCategory wraps from first to last', () => {
+                    currentCategoryIndex = 0;
+                    prevCategory();
+                    expect(currentCategoryIndex).toBe(CATEGORIES.length - 1);
+                });
+
+                test('nextCategory wraps from last to first', () => {
+                    currentCategoryIndex = CATEGORIES.length - 1;
+                    nextCategory();
+                    expect(currentCategoryIndex).toBe(0);
+                });
+
+                test('navigateToCategory updates index correctly', () => {
+                    navigateToCategory(5);
+                    expect(currentCategoryIndex).toBe(5);
+                });
+            });
+
+            // Storage Tests
+            describe('LocalStorage Functions', () => {
+                test('saveWatchedItems stores data correctly', () => {
+                    localStorage.clear();
+                    watchedItems = new Set(['test-1', 'test-2']);
+                    saveWatchedItems();
+                    const stored = JSON.parse(localStorage.getItem(STORAGE_KEY));
+                    expect(stored).toContain('test-1');
+                    expect(stored).toContain('test-2');
+                });
+
+                test('loadWatchedItems retrieves data correctly', () => {
+                    localStorage.clear();
+                    localStorage.setItem(STORAGE_KEY, JSON.stringify(['item-a', 'item-b']));
+                    watchedItems = new Set();
+                    loadWatchedItems();
+                    expect(watchedItems.has('item-a')).toBe(true);
+                    expect(watchedItems.has('item-b')).toBe(true);
+                });
+
+                test('saveCurrentCategory stores category ID', () => {
+                    localStorage.clear();
+                    currentCategoryIndex = 3;
+                    saveCurrentCategory();
+                    const stored = localStorage.getItem(CATEGORY_KEY);
+                    expect(stored).toBe('best-actress');
+                });
+
+                test('loadCurrentCategory restores correct index', () => {
+                    localStorage.clear();
+                    localStorage.setItem(CATEGORY_KEY, 'best-actor');
+                    currentCategoryIndex = 0;
+                    loadCurrentCategory();
+                    expect(currentCategoryIndex).toBe(2);
+                });
+            });
+
+            // Progress Calculation Tests
+            describe('Progress Calculations', () => {
+                test('Progress counts watched items in current category', () => {
+                    localStorage.clear();
+                    currentCategoryIndex = 0;
+                    const nominees = CATEGORIES[0].nominees;
+                    watchedItems = new Set([nominees[0].id, nominees[1].id]);
+
+                    // Mock progressEl
+                    const mockProgress = { textContent: '' };
+                    const originalProgressEl = progressEl;
+                    window.progressEl = mockProgress;
+
+                    updateProgress();
+
+                    expect(mockProgress.textContent).toBe('2 / 10');
+                });
+
+                test('Total nominees count is correct', () => {
+                    const total = CATEGORIES.reduce((sum, cat) => sum + cat.nominees.length, 0);
+                    // 10 + 9*5 = 55 nominees
+                    expect(total).toBe(55);
+                });
+            });
+
+            // DOM Element Tests
+            describe('DOM Elements', () => {
+                test('Required DOM elements exist', () => {
+                    expect(document.getElementById('films-list')).toBeTruthy();
+                    expect(document.getElementById('progress')).toBeTruthy();
+                    expect(document.getElementById('category-select')).toBeTruthy();
+                    expect(document.getElementById('prev-category')).toBeTruthy();
+                    expect(document.getElementById('next-category')).toBeTruthy();
+                    expect(document.getElementById('hard-refresh')).toBeTruthy();
+                });
+
+                test('Category select has correct number of options', () => {
+                    const select = document.getElementById('category-select');
+                    expect(select.options.length).toBe(21);
+                });
+
+                test('Refresh button has tooltip', () => {
+                    const btn = document.getElementById('hard-refresh');
+                    const tooltip = btn.querySelector('.tooltip');
+                    expect(tooltip).toBeTruthy();
+                    expect(tooltip.textContent).toContain('cache');
+                });
+            });
+
+            // Render Summary
+            const passed = results.filter(r => r.passed).length;
+            const failed = results.filter(r => !r.passed).length;
+            summaryEl.className = `summary ${failed > 0 ? 'has-fail' : 'all-pass'}`;
+            summaryEl.textContent = `Tests: ${passed} passed, ${failed} failed, ${results.length} total`;
+        }
+    </script>
+</body>
+</html>

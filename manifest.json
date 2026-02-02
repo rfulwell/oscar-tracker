@@ -1,8 +1,10 @@
 {
-    "name": "Oscar Tracker",
-    "short_name": "Oscar Tracker",
+    "name": "Awards Tracker",
+    "short_name": "Awards Tracker",
     "description": "Track which Oscar-nominated films you've watched",
+    "id": "awardstracker-app",
     "start_url": "/",
+    "scope": "/",
     "display": "standalone",
     "background_color": "#0a0a0a",
     "theme_color": "#0a0a0a",
