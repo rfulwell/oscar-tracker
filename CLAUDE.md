@@ -37,6 +37,8 @@ Tests start a local HTTP server on port 3000 and run against the live app. Each 
 ### Coverage
 
 - **predictions.spec.js**: Predictions mode functionality (mode switching, single-select behavior, persistence, progress display, performance regression tests)
+- **sharing.spec.js**: Sharing predictions via URL (first-time visitors, returning visitors, shared list management, name sanitization, invalid links)
+- **favorites.spec.js**: Favorites mode (heart icons, single-select, cross-population modals, persistence, mode switching)
 
 ### Performance Profiling
 

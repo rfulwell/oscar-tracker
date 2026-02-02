@@ -275,6 +275,19 @@ Added in About modal with lock emoji icon.
 
 ---
 
+### ~~Favorites Mode~~ ✅ IMPLEMENTED
+
+Full implementation with cross-population modals. See [favorites-feature.md](favorites-feature.md) for complete spec.
+
+**Features implemented:**
+- Favorites mode with heart icons (♡/♥)
+- Single-select behavior (one favorite per category)
+- Cross-population modal when switching modes (copy predictions to favorites or vice versa)
+- Separate localStorage persistence
+- Full E2E test coverage
+
+---
+
 ### Data Export
 
 **Priority**: Low
