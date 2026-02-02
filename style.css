@@ -525,7 +525,7 @@ body {
 
 /* Onboarding Screen */
 .onboarding-screen {
-    padding-bottom: var(--spacing-xl);
+    padding-bottom: 0;
 }
 
 .onboarding-prompt {
@@ -552,6 +552,18 @@ body {
     color: var(--color-gold-light);
 }
 
+/* Sticky footer wrapper for browse button */
+.browse-btn-wrapper {
+    position: sticky;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: var(--spacing-lg) var(--spacing-md);
+    margin: 0 calc(-1 * var(--spacing-md));
+    background: linear-gradient(to top, var(--color-black) 60%, transparent);
+    pointer-events: none;
+}
+
 .browse-btn {
     display: flex;
     align-items: center;
@@ -559,7 +571,7 @@ body {
     gap: 8px;
     width: 100%;
     max-width: 280px;
-    margin: var(--spacing-lg) auto 0;
+    margin: 0 auto;
     padding: var(--spacing-sm) var(--spacing-md);
     font-family: var(--font-body);
     font-size: 1rem;
@@ -571,6 +583,7 @@ body {
     cursor: pointer;
     transition: all 0.2s ease;
     -webkit-tap-highlight-color: transparent;
+    pointer-events: auto;
 }
 
 .browse-btn:hover {
