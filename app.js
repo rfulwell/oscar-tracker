@@ -280,7 +280,18 @@ const FILM_NOMINEES = {
     'avatar-fire-and-ash': ['cost-avatar', 'vfx-avatar'],
     'blue-moon': ['actor-hawke', 'orig-bluemoon'],
     'sirat': ['intl-sirat', 'sound-sirat'],
-    'voice-of-hind-rajab': ['intl-hind']
+    'voice-of-hind-rajab': ['intl-hind'],
+    'if-i-had-legs': ['actress-byrne'],
+    'song-sung-blue': ['actress-hudson'],
+    'elio': ['anim-elio'],
+    'zootopia-2': ['anim-zootopia2'],
+    'alabama-solution': ['doc-alabama'],
+    'come-see-me': ['doc-goodlight'],
+    'perfect-neighbor': ['doc-neighbor'],
+    'smashing-machine': ['makeup-smashing'],
+    'ugly-stepsister': ['makeup-ugly'],
+    'jurassic-world-rebirth': ['vfx-jurassic'],
+    'lost-bus': ['vfx-lostbus']
 };
 
 // Build reverse lookup: nominee ID -> film key
@@ -310,18 +321,72 @@ const ALL_FILMS = [
     { key: 'avatar-fire-and-ash', title: 'Avatar: Fire and Ash', nominations: 2 },
     { key: 'arco', title: 'Arco', nominations: 1 },
     { key: 'little-amelie', title: 'Little Amélie or the Character of Rain', nominations: 1 },
-    { key: 'voice-of-hind-rajab', title: 'The Voice of Hind Rajab', nominations: 1 }
+    { key: 'voice-of-hind-rajab', title: 'The Voice of Hind Rajab', nominations: 1 },
+    { key: 'if-i-had-legs', title: 'If I Had Legs I\'d Kick You', nominations: 1 },
+    { key: 'song-sung-blue', title: 'Song Sung Blue', nominations: 1 },
+    { key: 'elio', title: 'Elio', nominations: 1 },
+    { key: 'zootopia-2', title: 'Zootopia 2', nominations: 1 },
+    { key: 'alabama-solution', title: 'The Alabama Solution', nominations: 1 },
+    { key: 'come-see-me', title: 'Come See Me in the Good Light', nominations: 1 },
+    { key: 'perfect-neighbor', title: 'The Perfect Neighbor', nominations: 1 },
+    { key: 'smashing-machine', title: 'The Smashing Machine', nominations: 1 },
+    { key: 'ugly-stepsister', title: 'The Ugly Stepsister', nominations: 1 },
+    { key: 'jurassic-world-rebirth', title: 'Jurassic World Rebirth', nominations: 1 },
+    { key: 'lost-bus', title: 'The Lost Bus', nominations: 1 }
 ].sort((a, b) => b.nominations - a.nominations);
 
-// Streaming service availability for films
-// Based on research: Netflix, Max, and Apple TV+ are top services with Oscar nominees
+// Streaming service availability for films (subscription streaming only, not rent/buy)
 const FILM_STREAMING = {
     'sinners': 'max',
     'one-battle-after-another': 'max',
+    'if-i-had-legs': 'max',
+    'smashing-machine': 'max',
+    'alabama-solution': 'max',
     'frankenstein': 'netflix',
     'train-dreams': 'netflix',
     'kpop-demon-hunters': 'netflix',
-    'f1': 'appletv'
+    'perfect-neighbor': 'netflix',
+    'f1': 'appletv',
+    'come-see-me': 'appletv',
+    'lost-bus': 'appletv',
+    'bugonia': 'peacock',
+    'jurassic-world-rebirth': 'peacock',
+    'ugly-stepsister': 'hulu',
+    'elio': 'disneyplus'
+};
+
+// Streaming service configuration
+const STREAMING_SERVICES = {
+    netflix: {
+        urlTemplate: 'https://www.netflix.com/search?q={title}',
+        icon: '/icons/netflix.svg',
+        name: 'Netflix'
+    },
+    max: {
+        urlTemplate: 'https://play.max.com/search?q={title}',
+        icon: '/icons/max.svg',
+        name: 'Max'
+    },
+    appletv: {
+        urlTemplate: 'https://tv.apple.com/search?term={title}',
+        icon: '/icons/appletv.svg',
+        name: 'Apple TV+'
+    },
+    peacock: {
+        urlTemplate: 'https://www.peacocktv.com/watch/search?q={title}',
+        icon: '/icons/peacock.svg',
+        name: 'Peacock'
+    },
+    hulu: {
+        urlTemplate: 'https://www.hulu.com/search?q={title}',
+        icon: '/icons/hulu.svg',
+        name: 'Hulu'
+    },
+    disneyplus: {
+        urlTemplate: 'https://www.disneyplus.com/search/{title}',
+        icon: '/icons/disneyplus.svg',
+        name: 'Disney+'
+    }
 };
 
 // Get streaming service for a nominee (if available)
@@ -1411,16 +1476,9 @@ function getFilmTitle(nomineeId) {
     const filmKey = NOMINEE_TO_FILM[nomineeId];
     if (!filmKey) return null;
 
-    // Map film keys to their display titles
-    const filmTitles = {
-        'sinners': 'Sinners',
-        'one-battle-after-another': 'One Battle After Another',
-        'frankenstein': 'Frankenstein',
-        'train-dreams': 'Train Dreams',
-        'kpop-demon-hunters': 'KPop Demon Hunters',
-        'f1': 'F1'
-    };
-    return filmTitles[filmKey] || null;
+    // Look up title from ALL_FILMS
+    const film = ALL_FILMS.find(f => f.key === filmKey);
+    return film ? film.title : null;
 }
 
 // Generate streaming icon HTML with link
@@ -1431,30 +1489,12 @@ function getStreamingIconHtml(nomineeId) {
     const filmTitle = getFilmTitle(nomineeId);
     if (!filmTitle) return '';
 
-    const encodedTitle = encodeURIComponent(filmTitle);
-
-    const serviceConfig = {
-        netflix: {
-            url: `https://www.netflix.com/search?q=${encodedTitle}`,
-            icon: '/icons/netflix.svg',
-            name: 'Netflix'
-        },
-        max: {
-            url: `https://play.max.com/search?q=${encodedTitle}`,
-            icon: '/icons/max.svg',
-            name: 'Max'
-        },
-        appletv: {
-            url: `https://tv.apple.com/search?term=${encodedTitle}`,
-            icon: '/icons/appletv.svg',
-            name: 'Apple TV+'
-        }
-    };
-
-    const config = serviceConfig[service];
+    const config = STREAMING_SERVICES[service];
     if (!config) return '';
 
-    return `<a href="${config.url}" target="_blank" rel="noopener noreferrer" class="streaming-icon" title="Watch on ${config.name}" onclick="event.stopPropagation()">
+    const encodedTitle = encodeURIComponent(filmTitle);
+    const url = config.urlTemplate.replace('{title}', encodedTitle);
+    return `<a href="${url}" target="_blank" rel="noopener noreferrer" class="streaming-icon" title="Watch on ${config.name}" onclick="event.stopPropagation()">
         <img src="${config.icon}" alt="${config.name}">
     </a>`;
 }
@@ -1467,30 +1507,12 @@ function getStreamingIconHtmlForFilm(filmKey) {
     const film = ALL_FILMS.find(f => f.key === filmKey);
     if (!film) return '';
 
-    const encodedTitle = encodeURIComponent(film.title);
-
-    const serviceConfig = {
-        netflix: {
-            url: `https://www.netflix.com/search?q=${encodedTitle}`,
-            icon: '/icons/netflix.svg',
-            name: 'Netflix'
-        },
-        max: {
-            url: `https://play.max.com/search?q=${encodedTitle}`,
-            icon: '/icons/max.svg',
-            name: 'Max'
-        },
-        appletv: {
-            url: `https://tv.apple.com/search?term=${encodedTitle}`,
-            icon: '/icons/appletv.svg',
-            name: 'Apple TV+'
-        }
-    };
-
-    const config = serviceConfig[service];
+    const config = STREAMING_SERVICES[service];
     if (!config) return '';
 
-    return `<a href="${config.url}" target="_blank" rel="noopener noreferrer" class="streaming-icon" title="Watch on ${config.name}" onclick="event.stopPropagation()">
+    const encodedTitle = encodeURIComponent(film.title);
+    const url = config.urlTemplate.replace('{title}', encodedTitle);
+    return `<a href="${url}" target="_blank" rel="noopener noreferrer" class="streaming-icon" title="Watch on ${config.name}" onclick="event.stopPropagation()">
         <img src="${config.icon}" alt="${config.name}">
     </a>`;
 }
