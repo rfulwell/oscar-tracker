@@ -913,6 +913,16 @@ body {
     margin-bottom: var(--spacing-sm);
 }
 
+.sw-version {
+    display: inline-block;
+    font-size: 0.65rem;
+    font-weight: 400;
+    color: var(--color-white-dim);
+    margin-left: 6px;
+    opacity: 0.5;
+    vertical-align: middle;
+}
+
 .about-description {
     font-size: 0.875rem;
     color: var(--color-white-dim);

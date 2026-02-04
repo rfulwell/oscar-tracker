@@ -28,8 +28,8 @@ jobs:
 
       - name: Bump version
         run: |
-          # Generate version: 1.1.{run_number}
-          VERSION="1.1.${{ github.run_number }}"
+          # Generate version: 1.2.{run_number}
+          VERSION="1.2.${{ github.run_number }}"
           echo "Deploying version: $VERSION"
 
           # Update APP_VERSION in app.js

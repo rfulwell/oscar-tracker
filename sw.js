@@ -1,5 +1,6 @@
 // Service Worker for Awards Tracker PWA
-const CACHE_NAME = 'awards-tracker-v5';
+const SW_VERSION = '6';
+const CACHE_NAME = `awards-tracker-v${SW_VERSION}`;
 
 const ASSETS_TO_CACHE = [
     '/',
@@ -11,8 +12,21 @@ const ASSETS_TO_CACHE = [
     '/icons/icon-512.png',
     '/icons/netflix.svg',
     '/icons/max.svg',
-    '/icons/appletv.svg'
+    '/icons/appletv.svg',
+    '/icons/peacock.svg',
+    '/icons/hulu.svg',
+    '/icons/disneyplus.svg'
 ];
+
+// Respond to version queries from the app
+self.addEventListener('message', (event) => {
+    if (event.data && event.data.type === 'GET_VERSION') {
+        const port = event.ports[0];
+        if (port) {
+            port.postMessage({ type: 'SW_VERSION', version: SW_VERSION });
+        }
+    }
+});
 
 // Install event - cache assets
 self.addEventListener('install', (event) => {

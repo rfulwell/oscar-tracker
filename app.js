@@ -2,8 +2,9 @@
 // 98th Academy Awards (2026)
 
 // Version and Changelog
-const APP_VERSION = '1.1.0';
+const APP_VERSION = '1.2.0';
 const CHANGELOG = [
+    { version: '1.2.0', description: 'Streamable list — see what\'s streaming and where' },
     { version: '1.1.0', description: 'Share predictions with friends via URL' },
     { version: '1.0.0', description: 'Initial release - track watched films and make predictions' }
 ];
@@ -2098,9 +2099,31 @@ function showAboutModal() {
     updateCountdown();
     renderChangelog();
     if (versionBadge) versionBadge.textContent = `v${APP_VERSION}`;
+    updateSwVersion();
     if (aboutModal) {
         aboutModal.hidden = false;
         document.body.classList.add('modal-open');
+    }
+}
+
+function updateSwVersion() {
+    const swVersionEl = document.getElementById('sw-version');
+    if (!swVersionEl) return;
+
+    if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
+        // Ask the active service worker for its version
+        const messageChannel = new MessageChannel();
+        messageChannel.port1.onmessage = (event) => {
+            if (event.data && event.data.type === 'SW_VERSION') {
+                swVersionEl.textContent = `SW v${event.data.version}`;
+            }
+        };
+        navigator.serviceWorker.controller.postMessage(
+            { type: 'GET_VERSION' },
+            [messageChannel.port2]
+        );
+    } else {
+        swVersionEl.textContent = 'SW inactive';
     }
 }
 
