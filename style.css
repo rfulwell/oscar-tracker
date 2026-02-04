@@ -1325,6 +1325,27 @@ body.modal-open {
 }
 
 /* Streamable mode styling */
+.streamable-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--spacing-sm) var(--spacing-xs);
+    margin-bottom: var(--spacing-sm);
+}
+
+.streamable-title {
+    font-family: var(--font-display);
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: var(--color-white);
+}
+
+.streamable-progress {
+    font-family: var(--font-body);
+    font-size: 0.8125rem;
+    color: var(--color-white-dim);
+}
+
 .film.streamable-view {
     cursor: default;
 }
@@ -1357,14 +1378,9 @@ body.modal-open {
     color: rgba(165, 180, 252, 1);
 }
 
-.film.streamable-view:not(.streamable) .checkbox {
-    background: transparent;
-    border-color: var(--color-white-dimmer);
-    opacity: 0.4;
-}
-
-.film.streamable-view:not(.streamable) .checkbox svg {
-    opacity: 0.3;
+.film.streamable.streamable-item-watched {
+    border-color: rgba(99, 102, 241, 0.25);
+    opacity: 0.7;
 }
 
 .streamable-watched {

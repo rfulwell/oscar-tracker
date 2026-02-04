@@ -1319,6 +1319,55 @@ function isStreamableMode() {
     return currentMode === 'streamable';
 }
 
+// Update UI for streamable mode (hide category nav, show streamable header)
+function updateStreamableUI() {
+    const isStreamable = isStreamableMode();
+    const categoryHeader = document.querySelector('.category-header');
+    const categoryFooter = document.querySelector('.category-footer');
+    const streamableHeader = document.getElementById('streamable-header');
+
+    if (categoryHeader) categoryHeader.style.display = isStreamable ? 'none' : '';
+    if (categoryFooter) categoryFooter.style.display = isStreamable ? 'none' : '';
+
+    if (isStreamable) {
+        // Show or create streamable header
+        if (!streamableHeader) {
+            const header = document.createElement('div');
+            header.id = 'streamable-header';
+            header.className = 'streamable-header';
+            const watchedCount = getStreamableWatchedCount();
+            const totalCount = getStreamableTotalCount();
+            header.innerHTML = `
+                <span class="streamable-title">Now Streaming</span>
+                <span class="streamable-progress">${watchedCount} / ${totalCount} watched</span>
+            `;
+            filmsList.parentNode.insertBefore(header, filmsList);
+        } else {
+            streamableHeader.style.display = '';
+            updateStreamableProgress();
+        }
+    } else if (streamableHeader) {
+        streamableHeader.style.display = 'none';
+    }
+}
+
+function getStreamableTotalCount() {
+    return Object.keys(FILM_STREAMING).length;
+}
+
+function getStreamableWatchedCount() {
+    return Object.keys(FILM_STREAMING).filter(key => isFilmWatched(key)).length;
+}
+
+function updateStreamableProgress() {
+    const header = document.getElementById('streamable-header');
+    if (!header) return;
+    const progressEl = header.querySelector('.streamable-progress');
+    if (progressEl) {
+        progressEl.textContent = `${getStreamableWatchedCount()} / ${getStreamableTotalCount()} watched`;
+    }
+}
+
 // Load current mode from localStorage
 function loadMode() {
     try {
@@ -1410,12 +1459,90 @@ function getStreamingIconHtml(nomineeId) {
     </a>`;
 }
 
+// Generate streaming icon HTML from a film key (not nominee ID)
+function getStreamingIconHtmlForFilm(filmKey) {
+    const service = FILM_STREAMING[filmKey];
+    if (!service) return '';
+
+    const film = ALL_FILMS.find(f => f.key === filmKey);
+    if (!film) return '';
+
+    const encodedTitle = encodeURIComponent(film.title);
+
+    const serviceConfig = {
+        netflix: {
+            url: `https://www.netflix.com/search?q=${encodedTitle}`,
+            icon: '/icons/netflix.svg',
+            name: 'Netflix'
+        },
+        max: {
+            url: `https://play.max.com/search?q=${encodedTitle}`,
+            icon: '/icons/max.svg',
+            name: 'Max'
+        },
+        appletv: {
+            url: `https://tv.apple.com/search?term=${encodedTitle}`,
+            icon: '/icons/appletv.svg',
+            name: 'Apple TV+'
+        }
+    };
+
+    const config = serviceConfig[service];
+    if (!config) return '';
+
+    return `<a href="${config.url}" target="_blank" rel="noopener noreferrer" class="streaming-icon" title="Watch on ${config.name}" onclick="event.stopPropagation()">
+        <img src="${config.icon}" alt="${config.name}">
+    </a>`;
+}
+
+// Render the streamable flat list (all streamable films in one view)
+function renderStreamableList() {
+    const streamableFilms = ALL_FILMS.filter(f => FILM_STREAMING[f.key]);
+
+    const playIcon = `<svg viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="0" stroke-linecap="round" stroke-linejoin="round">
+        <polygon points="8 5 19 12 8 19 8 5"></polygon>
+    </svg>`;
+
+    filmsList.innerHTML = streamableFilms.map(film => {
+        const watched = isFilmWatched(film.key);
+        const streamingIcon = getStreamingIconHtmlForFilm(film.key);
+        const subtitleText = watched ? '✓ Watched' : 'Not yet watched';
+        const subtitleClass = watched ? 'film-studio streamable-watched' : 'film-studio streamable-unwatched';
+        const watchedClass = watched ? ' streamable-item-watched' : '';
+
+        return `
+        <li class="film streamable streamable-view${watchedClass}"
+            data-film="${film.key}"
+            role="listitem"
+            tabindex="-1">
+            <div class="checkbox">
+                ${playIcon}
+            </div>
+            <div class="film-info">
+                <div class="film-title">${film.title}</div>
+                <div class="${subtitleClass}">${subtitleText}</div>
+            </div>
+            <div class="streaming-box">
+                ${streamingIcon}
+            </div>
+        </li>
+    `}).join('');
+
+    // No click handlers - read-only mode
+}
+
 // Render nominees list
 function renderNominees() {
+    // Streamable mode renders a completely different flat list
+    if (isStreamableMode()) {
+        renderStreamableList();
+        updateStreamableUI();
+        return;
+    }
+
     const category = getCurrentCategory();
     const isPredictionsMode = currentMode === 'predictions';
     const isFavMode = isFavoritesMode();
-    const isStreamable = isStreamableMode();
     const isSharedView = isSharedMode();
     const sharedList = isSharedView ? getCurrentSharedList() : null;
 
@@ -1433,12 +1560,7 @@ function renderNominees() {
 
         // Determine state based on mode
         let isSelected, stateClass, role;
-        if (isStreamable) {
-            const hasStream = getStreamingService(nominee.id) !== null;
-            isSelected = hasStream;
-            stateClass = 'streamable';
-            role = 'listitem';
-        } else if (isFavMode) {
+        if (isFavMode) {
             isSelected = favoritedNominee === nominee.id;
             stateClass = 'favorited';
             role = 'radio';
@@ -1452,17 +1574,12 @@ function renderNominees() {
             role = 'checkbox';
         }
 
-        // Add read-only class for non-interactive modes
-        const readOnlyClass = isSharedView ? ' shared-view' : (isStreamable ? ' streamable-view' : '');
+        // Add shared-view class for read-only styling
+        const sharedViewClass = isSharedView ? ' shared-view' : '';
 
-        // Icon based on mode: heart for favorites, star for predictions/shared, play for streamable, checkmark for watched
+        // Icon based on mode: heart for favorites, star for predictions/shared, checkmark for watched
         let iconSvg;
-        if (isStreamable) {
-            // Play icon for streamable
-            iconSvg = `<svg viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="0" stroke-linecap="round" stroke-linejoin="round">
-                <polygon points="8 5 19 12 8 19 8 5"></polygon>
-               </svg>`;
-        } else if (isFavMode) {
+        if (isFavMode) {
             // Heart icon
             iconSvg = `<svg viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
@@ -1479,26 +1596,18 @@ function renderNominees() {
                </svg>`;
         }
 
-        // Subtitle: in streamable mode, show watched status
-        const subtitleText = isStreamable
-            ? (watchedItems.has(nominee.id) ? '✓ Watched' : 'Not yet watched')
-            : nominee.subtitle;
-        const subtitleClass = isStreamable
-            ? (watchedItems.has(nominee.id) ? 'film-studio streamable-watched' : 'film-studio streamable-unwatched')
-            : 'film-studio';
-
         return `
-        <li class="film ${isSelected ? stateClass : ''}${readOnlyClass}"
+        <li class="film ${isSelected ? stateClass : ''}${sharedViewClass}"
             data-id="${nominee.id}"
             role="${role}"
             aria-checked="${isSelected}"
-            tabindex="${isSharedView || isStreamable ? -1 : 0}">
+            tabindex="${isSharedView ? -1 : 0}">
             <div class="checkbox">
                 ${iconSvg}
             </div>
             <div class="film-info">
                 <div class="film-title">${nominee.title}</div>
-                <div class="${subtitleClass}">${subtitleText}</div>
+                <div class="film-studio">${nominee.subtitle}</div>
             </div>
             <div class="streaming-box ${hasStreaming ? '' : 'empty'}">
                 ${streamingIcon}
@@ -1507,7 +1616,7 @@ function renderNominees() {
     `}).join('');
 
     // Add event listeners (only for interactive modes)
-    if (!isSharedView && !isStreamable) {
+    if (!isSharedView) {
         document.querySelectorAll('#films-list .film').forEach(el => {
             el.addEventListener('click', handleNomineeClick);
             el.addEventListener('keydown', handleNomineeKeydown);
@@ -1631,17 +1740,11 @@ function updateProgress() {
     let titleProgress;
 
     if (currentMode === 'streamable') {
-        // For streamable: show how many nominees in this category have streaming
-        const streamableCount = category.nominees.filter(n => getStreamingService(n.id) !== null).length;
-        const total = category.nominees.length;
-        progressText = `${streamableCount} / ${total}`;
-
-        // Total streamable across all categories
-        const totalStreamable = CATEGORIES.reduce((sum, cat) =>
-            sum + cat.nominees.filter(n => getStreamingService(n.id) !== null).length, 0
-        );
-        const totalNominees = CATEGORIES.reduce((sum, cat) => sum + cat.nominees.length, 0);
-        titleProgress = totalStreamable > 0 ? `${totalStreamable}/${totalNominees}` : null;
+        // For streamable: show watched/total in document title only
+        const watchedCount = getStreamableWatchedCount();
+        const totalCount = getStreamableTotalCount();
+        progressText = '';
+        titleProgress = `${watchedCount}/${totalCount}`;
     } else if (currentMode === 'favorites') {
         // For favorites: show how many categories have favorites
         const favoritedCount = Object.keys(favorites).length;
@@ -1744,6 +1847,8 @@ function handleModeChange(e) {
     currentMode = newMode;
     currentSharedId = isSharedMode() ? currentMode.substring(7) : null;
     saveMode();
+    // Restore category nav if leaving streamable mode
+    updateStreamableUI();
     renderNominees();
     updateProgress();
     updateShareDeleteButton();

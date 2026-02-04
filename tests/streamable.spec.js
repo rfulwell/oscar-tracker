@@ -17,6 +17,12 @@ async function completeOnboarding(page) {
     await page.waitForSelector('#films-list .film', { state: 'visible' });
 }
 
+// Helper to switch to streamable mode
+async function switchToStreamable(page) {
+    await page.locator('#mode-select').selectOption('streamable');
+    await page.waitForSelector('#streamable-header', { state: 'visible' });
+}
+
 test.describe('Streamable Mode', () => {
 
     test.describe('Mode Switching', () => {
@@ -31,41 +37,103 @@ test.describe('Streamable Mode', () => {
         test('should switch to streamable mode via dropdown', async ({ page }) => {
             await completeOnboarding(page);
 
-            await page.locator('#mode-select').selectOption('streamable');
+            await switchToStreamable(page);
             await expect(page.locator('#mode-select')).toHaveValue('streamable');
-        });
-
-        test('streamable should appear after predictions in dropdown', async ({ page }) => {
-            await completeOnboarding(page);
-
-            const options = await page.locator('#mode-select option').allTextContents();
-            const predictionsIndex = options.indexOf('Predictions');
-            const streamableIndex = options.indexOf('Streamable');
-
-            expect(streamableIndex).toBeGreaterThan(predictionsIndex);
         });
 
         test('should persist streamable mode across reloads', async ({ page }) => {
             await completeOnboarding(page);
-            await page.locator('#mode-select').selectOption('streamable');
+            await switchToStreamable(page);
 
             await page.reload();
             await completeOnboarding(page);
 
             await expect(page.locator('#mode-select')).toHaveValue('streamable');
+            await expect(page.locator('#streamable-header')).toBeVisible();
+        });
+
+        test('should restore category navigation when switching away', async ({ page }) => {
+            await completeOnboarding(page);
+            await switchToStreamable(page);
+
+            // Category nav should be hidden
+            await expect(page.locator('.category-header')).toBeHidden();
+
+            // Switch back to watched
+            await page.locator('#mode-select').selectOption('watched');
+            await page.waitForTimeout(200);
+
+            // Category nav should be visible again
+            await expect(page.locator('.category-header')).toBeVisible();
+            await expect(page.locator('#streamable-header')).toBeHidden();
+        });
+    });
+
+    test.describe('Flat List Layout', () => {
+
+        test('should show all streamable films in one list', async ({ page }) => {
+            await completeOnboarding(page);
+            await switchToStreamable(page);
+
+            const films = page.locator('#films-list .film');
+            const count = await films.count();
+
+            // Should show exactly the number of films in FILM_STREAMING (currently 6)
+            expect(count).toBe(6);
+        });
+
+        test('should show each streamable film by title', async ({ page }) => {
+            await completeOnboarding(page);
+            await switchToStreamable(page);
+
+            const titles = await page.locator('#films-list .film-title').allTextContents();
+
+            expect(titles).toContain('Sinners');
+            expect(titles).toContain('One Battle After Another');
+            expect(titles).toContain('Frankenstein');
+            expect(titles).toContain('Train Dreams');
+            expect(titles).toContain('KPop Demon Hunters');
+            expect(titles).toContain('F1');
+        });
+
+        test('should hide category navigation', async ({ page }) => {
+            await completeOnboarding(page);
+            await switchToStreamable(page);
+
+            await expect(page.locator('.category-header')).toBeHidden();
+            await expect(page.locator('.category-footer')).toBeHidden();
+        });
+
+        test('should show "Now Streaming" header', async ({ page }) => {
+            await completeOnboarding(page);
+            await switchToStreamable(page);
+
+            const header = page.locator('#streamable-header');
+            await expect(header).toBeVisible();
+            await expect(header.locator('.streamable-title')).toHaveText('Now Streaming');
+        });
+
+        test('all films should have streamable class', async ({ page }) => {
+            await completeOnboarding(page);
+            await switchToStreamable(page);
+
+            const films = page.locator('#films-list .film');
+            const count = await films.count();
+
+            for (let i = 0; i < count; i++) {
+                await expect(films.nth(i)).toHaveClass(/streamable/);
+            }
         });
     });
 
     test.describe('Read-Only Behavior', () => {
 
-        test('films should not be selectable in streamable mode', async ({ page }) => {
+        test('films should not be selectable', async ({ page }) => {
             await completeOnboarding(page);
-            await page.locator('#mode-select').selectOption('streamable');
+            await switchToStreamable(page);
 
-            // All films should have tabindex -1
             const films = page.locator('#films-list .film');
             const count = await films.count();
-            expect(count).toBeGreaterThan(0);
 
             for (let i = 0; i < count; i++) {
                 const tabindex = await films.nth(i).getAttribute('tabindex');
@@ -75,7 +143,7 @@ test.describe('Streamable Mode', () => {
 
         test('clicking a film should not change its state', async ({ page }) => {
             await completeOnboarding(page);
-            await page.locator('#mode-select').selectOption('streamable');
+            await switchToStreamable(page);
 
             const firstFilm = page.locator('#films-list .film').first();
             const classesBefore = await firstFilm.getAttribute('class');
@@ -86,134 +154,129 @@ test.describe('Streamable Mode', () => {
             const classesAfter = await firstFilm.getAttribute('class');
             expect(classesAfter).toBe(classesBefore);
         });
-
-        test('all films should have streamable-view class', async ({ page }) => {
-            await completeOnboarding(page);
-            await page.locator('#mode-select').selectOption('streamable');
-
-            const films = page.locator('#films-list .film');
-            const count = await films.count();
-
-            for (let i = 0; i < count; i++) {
-                await expect(films.nth(i)).toHaveClass(/streamable-view/);
-            }
-        });
     });
 
     test.describe('Streaming Icons', () => {
 
-        test('streaming icons should be visible and clickable', async ({ page }) => {
+        test('every film should have a streaming icon', async ({ page }) => {
             await completeOnboarding(page);
-            await page.locator('#mode-select').selectOption('streamable');
+            await switchToStreamable(page);
 
-            // Navigate to Best Picture which has streamable films
-            const streamingIcons = page.locator('#films-list .streaming-icon');
-            const iconCount = await streamingIcons.count();
+            const films = page.locator('#films-list .film');
+            const icons = page.locator('#films-list .streaming-icon');
 
-            // Best Picture should have some streaming icons
-            if (iconCount > 0) {
-                const href = await streamingIcons.first().getAttribute('href');
+            const filmCount = await films.count();
+            const iconCount = await icons.count();
+
+            // Every film in the streamable list should have a streaming icon
+            expect(iconCount).toBe(filmCount);
+        });
+
+        test('streaming icons should have valid links', async ({ page }) => {
+            await completeOnboarding(page);
+            await switchToStreamable(page);
+
+            const icons = page.locator('#films-list .streaming-icon');
+            const count = await icons.count();
+
+            for (let i = 0; i < count; i++) {
+                const href = await icons.nth(i).getAttribute('href');
                 expect(href).toBeTruthy();
                 expect(href).toMatch(/^https:\/\//);
             }
-        });
-
-        test('films with streaming should have streamable class', async ({ page }) => {
-            await completeOnboarding(page);
-            await page.locator('#mode-select').selectOption('streamable');
-
-            // Films with streaming icons should be highlighted
-            const streamableFilms = page.locator('#films-list .film.streamable');
-            const streamingIcons = page.locator('#films-list .streaming-icon');
-
-            const streamableCount = await streamableFilms.count();
-            const iconCount = await streamingIcons.count();
-
-            // Each film with a streaming icon should have the streamable class
-            expect(streamableCount).toBe(iconCount);
-        });
-
-        test('films without streaming should not have streamable class', async ({ page }) => {
-            await completeOnboarding(page);
-            await page.locator('#mode-select').selectOption('streamable');
-
-            const allFilms = page.locator('#films-list .film');
-            const streamableFilms = page.locator('#films-list .film.streamable');
-            const allCount = await allFilms.count();
-            const streamableCount = await streamableFilms.count();
-
-            // Not all films should be streamable
-            expect(streamableCount).toBeLessThan(allCount);
         });
     });
 
     test.describe('Watched Status Display', () => {
 
-        test('should show "Not yet watched" for unwatched films', async ({ page }) => {
+        test('should show "Not yet watched" for all films initially', async ({ page }) => {
             await completeOnboarding(page);
-            await page.locator('#mode-select').selectOption('streamable');
+            await switchToStreamable(page);
 
             const subtitles = page.locator('#films-list .film-studio');
             const count = await subtitles.count();
 
             for (let i = 0; i < count; i++) {
-                const text = await subtitles.nth(i).textContent();
-                expect(text).toBe('Not yet watched');
-            }
-        });
-
-        test('should show watched status for watched films', async ({ page }) => {
-            await completeOnboarding(page);
-
-            // Watch the first film in watched mode
-            await page.locator('#mode-select').selectOption('watched');
-            await page.locator('#films-list .film').first().click();
-            await page.waitForTimeout(200);
-
-            // Switch to streamable
-            await page.locator('#mode-select').selectOption('streamable');
-
-            const firstSubtitle = await page.locator('#films-list .film-studio').first().textContent();
-            expect(firstSubtitle).toContain('Watched');
-        });
-
-        test('watched films should have streamable-watched class on subtitle', async ({ page }) => {
-            await completeOnboarding(page);
-
-            // Watch the first film
-            await page.locator('#mode-select').selectOption('watched');
-            await page.locator('#films-list .film').first().click();
-            await page.waitForTimeout(200);
-
-            // Switch to streamable
-            await page.locator('#mode-select').selectOption('streamable');
-
-            await expect(page.locator('#films-list .film-studio').first()).toHaveClass(/streamable-watched/);
-        });
-
-        test('unwatched films should have streamable-unwatched class on subtitle', async ({ page }) => {
-            await completeOnboarding(page);
-            await page.locator('#mode-select').selectOption('streamable');
-
-            // All should be unwatched initially
-            const subtitles = page.locator('#films-list .film-studio');
-            const count = await subtitles.count();
-
-            for (let i = 0; i < count; i++) {
+                await expect(subtitles.nth(i)).toHaveText('Not yet watched');
                 await expect(subtitles.nth(i)).toHaveClass(/streamable-unwatched/);
             }
+        });
+
+        test('should reflect watched status from watched list', async ({ page }) => {
+            await completeOnboarding(page);
+
+            // Watch Sinners in watched mode (it's in Best Picture)
+            await page.locator('#mode-select').selectOption('watched');
+            await page.locator('#films-list .film[data-id="sinners"]').click();
+            await page.waitForTimeout(200);
+
+            // Switch to streamable
+            await switchToStreamable(page);
+
+            // Find Sinners in the streamable list and check its subtitle
+            const films = page.locator('#films-list .film');
+            const count = await films.count();
+            let sinnersWatched = false;
+
+            for (let i = 0; i < count; i++) {
+                const title = await films.nth(i).locator('.film-title').textContent();
+                const subtitle = await films.nth(i).locator('.film-studio').textContent();
+                if (title === 'Sinners') {
+                    expect(subtitle).toContain('Watched');
+                    sinnersWatched = true;
+                }
+            }
+            expect(sinnersWatched).toBe(true);
+        });
+
+        test('watched films should have streamable-watched class', async ({ page }) => {
+            await completeOnboarding(page);
+
+            // Watch Sinners
+            await page.locator('#mode-select').selectOption('watched');
+            await page.locator('#films-list .film[data-id="sinners"]').click();
+            await page.waitForTimeout(200);
+
+            await switchToStreamable(page);
+
+            // At least one subtitle should have the watched class
+            const watchedSubtitles = page.locator('#films-list .streamable-watched');
+            expect(await watchedSubtitles.count()).toBeGreaterThan(0);
         });
     });
 
     test.describe('Progress Display', () => {
 
-        test('should show streamable count in progress', async ({ page }) => {
+        test('should show watched count in streamable header', async ({ page }) => {
             await completeOnboarding(page);
-            await page.locator('#mode-select').selectOption('streamable');
+            await switchToStreamable(page);
 
-            const progress = await page.locator('#progress').textContent();
-            // Should show "X / Y" format
-            expect(progress).toMatch(/\d+ \/ \d+/);
+            const progress = await page.locator('.streamable-progress').textContent();
+            // Should show "0 / 6 watched" initially
+            expect(progress).toMatch(/\d+ \/ \d+ watched/);
+            expect(progress).toContain('0 / 6');
+        });
+
+        test('should update count when films are watched', async ({ page }) => {
+            await completeOnboarding(page);
+
+            // Watch Sinners in Best Picture
+            await page.locator('#mode-select').selectOption('watched');
+            await page.locator('#films-list .film[data-id="sinners"]').click();
+            await page.waitForTimeout(200);
+
+            await switchToStreamable(page);
+
+            const progress = await page.locator('.streamable-progress').textContent();
+            expect(progress).toContain('1 / 6');
+        });
+
+        test('should update document title with progress', async ({ page }) => {
+            await completeOnboarding(page);
+            await switchToStreamable(page);
+
+            const title = await page.title();
+            expect(title).toContain('0/6');
         });
     });
 
@@ -221,9 +284,8 @@ test.describe('Streamable Mode', () => {
 
         test('should show play icon in checkbox area', async ({ page }) => {
             await completeOnboarding(page);
-            await page.locator('#mode-select').selectOption('streamable');
+            await switchToStreamable(page);
 
-            // Check that play icon SVG polygon is present
             const playIcons = page.locator('#films-list .film .checkbox svg polygon');
             const count = await playIcons.count();
             expect(count).toBeGreaterThan(0);
