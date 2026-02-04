@@ -785,6 +785,11 @@ function updateModeDropdown() {
     predictionsOpt.textContent = 'Predictions';
     select.appendChild(predictionsOpt);
 
+    const streamableOpt = document.createElement('option');
+    streamableOpt.value = 'streamable';
+    streamableOpt.textContent = 'Streamable';
+    select.appendChild(streamableOpt);
+
     // Add separator and shared lists if any
     if (sharedLists.length > 0) {
         const separator = document.createElement('option');
@@ -1309,11 +1314,16 @@ function isFavoritesMode() {
     return currentMode === 'favorites';
 }
 
+// Check if in streamable mode
+function isStreamableMode() {
+    return currentMode === 'streamable';
+}
+
 // Load current mode from localStorage
 function loadMode() {
     try {
         const stored = localStorage.getItem(MODE_KEY);
-        if (stored && (stored === 'watched' || stored === 'favorites' || stored === 'predictions')) {
+        if (stored && (stored === 'watched' || stored === 'favorites' || stored === 'predictions' || stored === 'streamable')) {
             currentMode = stored;
             modeSelect.value = currentMode;
         }
@@ -1405,6 +1415,7 @@ function renderNominees() {
     const category = getCurrentCategory();
     const isPredictionsMode = currentMode === 'predictions';
     const isFavMode = isFavoritesMode();
+    const isStreamable = isStreamableMode();
     const isSharedView = isSharedMode();
     const sharedList = isSharedView ? getCurrentSharedList() : null;
 
@@ -1422,7 +1433,12 @@ function renderNominees() {
 
         // Determine state based on mode
         let isSelected, stateClass, role;
-        if (isFavMode) {
+        if (isStreamable) {
+            const hasStream = getStreamingService(nominee.id) !== null;
+            isSelected = hasStream;
+            stateClass = 'streamable';
+            role = 'listitem';
+        } else if (isFavMode) {
             isSelected = favoritedNominee === nominee.id;
             stateClass = 'favorited';
             role = 'radio';
@@ -1436,12 +1452,17 @@ function renderNominees() {
             role = 'checkbox';
         }
 
-        // Add shared-view class for read-only styling
-        const sharedViewClass = isSharedView ? ' shared-view' : '';
+        // Add read-only class for non-interactive modes
+        const readOnlyClass = isSharedView ? ' shared-view' : (isStreamable ? ' streamable-view' : '');
 
-        // Icon based on mode: heart for favorites, star for predictions/shared, checkmark for watched
+        // Icon based on mode: heart for favorites, star for predictions/shared, play for streamable, checkmark for watched
         let iconSvg;
-        if (isFavMode) {
+        if (isStreamable) {
+            // Play icon for streamable
+            iconSvg = `<svg viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="0" stroke-linecap="round" stroke-linejoin="round">
+                <polygon points="8 5 19 12 8 19 8 5"></polygon>
+               </svg>`;
+        } else if (isFavMode) {
             // Heart icon
             iconSvg = `<svg viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
@@ -1458,18 +1479,26 @@ function renderNominees() {
                </svg>`;
         }
 
+        // Subtitle: in streamable mode, show watched status
+        const subtitleText = isStreamable
+            ? (watchedItems.has(nominee.id) ? '✓ Watched' : 'Not yet watched')
+            : nominee.subtitle;
+        const subtitleClass = isStreamable
+            ? (watchedItems.has(nominee.id) ? 'film-studio streamable-watched' : 'film-studio streamable-unwatched')
+            : 'film-studio';
+
         return `
-        <li class="film ${isSelected ? stateClass : ''}${sharedViewClass}"
+        <li class="film ${isSelected ? stateClass : ''}${readOnlyClass}"
             data-id="${nominee.id}"
             role="${role}"
             aria-checked="${isSelected}"
-            tabindex="${isSharedView ? -1 : 0}">
+            tabindex="${isSharedView || isStreamable ? -1 : 0}">
             <div class="checkbox">
                 ${iconSvg}
             </div>
             <div class="film-info">
                 <div class="film-title">${nominee.title}</div>
-                <div class="film-studio">${nominee.subtitle}</div>
+                <div class="${subtitleClass}">${subtitleText}</div>
             </div>
             <div class="streaming-box ${hasStreaming ? '' : 'empty'}">
                 ${streamingIcon}
@@ -1477,8 +1506,8 @@ function renderNominees() {
         </li>
     `}).join('');
 
-    // Add event listeners (only for non-shared modes)
-    if (!isSharedView) {
+    // Add event listeners (only for interactive modes)
+    if (!isSharedView && !isStreamable) {
         document.querySelectorAll('#films-list .film').forEach(el => {
             el.addEventListener('click', handleNomineeClick);
             el.addEventListener('keydown', handleNomineeKeydown);
@@ -1601,7 +1630,19 @@ function updateProgress() {
     let progressText;
     let titleProgress;
 
-    if (currentMode === 'favorites') {
+    if (currentMode === 'streamable') {
+        // For streamable: show how many nominees in this category have streaming
+        const streamableCount = category.nominees.filter(n => getStreamingService(n.id) !== null).length;
+        const total = category.nominees.length;
+        progressText = `${streamableCount} / ${total}`;
+
+        // Total streamable across all categories
+        const totalStreamable = CATEGORIES.reduce((sum, cat) =>
+            sum + cat.nominees.filter(n => getStreamingService(n.id) !== null).length, 0
+        );
+        const totalNominees = CATEGORIES.reduce((sum, cat) => sum + cat.nominees.length, 0);
+        titleProgress = totalStreamable > 0 ? `${totalStreamable}/${totalNominees}` : null;
+    } else if (currentMode === 'favorites') {
         // For favorites: show how many categories have favorites
         const favoritedCount = Object.keys(favorites).length;
         const totalCategories = CATEGORIES.length;

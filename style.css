@@ -1324,6 +1324,58 @@ body.modal-open {
     transform: scale(1);
 }
 
+/* Streamable mode styling */
+.film.streamable-view {
+    cursor: default;
+}
+
+.film.streamable-view:hover {
+    background: var(--color-black-light);
+    border-color: var(--color-black-lighter);
+}
+
+.film.streamable-view:active {
+    transform: none;
+}
+
+.film.streamable {
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.15) 0%, rgba(99, 102, 241, 0.08) 100%);
+    border-color: rgba(99, 102, 241, 0.4);
+}
+
+.film.streamable .checkbox {
+    background: rgba(99, 102, 241, 0.85);
+    border-color: rgba(99, 102, 241, 0.85);
+}
+
+.film.streamable .checkbox svg {
+    opacity: 1;
+    transform: scale(1);
+}
+
+.film.streamable .film-title {
+    color: rgba(165, 180, 252, 1);
+}
+
+.film.streamable-view:not(.streamable) .checkbox {
+    background: transparent;
+    border-color: var(--color-white-dimmer);
+    opacity: 0.4;
+}
+
+.film.streamable-view:not(.streamable) .checkbox svg {
+    opacity: 0.3;
+}
+
+.streamable-watched {
+    color: var(--color-gold-dark);
+}
+
+.streamable-unwatched {
+    color: var(--color-white-dimmer);
+    font-style: italic;
+}
+
 /* Copy modal styling */
 .modal-content-copy {
     text-align: center;
