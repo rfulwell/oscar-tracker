@@ -78,8 +78,8 @@ test.describe('Streamable Mode', () => {
             const films = page.locator('#films-list .film');
             const count = await films.count();
 
-            // Should show exactly the number of films in FILM_STREAMING (currently 6)
-            expect(count).toBe(6);
+            // Should show exactly the number of films in FILM_STREAMING (currently 16)
+            expect(count).toBe(16);
         });
 
         test('should show each streamable film by title', async ({ page }) => {
@@ -252,9 +252,9 @@ test.describe('Streamable Mode', () => {
             await switchToStreamable(page);
 
             const progress = await page.locator('.streamable-progress').textContent();
-            // Should show "0 / 6 watched" initially
+            // Should show "0 / 16 watched" initially
             expect(progress).toMatch(/\d+ \/ \d+ watched/);
-            expect(progress).toContain('0 / 6');
+            expect(progress).toContain('0 / 16');
         });
 
         test('should update count when films are watched', async ({ page }) => {
@@ -268,7 +268,7 @@ test.describe('Streamable Mode', () => {
             await switchToStreamable(page);
 
             const progress = await page.locator('.streamable-progress').textContent();
-            expect(progress).toContain('1 / 6');
+            expect(progress).toContain('1 / 16');
         });
 
         test('should update document title with progress', async ({ page }) => {
@@ -276,7 +276,7 @@ test.describe('Streamable Mode', () => {
             await switchToStreamable(page);
 
             const title = await page.title();
-            expect(title).toContain('0/6');
+            expect(title).toContain('0/16');
         });
     });
 
