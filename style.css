@@ -1028,6 +1028,13 @@ body {
         transition: color 150ms ease, background-color 150ms ease;
     }
 
+    .nav-dedication {
+        position: absolute;
+        bottom: 60px;
+        left: 0;
+        right: 0;
+    }
+
     .sidebar-toggle:hover {
         color: var(--color-white);
         background: var(--color-black-lighter);
@@ -1050,6 +1057,10 @@ body {
         background: rgba(212, 175, 55, 0.1);
         border-radius: 8px;
         margin: 0 8px;
+    }
+
+    .nav-drawer.collapsed .nav-dedication {
+        display: none;
     }
 
     .nav-drawer.collapsed .nav-divider {
