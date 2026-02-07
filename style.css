@@ -556,6 +556,38 @@ body {
     font-variant-numeric: tabular-nums;
 }
 
+/* Source Link */
+.source-link {
+    font-size: 0.75rem;
+    font-weight: 400;
+    color: var(--color-gold);
+    text-decoration: none;
+    margin-left: var(--spacing-sm);
+    opacity: 0.8;
+    transition: opacity 0.2s ease;
+    white-space: nowrap;
+}
+
+.source-link:hover {
+    opacity: 1;
+    text-decoration: underline;
+}
+
+.source-arrow {
+    font-size: 0.7rem;
+}
+
+/* External arrow for sidebar */
+.external-arrow {
+    font-size: 0.75rem;
+    color: var(--color-text-secondary);
+    margin-left: auto;
+}
+
+.menu-item:hover .external-arrow {
+    color: var(--color-gold);
+}
+
 /* Films List */
 .films {
     list-style: none;
