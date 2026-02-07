@@ -558,15 +558,16 @@ function showOnboardingScreen() {
 }
 
 // Show category screen
-function showCategoryScreen() {
+function showCategoryScreen(scrollToTop = true) {
     onboardingScreen.style.display = 'none';
     categoryScreen.style.display = '';
     renderNominees();
     updateProgress();
-    // Scroll to top of category list (same as bottom nav bar behavior)
-    const headerTop = categoryHeader.getBoundingClientRect().top + window.scrollY;
-    const offset = 16;
-    window.scrollTo({ top: headerTop - offset, behavior: 'smooth' });
+    if (scrollToTop) {
+        const headerTop = categoryHeader.getBoundingClientRect().top + window.scrollY;
+        const offset = 16;
+        window.scrollTo({ top: headerTop - offset, behavior: 'smooth' });
+    }
 }
 
 // ============================================
@@ -1127,7 +1128,7 @@ function handleNavModeSwitch(mode) {
     if (mode === 'watched' && watchedItems.size === 0) {
         showOnboardingScreen();
     } else {
-        showCategoryScreen();
+        showCategoryScreen(false);
     }
 }
 
