@@ -564,6 +564,10 @@ function showCategoryScreen() {
     categoryScreen.style.display = '';
     renderNominees();
     updateProgress();
+    // Scroll to top of category list (same as bottom nav bar behavior)
+    const headerTop = categoryHeader.getBoundingClientRect().top + window.scrollY;
+    const offset = 16;
+    window.scrollTo({ top: headerTop - offset, behavior: 'smooth' });
 }
 
 // ============================================
