@@ -110,4 +110,98 @@ test.describe('Navigation Counts', () => {
         expect(text).toMatch(/[1-9]\d*\/\d+/); // Should be non-zero
     });
 
+    test('watched count should be correct with pre-existing localStorage data', async ({ page }) => {
+        await page.setViewportSize({ width: 1200, height: 800 });
+
+        // Simulate user with many watched nominees stored in localStorage
+        // This represents watching nominees across multiple categories
+        // (e.g., Sinners in Best Picture, Director, Actor, etc.)
+        await page.evaluate(() => {
+            // Simulate 35+ nominee IDs in localStorage (the bug scenario)
+            const watchedNominees = [
+                'sinners', 'dir-coogler', 'actor-jordan', 'supp-actor-lindo',
+                'one-battle-after-another', 'dir-anderson', 'actor-dicaprio',
+                'marty-supreme', 'dir-safdie', 'actor-chalamet',
+                'sentimental-value', 'dir-coen', 'actress-hunter',
+                'frankenstein', 'dir-delvago', 'actor-garfield',
+                'hamnet', 'dir-branagh', 'actress-blanchett',
+                'train-dreams', 'cin-traindreams', 'edit-traindreams',
+                'f1', 'cin-f1', 'edit-f1', 'sound-f1',
+                'secret-agent', 'cin-secretagent', 'edit-secretagent',
+                'bugonia', 'dir-yorgos', 'actress-stone',
+                'sirat', 'intl-sirat',
+                'blue-moon', 'orig-bluemoon'
+            ];
+            localStorage.setItem('oscar-tracker-watched', JSON.stringify(watchedNominees));
+        });
+
+        await page.reload();
+        await completeOnboarding(page);
+
+        const watchedCount = page.locator('#nav-count-watched');
+        const countText = await watchedCount.textContent();
+        const match = countText.match(/(\d+)\/(\d+)/);
+        expect(match).not.toBeNull();
+
+        const watched = parseInt(match[1], 10);
+        const total = parseInt(match[2], 10);
+
+        // The count should be unique films, not nominee IDs
+        // With the data above, we have ~11 unique films but 35+ nominee IDs
+        expect(watched).toBeLessThanOrEqual(total);
+        expect(total).toBe(29);
+
+        // Should be around 11 films (not 35)
+        expect(watched).toBeLessThan(15);
+
+        await page.screenshot({ path: 'test-results/nav-counts-preexisting-data.png' });
+    });
+
+    test('watched count should never exceed total films', async ({ page }) => {
+        await page.setViewportSize({ width: 1200, height: 800 });
+        await completeOnboarding(page);
+
+        const watchedCount = page.locator('#nav-count-watched');
+
+        // Watch multiple nominees across different categories
+        // This tests that related nominees don't inflate the count
+        await page.click('#films-list .film[data-id="sinners"]');
+        await page.waitForTimeout(100);
+
+        // Navigate to Director category and watch there too
+        await page.locator('#category-select').selectOption('1'); // Director
+        await page.waitForTimeout(200);
+        await page.click('#films-list .film:first-child');
+        await page.waitForTimeout(100);
+
+        // Navigate to Actor category
+        await page.locator('#category-select').selectOption('2'); // Actor
+        await page.waitForTimeout(200);
+        await page.click('#films-list .film:first-child');
+        await page.waitForTimeout(100);
+
+        // Navigate to Actress category
+        await page.locator('#category-select').selectOption('3'); // Actress
+        await page.waitForTimeout(200);
+        await page.click('#films-list .film:first-child');
+        await page.waitForTimeout(100);
+
+        // Get the count and verify it's valid (watched <= total)
+        const countText = await watchedCount.textContent();
+        const match = countText.match(/(\d+)\/(\d+)/);
+        expect(match).not.toBeNull();
+
+        const watched = parseInt(match[1], 10);
+        const total = parseInt(match[2], 10);
+
+        // The key assertion: watched should never exceed total
+        expect(watched).toBeLessThanOrEqual(total);
+
+        // Total should be 29 (number of unique films)
+        expect(total).toBe(29);
+
+        // Take screenshot for debugging
+        await page.screenshot({ path: 'test-results/nav-counts-multiple-watches.png' });
+    });
+
 });
