@@ -1045,9 +1045,9 @@ function updateNavCounts() {
     const favoritesCountEl = document.getElementById('nav-count-favorites');
     const streamableCountEl = document.getElementById('nav-count-streamable');
 
-    // Watched: films watched / total unique films
+    // Watched: unique films watched / total unique films
     if (watchedCountEl) {
-        const watched = watchedItems.size;
+        const watched = ALL_FILMS.filter(f => isFilmWatched(f.key)).length;
         const total = ALL_FILMS.length;
         watchedCountEl.textContent = `${watched}/${total}`;
     }
