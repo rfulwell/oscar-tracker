@@ -1432,7 +1432,7 @@ function init() {
     const shareData = parseShareParams();
     if (shareData) {
         // Always show category screen for shared links
-        showCategoryScreen();
+        showCategoryScreen(false);
         handleIncomingShare(shareData);
         return;
     }
@@ -1456,7 +1456,7 @@ function init() {
     if (currentMode === 'watched' && watchedItems.size === 0) {
         showOnboardingScreen();
     } else {
-        showCategoryScreen();
+        showCategoryScreen(false);
     }
 }
 
