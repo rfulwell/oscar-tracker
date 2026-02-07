@@ -508,6 +508,7 @@ function toggleFilmWatched(filmKey, filmEl) {
     }
 
     saveWatchedItems();
+    updateNavCounts();
     updateTip();
 }
 
@@ -926,6 +927,7 @@ function initNavigation() {
     updateActiveMenuItem(currentMode);
     updateCurrentModeLabel(currentMode);
     updateNavShareVisibility();
+    updateNavCounts();
 }
 
 function openDrawer() {
@@ -1033,6 +1035,42 @@ function updateNavShareVisibility() {
         const hasPredictions = hasAnyPredictions(predictions);
         shareBtn.classList.toggle('disabled', !hasPredictions);
         shareBtn.setAttribute('aria-disabled', (!hasPredictions).toString());
+    }
+}
+
+// Update navigation counts for all modes
+function updateNavCounts() {
+    const watchedCountEl = document.getElementById('nav-count-watched');
+    const predictionsCountEl = document.getElementById('nav-count-predictions');
+    const favoritesCountEl = document.getElementById('nav-count-favorites');
+    const streamableCountEl = document.getElementById('nav-count-streamable');
+
+    // Watched: films watched / total unique films
+    if (watchedCountEl) {
+        const watched = watchedItems.size;
+        const total = ALL_FILMS.length;
+        watchedCountEl.textContent = `${watched}/${total}`;
+    }
+
+    // Predictions: categories predicted / total categories
+    if (predictionsCountEl) {
+        const predicted = countPredictions();
+        const total = CATEGORIES.length;
+        predictionsCountEl.textContent = `${predicted}/${total}`;
+    }
+
+    // Favorites: categories favorited / total categories
+    if (favoritesCountEl) {
+        const favorited = countFavorites();
+        const total = CATEGORIES.length;
+        favoritesCountEl.textContent = `${favorited}/${total}`;
+    }
+
+    // Streamable: streamable films watched / total streamable films
+    if (streamableCountEl) {
+        const watched = getStreamableWatchedCount();
+        const total = getStreamableTotalCount();
+        streamableCountEl.textContent = `${watched}/${total}`;
     }
 }
 
@@ -1617,12 +1655,14 @@ function countPredictions() {
 function copyPredictionsToFavorites() {
     favorites = { ...predictions };
     saveFavorites();
+    updateNavCounts();
 }
 
 // Copy favorites to predictions
 function copyFavoritesToPredictions() {
     predictions = { ...favorites };
     savePredictions();
+    updateNavCounts();
 }
 
 // Check if in favorites mode
@@ -1938,6 +1978,7 @@ function toggleNominee(nomineeId, filmEl) {
     saveWatchedItems();
     updateProgress();
     updateTip();
+    updateNavCounts();
 }
 
 // Toggle prediction for a nominee (single-select per category)
@@ -1972,6 +2013,7 @@ function togglePrediction(nomineeId) {
     updateProgress();
     updateShareDeleteButton();
     updateNavShareVisibility();
+    updateNavCounts();
 }
 
 // Toggle favorite for current category
@@ -2004,6 +2046,7 @@ function toggleFavoriteNominee(nomineeId) {
 
     saveFavorites();
     updateProgress();
+    updateNavCounts();
 }
 
 // Update progress display

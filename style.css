@@ -357,6 +357,21 @@ body {
     height: 20px;
 }
 
+.menu-text {
+    flex: 1;
+}
+
+.menu-count {
+    font-size: 0.75rem;
+    color: var(--color-text-secondary);
+    font-weight: 400;
+    margin-left: auto;
+}
+
+.menu-item.active .menu-count {
+    color: var(--color-gold);
+}
+
 .nav-divider {
     height: 1px;
     background: var(--color-black-lighter);
@@ -1040,7 +1055,8 @@ body {
         display: block;
     }
 
-    .nav-drawer.collapsed .menu-text {
+    .nav-drawer.collapsed .menu-text,
+    .nav-drawer.collapsed .menu-count {
         opacity: 0;
         width: 0;
         overflow: hidden;
