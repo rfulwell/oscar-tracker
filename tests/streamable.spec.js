@@ -17,9 +17,14 @@ async function completeOnboarding(page) {
     await page.waitForSelector('#films-list .film', { state: 'visible' });
 }
 
+// Helper to switch mode via sidebar navigation
+async function switchMode(page, mode) {
+    await page.click(`.menu-item[data-mode="${mode}"]`);
+}
+
 // Helper to switch to streamable mode
 async function switchToStreamable(page) {
-    await page.locator('#mode-select').selectOption('streamable');
+    await switchMode(page, 'streamable');
     await page.waitForSelector('#streamable-header', { state: 'visible' });
 }
 
@@ -27,18 +32,18 @@ test.describe('Streamable Mode', () => {
 
     test.describe('Mode Switching', () => {
 
-        test('should show streamable option in mode dropdown', async ({ page }) => {
+        test('should show streamable option in navigation menu', async ({ page }) => {
             await completeOnboarding(page);
 
-            const options = await page.locator('#mode-select option').allTextContents();
-            expect(options).toContain('Streamable');
+            await expect(page.locator('.menu-item[data-mode="streamable"]')).toBeVisible();
+            await expect(page.locator('.menu-item[data-mode="streamable"] .menu-text')).toHaveText('Streamable');
         });
 
-        test('should switch to streamable mode via dropdown', async ({ page }) => {
+        test('should switch to streamable mode via navigation', async ({ page }) => {
             await completeOnboarding(page);
 
             await switchToStreamable(page);
-            await expect(page.locator('#mode-select')).toHaveValue('streamable');
+            await expect(page.locator('.menu-item[data-mode="streamable"]')).toHaveClass(/active/);
         });
 
         test('should persist streamable mode across reloads', async ({ page }) => {
@@ -48,19 +53,24 @@ test.describe('Streamable Mode', () => {
             await page.reload();
             await completeOnboarding(page);
 
-            await expect(page.locator('#mode-select')).toHaveValue('streamable');
+            await expect(page.locator('.menu-item[data-mode="streamable"]')).toHaveClass(/active/);
             await expect(page.locator('#streamable-header')).toBeVisible();
         });
 
         test('should restore category navigation when switching away', async ({ page }) => {
             await completeOnboarding(page);
+
+            // Watch a film first so watched mode shows category screen
+            await page.locator('#films-list .film').first().click();
+            await page.waitForTimeout(200);
+
             await switchToStreamable(page);
 
             // Category nav should be hidden
             await expect(page.locator('.category-header')).toBeHidden();
 
             // Switch back to watched
-            await page.locator('#mode-select').selectOption('watched');
+            await switchMode(page, 'watched');
             await page.waitForTimeout(200);
 
             // Category nav should be visible again
@@ -205,8 +215,7 @@ test.describe('Streamable Mode', () => {
         test('should reflect watched status from watched list', async ({ page }) => {
             await completeOnboarding(page);
 
-            // Watch Sinners in watched mode (it's in Best Picture)
-            await page.locator('#mode-select').selectOption('watched');
+            // Watch Sinners in watched mode (it's in Best Picture) - already in watched mode after onboarding
             await page.locator('#films-list .film[data-id="sinners"]').click();
             await page.waitForTimeout(200);
 
@@ -232,8 +241,7 @@ test.describe('Streamable Mode', () => {
         test('watched films should have streamable-watched class', async ({ page }) => {
             await completeOnboarding(page);
 
-            // Watch Sinners
-            await page.locator('#mode-select').selectOption('watched');
+            // Watch Sinners - already in watched mode after onboarding
             await page.locator('#films-list .film[data-id="sinners"]').click();
             await page.waitForTimeout(200);
 
@@ -260,8 +268,7 @@ test.describe('Streamable Mode', () => {
         test('should update count when films are watched', async ({ page }) => {
             await completeOnboarding(page);
 
-            // Watch Sinners in Best Picture
-            await page.locator('#mode-select').selectOption('watched');
+            // Watch Sinners in Best Picture - already in watched mode after onboarding
             await page.locator('#films-list .film[data-id="sinners"]').click();
             await page.waitForTimeout(200);
 

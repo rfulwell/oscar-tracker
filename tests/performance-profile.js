@@ -57,7 +57,7 @@ async function runPerformanceAnalysis() {
     }
 
     // Switch to predictions mode
-    await page.locator('#mode-select').selectOption('predictions');
+    await page.click('.menu-item[data-mode="predictions"]');
 
     console.log('\n🎯 Profiling prediction interactions...\n');
 

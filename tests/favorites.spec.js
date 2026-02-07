@@ -17,46 +17,46 @@ async function completeOnboarding(page) {
     await page.waitForSelector('#films-list .film', { state: 'visible' });
 }
 
+// Helper to switch mode via sidebar navigation
+async function switchMode(page, mode) {
+    await page.click(`.menu-item[data-mode="${mode}"]`);
+}
+
 test.describe('Favorites Mode', () => {
 
     test.describe('Mode Switching', () => {
 
-        test('should show favorites option in mode dropdown', async ({ page }) => {
+        test('should show favorites option in navigation menu', async ({ page }) => {
             await completeOnboarding(page);
 
-            const modeSelect = page.locator('#mode-select');
-            const options = await modeSelect.locator('option').allTextContents();
-
-            expect(options).toContain('Favorites');
+            await expect(page.locator('.menu-item[data-mode="favorites"]')).toBeVisible();
+            await expect(page.locator('.menu-item[data-mode="favorites"] .menu-text')).toHaveText('Favorites');
         });
 
-        test('should switch to favorites mode via dropdown', async ({ page }) => {
+        test('should switch to favorites mode via navigation', async ({ page }) => {
             await completeOnboarding(page);
 
-            await page.locator('#mode-select').selectOption('favorites');
+            await switchMode(page, 'favorites');
 
-            await expect(page.locator('#mode-select')).toHaveValue('favorites');
+            await expect(page.locator('.menu-item[data-mode="favorites"]')).toHaveClass(/active/);
         });
 
-        test('favorites should appear between watched and predictions', async ({ page }) => {
+        test('navigation should have correct menu order', async ({ page }) => {
             await completeOnboarding(page);
 
-            const options = await page.locator('#mode-select option').allTextContents();
-            const watchedIndex = options.indexOf('Watched');
-            const favoritesIndex = options.indexOf('Favorites');
-            const predictionsIndex = options.indexOf('Predictions');
+            const menuItems = page.locator('.nav-menu .menu-item[data-mode]');
+            const modes = await menuItems.evaluateAll(items => items.map(item => item.dataset.mode));
 
-            expect(favoritesIndex).toBeGreaterThan(watchedIndex);
-            expect(favoritesIndex).toBeLessThan(predictionsIndex);
+            expect(modes).toEqual(['watched', 'predictions', 'favorites', 'streamable']);
         });
 
         test('should persist favorites mode across page reload', async ({ page }) => {
             await completeOnboarding(page);
 
-            await page.locator('#mode-select').selectOption('favorites');
+            await switchMode(page, 'favorites');
             await page.reload();
 
-            await expect(page.locator('#mode-select')).toHaveValue('favorites');
+            await expect(page.locator('.menu-item[data-mode="favorites"]')).toHaveClass(/active/);
         });
 
     });
@@ -65,7 +65,7 @@ test.describe('Favorites Mode', () => {
 
         test('should select a favorite when clicked', async ({ page }) => {
             await completeOnboarding(page);
-            await page.locator('#mode-select').selectOption('favorites');
+            await switchMode(page, 'favorites');
 
             await page.locator('#films-list .film:first-child').click();
 
@@ -74,7 +74,7 @@ test.describe('Favorites Mode', () => {
 
         test('should deselect when clicking the same nominee again', async ({ page }) => {
             await completeOnboarding(page);
-            await page.locator('#mode-select').selectOption('favorites');
+            await switchMode(page, 'favorites');
 
             const film = page.locator('#films-list .film:first-child');
             await film.click();
@@ -86,7 +86,7 @@ test.describe('Favorites Mode', () => {
 
         test('should only allow one favorite per category', async ({ page }) => {
             await completeOnboarding(page);
-            await page.locator('#mode-select').selectOption('favorites');
+            await switchMode(page, 'favorites');
 
             // Select first film
             await page.locator('#films-list .film:first-child').click();
@@ -106,7 +106,7 @@ test.describe('Favorites Mode', () => {
 
         test('should persist favorites across page reload', async ({ page }) => {
             await completeOnboarding(page);
-            await page.locator('#mode-select').selectOption('favorites');
+            await switchMode(page, 'favorites');
 
             // Make a favorite
             await page.locator('#films-list .film:first-child').click();
@@ -122,11 +122,11 @@ test.describe('Favorites Mode', () => {
             await completeOnboarding(page);
 
             // Make a prediction
-            await page.locator('#mode-select').selectOption('predictions');
+            await switchMode(page, 'predictions');
             await page.locator('#films-list .film:first-child').click();
 
             // Make a different favorite (decline copy)
-            await page.locator('#mode-select').selectOption('favorites');
+            await switchMode(page, 'favorites');
             const copyModal = page.locator('#copy-modal');
             if (await copyModal.isVisible()) {
                 await page.locator('#copy-no').click();
@@ -134,12 +134,12 @@ test.describe('Favorites Mode', () => {
             await page.locator('#films-list .film:nth-child(2)').click();
 
             // Verify prediction is still first film
-            await page.locator('#mode-select').selectOption('predictions');
+            await switchMode(page, 'predictions');
             await expect(page.locator('#films-list .film:first-child')).toHaveClass(/predicted/);
             await expect(page.locator('#films-list .film:nth-child(2)')).not.toHaveClass(/predicted/);
 
             // Verify favorite is second film
-            await page.locator('#mode-select').selectOption('favorites');
+            await switchMode(page, 'favorites');
             await expect(page.locator('#films-list .film:first-child')).not.toHaveClass(/favorited/);
             await expect(page.locator('#films-list .film:nth-child(2)')).toHaveClass(/favorited/);
         });
@@ -150,7 +150,7 @@ test.describe('Favorites Mode', () => {
 
         test('should show heart progress indicator', async ({ page }) => {
             await completeOnboarding(page);
-            await page.locator('#mode-select').selectOption('favorites');
+            await switchMode(page, 'favorites');
 
             // Before selecting - should show empty heart
             await expect(page.locator('#progress')).toContainText('♡');
@@ -169,7 +169,7 @@ test.describe('Favorites Mode', () => {
         test('should hide share button in favorites mode', async ({ page }) => {
             await completeOnboarding(page);
 
-            await page.locator('#mode-select').selectOption('favorites');
+            await switchMode(page, 'favorites');
 
             await expect(page.locator('#share-btn')).not.toBeVisible();
         });
@@ -186,11 +186,11 @@ test.describe('Copy Modal', () => {
             await completeOnboarding(page);
 
             // Make predictions first
-            await page.locator('#mode-select').selectOption('predictions');
+            await switchMode(page, 'predictions');
             await page.locator('#films-list .film:first-child').click();
 
             // Switch to favorites
-            await page.locator('#mode-select').selectOption('favorites');
+            await switchMode(page, 'favorites');
 
             // Modal should appear
             await expect(page.locator('#copy-modal')).toBeVisible();
@@ -200,10 +200,10 @@ test.describe('Copy Modal', () => {
         test('should show reassurance text in copy modal', async ({ page }) => {
             await completeOnboarding(page);
 
-            await page.locator('#mode-select').selectOption('predictions');
+            await switchMode(page, 'predictions');
             await page.locator('#films-list .film:first-child').click();
 
-            await page.locator('#mode-select').selectOption('favorites');
+            await switchMode(page, 'favorites');
 
             await expect(page.locator('.copy-subtitle')).toContainText('change them later');
         });
@@ -212,11 +212,11 @@ test.describe('Copy Modal', () => {
             await completeOnboarding(page);
 
             // Make prediction
-            await page.locator('#mode-select').selectOption('predictions');
+            await switchMode(page, 'predictions');
             await page.locator('#films-list .film:first-child').click();
 
             // Switch to favorites and accept copy
-            await page.locator('#mode-select').selectOption('favorites');
+            await switchMode(page, 'favorites');
             await page.locator('#copy-yes').click();
 
             // First film should be favorited
@@ -227,11 +227,11 @@ test.describe('Copy Modal', () => {
             await completeOnboarding(page);
 
             // Make prediction
-            await page.locator('#mode-select').selectOption('predictions');
+            await switchMode(page, 'predictions');
             await page.locator('#films-list .film:first-child').click();
 
             // Switch to favorites and decline copy
-            await page.locator('#mode-select').selectOption('favorites');
+            await switchMode(page, 'favorites');
             await page.locator('#copy-no').click();
 
             // No film should be favorited
@@ -242,16 +242,16 @@ test.describe('Copy Modal', () => {
             await completeOnboarding(page);
 
             // Make prediction
-            await page.locator('#mode-select').selectOption('predictions');
+            await switchMode(page, 'predictions');
             await page.locator('#films-list .film:first-child').click();
 
             // Switch to favorites and decline
-            await page.locator('#mode-select').selectOption('favorites');
+            await switchMode(page, 'favorites');
             await page.locator('#copy-no').click();
 
             // Switch away and back
-            await page.locator('#mode-select').selectOption('watched');
-            await page.locator('#mode-select').selectOption('favorites');
+            await switchMode(page, 'watched');
+            await switchMode(page, 'favorites');
 
             // Modal should NOT appear
             await expect(page.locator('#copy-modal')).not.toBeVisible();
@@ -261,7 +261,7 @@ test.describe('Copy Modal', () => {
             await completeOnboarding(page);
 
             // Switch to favorites without making predictions
-            await page.locator('#mode-select').selectOption('favorites');
+            await switchMode(page, 'favorites');
 
             // Modal should NOT appear
             await expect(page.locator('#copy-modal')).not.toBeVisible();
@@ -275,11 +275,11 @@ test.describe('Copy Modal', () => {
             await completeOnboarding(page);
 
             // Make favorites first (no modal since no predictions)
-            await page.locator('#mode-select').selectOption('favorites');
+            await switchMode(page, 'favorites');
             await page.locator('#films-list .film:first-child').click();
 
             // Switch to predictions
-            await page.locator('#mode-select').selectOption('predictions');
+            await switchMode(page, 'predictions');
 
             // Modal should appear
             await expect(page.locator('#copy-modal')).toBeVisible();
@@ -290,11 +290,11 @@ test.describe('Copy Modal', () => {
             await completeOnboarding(page);
 
             // Make favorite
-            await page.locator('#mode-select').selectOption('favorites');
+            await switchMode(page, 'favorites');
             await page.locator('#films-list .film:first-child').click();
 
             // Switch to predictions and accept copy
-            await page.locator('#mode-select').selectOption('predictions');
+            await switchMode(page, 'predictions');
             await page.locator('#copy-yes').click();
 
             // First film should be predicted
@@ -305,11 +305,11 @@ test.describe('Copy Modal', () => {
             await completeOnboarding(page);
 
             // Make favorite
-            await page.locator('#mode-select').selectOption('favorites');
+            await switchMode(page, 'favorites');
             await page.locator('#films-list .film:first-child').click();
 
             // Switch to predictions and decline copy
-            await page.locator('#mode-select').selectOption('predictions');
+            await switchMode(page, 'predictions');
             await page.locator('#copy-no').click();
 
             // No film should be predicted
@@ -324,21 +324,21 @@ test.describe('Copy Modal', () => {
             await completeOnboarding(page);
 
             // Make prediction
-            await page.locator('#mode-select').selectOption('predictions');
+            await switchMode(page, 'predictions');
             await page.locator('#films-list .film:first-child').click();
 
             // Make favorite (decline copy)
-            await page.locator('#mode-select').selectOption('favorites');
+            await switchMode(page, 'favorites');
             await page.locator('#copy-no').click();
             await page.locator('#films-list .film:nth-child(2)').click();
 
             // Make another prediction
-            await page.locator('#mode-select').selectOption('predictions');
+            await switchMode(page, 'predictions');
             await page.locator('#next-category').click();
             await page.locator('#films-list .film:first-child').click();
 
             // Go back to favorites - should NOT show modal (favorites already has data)
-            await page.locator('#mode-select').selectOption('favorites');
+            await switchMode(page, 'favorites');
             await expect(page.locator('#copy-modal')).not.toBeVisible();
         });
 
@@ -346,11 +346,11 @@ test.describe('Copy Modal', () => {
             await completeOnboarding(page);
 
             // Make prediction
-            await page.locator('#mode-select').selectOption('predictions');
+            await switchMode(page, 'predictions');
             await page.locator('#films-list .film:first-child').click();
 
             // Switch to favorites
-            await page.locator('#mode-select').selectOption('favorites');
+            await switchMode(page, 'favorites');
             await expect(page.locator('#copy-modal')).toBeVisible();
 
             // Close via X button
@@ -358,18 +358,18 @@ test.describe('Copy Modal', () => {
 
             // Modal should close, should switch to favorites mode
             await expect(page.locator('#copy-modal')).not.toBeVisible();
-            await expect(page.locator('#mode-select')).toHaveValue('favorites');
+            await expect(page.locator('.menu-item[data-mode="favorites"]')).toHaveClass(/active/);
         });
 
         test('should close modal on backdrop click', async ({ page }) => {
             await completeOnboarding(page);
 
             // Make prediction
-            await page.locator('#mode-select').selectOption('predictions');
+            await switchMode(page, 'predictions');
             await page.locator('#films-list .film:first-child').click();
 
             // Switch to favorites
-            await page.locator('#mode-select').selectOption('favorites');
+            await switchMode(page, 'favorites');
             await expect(page.locator('#copy-modal')).toBeVisible();
 
             // Close via backdrop click (click at edge of screen to avoid modal content)

@@ -21,6 +21,29 @@ async function waitForCategoryScreen(page) {
     await page.waitForSelector('#films-list .film', { state: 'visible' });
 }
 
+// Helper to switch mode via sidebar navigation
+async function switchMode(page, mode) {
+    await page.click(`.menu-item[data-mode="${mode}"]`);
+}
+
+// Helper to get all shared list names from navigation
+async function getSharedListNames(page) {
+    const sharedItems = page.locator('#nav-shared-lists .menu-item');
+    const count = await sharedItems.count();
+    const names = [];
+    for (let i = 0; i < count; i++) {
+        const text = await sharedItems.nth(i).locator('.menu-text').textContent();
+        if (text) names.push(text);
+    }
+    return names;
+}
+
+// Helper to check if a shared list exists in navigation
+async function hasSharedList(page, name) {
+    const names = await getSharedListNames(page);
+    return names.some(n => n.includes(name));
+}
+
 test.describe('Sharing Predictions', () => {
 
     test.describe('First-Time Visitor with Shared Link', () => {
@@ -40,11 +63,8 @@ test.describe('Sharing Predictions', () => {
 
             await waitForCategoryScreen(page);
 
-            // After onboarding, Sarah's list should be in the dropdown
-            const modeSelect = page.locator('#mode-select');
-            const options = await modeSelect.locator('option').allTextContents();
-
-            expect(options.some(opt => opt.includes("Sarah"))).toBeTruthy();
+            // After onboarding, Sarah's list should be in the navigation
+            expect(await hasSharedList(page, "Sarah")).toBeTruthy();
         });
 
         test('should auto-switch to shared view after first-time onboarding', async ({ page }) => {
@@ -53,11 +73,9 @@ test.describe('Sharing Predictions', () => {
             // Complete onboarding if showing
             await completeOnboarding(page);
 
-            // Should be viewing Sarah's predictions
-            const modeSelect = page.locator('#mode-select');
-            const selectedValue = await modeSelect.inputValue();
-
-            expect(selectedValue).toContain('shared:');
+            // Should be viewing Sarah's predictions - check mode label shows their name
+            const modeLabel = page.locator('#current-mode-label');
+            await expect(modeLabel).toContainText("Sarah");
         });
 
         test('should show shared banner after first-time onboarding', async ({ page }) => {
@@ -86,11 +104,8 @@ test.describe('Sharing Predictions', () => {
             }
             await waitForCategoryScreen(page);
 
-            // Sarah's list should still be available
-            const modeSelect = page.locator('#mode-select');
-            const options = await modeSelect.locator('option').allTextContents();
-
-            expect(options.some(opt => opt.includes("Sarah"))).toBeTruthy();
+            // Sarah's list should still be available in navigation
+            expect(await hasSharedList(page, "Sarah")).toBeTruthy();
         });
 
         test('should display correct predictions from shared link after onboarding', async ({ page }) => {
@@ -119,11 +134,8 @@ test.describe('Sharing Predictions', () => {
             await page.goto('/?p=8--------------------&name=Mike');
             await waitForCategoryScreen(page);
 
-            // Mike's list should be in the dropdown
-            const modeSelect = page.locator('#mode-select');
-            const options = await modeSelect.locator('option').allTextContents();
-
-            expect(options.some(opt => opt.includes("Mike"))).toBeTruthy();
+            // Mike's list should be in the navigation
+            expect(await hasSharedList(page, "Mike")).toBeTruthy();
         });
 
         test('should preserve own predictions when receiving shared link', async ({ page }) => {
@@ -132,7 +144,7 @@ test.describe('Sharing Predictions', () => {
             await completeOnboarding(page);
 
             // Make a prediction
-            await page.locator('#mode-select').selectOption('predictions');
+            await page.click('.menu-item[data-mode="predictions"]');
             await page.locator('#films-list .film').first().click();
 
             // Get the first film's predicted state
@@ -143,7 +155,7 @@ test.describe('Sharing Predictions', () => {
             await waitForCategoryScreen(page);
 
             // Switch back to own predictions
-            await page.locator('#mode-select').selectOption('predictions');
+            await page.click('.menu-item[data-mode="predictions"]');
 
             // Own prediction should still be there
             await expect(page.locator('#films-list .film').first()).toHaveClass(/predicted/);
@@ -166,7 +178,7 @@ test.describe('Sharing Predictions', () => {
             await page.goto('/');
             await completeOnboarding(page);
 
-            await page.locator('#mode-select').selectOption('predictions');
+            await page.click('.menu-item[data-mode="predictions"]');
 
             // Should show share button
             await expect(page.locator('#share-btn')).toBeVisible();
@@ -197,12 +209,10 @@ test.describe('Sharing Predictions', () => {
             await page.locator('#delete-confirm').click();
 
             // Should switch to watched mode
-            const modeSelect = page.locator('#mode-select');
-            await expect(modeSelect).toHaveValue('watched');
+            await expect(page.locator('.menu-item[data-mode="watched"]')).toHaveClass(/active/);
 
-            // Sarah should no longer be in dropdown
-            const options = await modeSelect.locator('option').allTextContents();
-            expect(options.some(opt => opt.includes("Sarah"))).toBeFalsy();
+            // Sarah should no longer be in navigation
+            expect(await hasSharedList(page, "Sarah")).toBeFalsy();
         });
 
         test('should keep shared list when delete cancelled', async ({ page }) => {
@@ -215,10 +225,9 @@ test.describe('Sharing Predictions', () => {
             // Cancel deletion
             await page.locator('#delete-cancel').click();
 
-            // Should still be viewing Sarah's list
-            const modeSelect = page.locator('#mode-select');
-            const selectedValue = await modeSelect.inputValue();
-            expect(selectedValue).toContain('shared:');
+            // Should still be viewing Sarah's list (check mode label)
+            const modeLabel = page.locator('#current-mode-label');
+            await expect(modeLabel).toContainText("Sarah");
         });
 
     });
@@ -234,12 +243,9 @@ test.describe('Sharing Predictions', () => {
             await page.goto('/?p=0--------------------&name=Mike');
             await waitForCategoryScreen(page);
 
-            // Both should be in dropdown
-            const modeSelect = page.locator('#mode-select');
-            const options = await modeSelect.locator('option').allTextContents();
-
-            expect(options.some(opt => opt.includes("Sarah"))).toBeTruthy();
-            expect(options.some(opt => opt.includes("Mike"))).toBeTruthy();
+            // Both should be in navigation
+            expect(await hasSharedList(page, "Sarah")).toBeTruthy();
+            expect(await hasSharedList(page, "Mike")).toBeTruthy();
         });
 
         test('should load correct predictions when switching between shared lists', async ({ page }) => {
@@ -255,28 +261,25 @@ test.describe('Sharing Predictions', () => {
             // Currently viewing Mike's - first film should be predicted
             await expect(page.locator('#films-list .film').first()).toHaveClass(/predicted/);
 
-            // Get Sarah's shared list value
-            const modeSelect = page.locator('#mode-select');
-            const options = await modeSelect.locator('option');
-            const count = await options.count();
+            // Find and click Sarah's shared list in navigation
+            const sharedItems = page.locator('#nav-shared-lists .menu-item');
+            const count = await sharedItems.count();
 
-            let sarahValue = null;
             for (let i = 0; i < count; i++) {
-                const text = await options.nth(i).textContent();
+                const text = await sharedItems.nth(i).locator('.menu-text').textContent();
                 if (text && text.includes('Sarah')) {
-                    sarahValue = await options.nth(i).getAttribute('value');
+                    await sharedItems.nth(i).click();
                     break;
                 }
             }
 
-            if (sarahValue) {
-                await modeSelect.selectOption(sarahValue);
+            // Wait for UI to update
+            await page.waitForTimeout(200);
 
-                // Sarah's prediction is index 8 (9th film)
-                const films = page.locator('#films-list .film');
-                await expect(films.nth(8)).toHaveClass(/predicted/);
-                await expect(films.first()).not.toHaveClass(/predicted/);
-            }
+            // Sarah's prediction is index 8 (9th film)
+            const films = page.locator('#films-list .film');
+            await expect(films.nth(8)).toHaveClass(/predicted/);
+            await expect(films.first()).not.toHaveClass(/predicted/);
         });
 
     });
@@ -287,10 +290,7 @@ test.describe('Sharing Predictions', () => {
             await page.goto('/?p=8--------------------&name=Sarah%20%26%20John');
             await completeOnboarding(page);
 
-            const modeSelect = page.locator('#mode-select');
-            const options = await modeSelect.locator('option').allTextContents();
-
-            expect(options.some(opt => opt.includes("Sarah & John"))).toBeTruthy();
+            expect(await hasSharedList(page, "Sarah & John")).toBeTruthy();
         });
 
         test('should trim whitespace from names', async ({ page }) => {
@@ -322,8 +322,7 @@ test.describe('Sharing Predictions', () => {
             await completeOnboarding(page);
 
             // Should be in watched mode (ignored invalid link)
-            const modeSelect = page.locator('#mode-select');
-            await expect(modeSelect).toHaveValue('watched');
+            await expect(page.locator('.menu-item[data-mode="watched"]')).toHaveClass(/active/);
         });
 
         test('should ignore too-short prediction string', async ({ page }) => {
@@ -331,8 +330,7 @@ test.describe('Sharing Predictions', () => {
             await completeOnboarding(page);
 
             // Should be in watched mode
-            const modeSelect = page.locator('#mode-select');
-            await expect(modeSelect).toHaveValue('watched');
+            await expect(page.locator('.menu-item[data-mode="watched"]')).toHaveClass(/active/);
         });
 
     });

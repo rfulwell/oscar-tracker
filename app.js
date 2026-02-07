@@ -436,7 +436,6 @@ const categoryScreen = document.getElementById('category-screen');
 const allFilmsList = document.getElementById('all-films-list');
 const browseByCategory = document.getElementById('browse-by-category');
 const tipContent = document.getElementById('tip-content');
-const modeSelect = document.getElementById('mode-select');
 const aboutLink = document.getElementById('about-link');
 const aboutModal = document.getElementById('about-modal');
 const aboutClose = document.getElementById('about-close');
@@ -698,6 +697,7 @@ function addSharedList(name, preds) {
     };
     sharedLists.push(newList);
     saveSharedLists();
+    renderSharedListsNav();
     return newList;
 }
 
@@ -715,6 +715,7 @@ function updateSharedList(id, preds) {
 function removeSharedList(id) {
     sharedLists = sharedLists.filter(l => l.id !== id);
     saveSharedLists();
+    renderSharedListsNav();
 }
 
 // Get next available name with number suffix
@@ -801,7 +802,8 @@ function switchToSharedList(id) {
     currentMode = `shared:${id}`;
     currentSharedId = id;
     saveMode();
-    updateModeDropdown();
+    updateActiveMenuItem(currentMode);
+    updateCurrentModeLabel(currentMode);
     renderNominees();
     updateProgress();
     updateShareDeleteButton();
@@ -815,7 +817,6 @@ function handleIncomingShare(shareData) {
     if (!existing) {
         // New person - add and switch
         const newList = addSharedList(shareData.name, shareData.predictions);
-        updateModeDropdown();
         switchToSharedList(newList.id);
         // Clear URL params
         window.history.replaceState({}, '', window.location.pathname);
@@ -832,53 +833,6 @@ function handleIncomingShare(shareData) {
 }
 
 // Update mode dropdown with shared lists
-function updateModeDropdown() {
-    const select = modeSelect;
-    if (!select) return;
-
-    // Clear existing options
-    select.innerHTML = '';
-
-    // Add base options
-    const watchedOpt = document.createElement('option');
-    watchedOpt.value = 'watched';
-    watchedOpt.textContent = 'Watched';
-    select.appendChild(watchedOpt);
-
-    const favoritesOpt = document.createElement('option');
-    favoritesOpt.value = 'favorites';
-    favoritesOpt.textContent = 'Favorites';
-    select.appendChild(favoritesOpt);
-
-    const predictionsOpt = document.createElement('option');
-    predictionsOpt.value = 'predictions';
-    predictionsOpt.textContent = 'Predictions';
-    select.appendChild(predictionsOpt);
-
-    const streamableOpt = document.createElement('option');
-    streamableOpt.value = 'streamable';
-    streamableOpt.textContent = 'Streamable';
-    select.appendChild(streamableOpt);
-
-    // Add separator and shared lists if any
-    if (sharedLists.length > 0) {
-        const separator = document.createElement('option');
-        separator.disabled = true;
-        separator.textContent = '──────────';
-        select.appendChild(separator);
-
-        sharedLists.forEach(list => {
-            const opt = document.createElement('option');
-            opt.value = `shared:${list.id}`;
-            opt.textContent = `${list.name}'s Picks`;
-            select.appendChild(opt);
-        });
-    }
-
-    // Set current value
-    select.value = currentMode;
-}
-
 // Update share/delete button visibility and state
 function updateShareDeleteButton() {
     const shareBtn = document.getElementById('share-btn');
@@ -964,7 +918,8 @@ function initNavigation() {
         updateSidebarToggleIcon();
     }
 
-    // Initialize active state
+    // Initialize active state and shared lists
+    renderSharedListsNav();
     updateActiveMenuItem(currentMode);
     updateCurrentModeLabel(currentMode);
     updateNavShareVisibility();
@@ -1028,10 +983,12 @@ function updateSidebarToggleIcon() {
 }
 
 function updateActiveMenuItem(mode) {
+    // Update all menu items including dynamically added shared lists
     const menuItems = document.querySelectorAll('.menu-item[data-mode]');
 
     menuItems.forEach(item => {
-        const isActive = item.dataset.mode === mode;
+        const itemMode = item.dataset.mode;
+        const isActive = itemMode === mode;
         item.classList.toggle('active', isActive);
         item.setAttribute('aria-current', isActive ? 'page' : 'false');
     });
@@ -1076,16 +1033,90 @@ function updateNavShareVisibility() {
     }
 }
 
+// Render shared lists in navigation
+function renderSharedListsNav() {
+    const container = document.getElementById('nav-shared-lists');
+    const divider = document.getElementById('nav-shared-divider');
+
+    if (!container) return;
+
+    // Clear existing items
+    container.innerHTML = '';
+
+    // Show/hide divider based on whether there are shared lists
+    if (divider) {
+        divider.style.display = sharedLists.length > 0 ? '' : 'none';
+    }
+
+    // Render each shared list
+    sharedLists.forEach(list => {
+        const li = document.createElement('li');
+        const a = document.createElement('a');
+        a.href = '#';
+        a.className = 'menu-item';
+        a.dataset.mode = `shared:${list.id}`;
+
+        // Check if this is the active shared list
+        if (currentMode === `shared:${list.id}`) {
+            a.classList.add('active');
+            a.setAttribute('aria-current', 'page');
+        }
+
+        a.innerHTML = `
+            <span class="menu-icon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                    <circle cx="9" cy="7" r="4"/>
+                    <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+                    <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                </svg>
+            </span>
+            <span class="menu-text">${escapeHtml(list.name)}'s Picks</span>
+        `;
+
+        a.addEventListener('click', (e) => {
+            e.preventDefault();
+            handleNavModeSwitch(`shared:${list.id}`);
+        });
+
+        li.appendChild(a);
+        container.appendChild(li);
+    });
+}
+
+// Escape HTML to prevent XSS
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
 function handleNavModeSwitch(mode) {
+    // Check if we should show copy modal before switching
+    if (mode === 'favorites' && shouldShowCopyToFavoritesModal()) {
+        pendingCopyTarget = 'favorites';
+        showCopyModal('predictions', countPredictions());
+        return;
+    } else if (mode === 'predictions' && shouldShowCopyToPredictionsModal()) {
+        pendingCopyTarget = 'predictions';
+        showCopyModal('favorites', countFavorites());
+        return;
+    }
+
     // Update state
     currentMode = mode;
+    currentSharedId = isSharedMode() ? currentMode.substring(7) : null;
     saveMode();
+
+    // Close drawer on mobile after selection
+    if (isDrawerOpen && window.innerWidth < 768) {
+        closeDrawer();
+    }
 
     // Update UI
     updateActiveMenuItem(mode);
     updateCurrentModeLabel(mode);
     updateNavShareVisibility();
-    updateModeDropdown();
     updateStreamableUI();
     renderNominees();
     updateProgress();
@@ -1242,7 +1273,6 @@ function handleDuplicateKeepBoth() {
 
     const newName = getNextAvailableName(pendingSharedData.name);
     const newList = addSharedList(newName, pendingSharedData.predictions);
-    updateModeDropdown();
     switchToSharedList(newList.id);
     window.history.replaceState({}, '', window.location.pathname);
     hideDuplicateModal();
@@ -1326,8 +1356,10 @@ function handleCopyYes() {
     }
 
     hideCopyModal();
-    modeSelect.value = currentMode;
     saveMode();
+    updateActiveMenuItem(currentMode);
+    updateCurrentModeLabel(currentMode);
+    updateNavShareVisibility();
     renderNominees();
     updateProgress();
     updateShareDeleteButton();
@@ -1345,8 +1377,10 @@ function handleCopyNo() {
     }
 
     hideCopyModal();
-    modeSelect.value = currentMode;
     saveMode();
+    updateActiveMenuItem(currentMode);
+    updateCurrentModeLabel(currentMode);
+    updateNavShareVisibility();
     renderNominees();
     updateProgress();
     updateShareDeleteButton();
@@ -1365,7 +1399,9 @@ function handleDeleteConfirm() {
     currentSharedId = null;
     saveMode();
 
-    updateModeDropdown();
+    updateActiveMenuItem(currentMode);
+    updateCurrentModeLabel(currentMode);
+    updateNavShareVisibility();
     renderNominees();
     updateProgress();
     updateShareDeleteButton();
@@ -1386,7 +1422,6 @@ function init() {
     loadSharedLists();
     loadMode();
     renderCategoryOptions();
-    updateModeDropdown();
     initNavigation();
     setupEventListeners();
     registerServiceWorker();
@@ -1407,10 +1442,12 @@ function init() {
         if (!list) {
             currentMode = 'watched';
             saveMode();
+            // Update nav after mode fallback
+            updateActiveMenuItem(currentMode);
+            updateCurrentModeLabel(currentMode);
         }
     }
 
-    updateModeDropdown();
     updateShareDeleteButton();
     updateSharedBanner();
 
@@ -1650,7 +1687,6 @@ function loadMode() {
         const stored = localStorage.getItem(MODE_KEY);
         if (stored && (stored === 'watched' || stored === 'favorites' || stored === 'predictions' || stored === 'streamable')) {
             currentMode = stored;
-            modeSelect.value = currentMode;
         }
     } catch (e) {
         console.warn('Could not load mode:', e);
@@ -2059,40 +2095,6 @@ function nextCategory(scrollToTop = false) {
     navigateToCategory(newIndex, scrollToTop);
 }
 
-// Handle mode change
-function handleModeChange(e) {
-    const newMode = e.target.value;
-
-    // Check if we should show copy modal before switching
-    if (newMode === 'favorites' && shouldShowCopyToFavoritesModal()) {
-        pendingCopyTarget = 'favorites';
-        showCopyModal('predictions', countPredictions());
-        // Don't switch mode yet - wait for modal response
-        modeSelect.value = currentMode;
-        return;
-    } else if (newMode === 'predictions' && shouldShowCopyToPredictionsModal()) {
-        pendingCopyTarget = 'predictions';
-        showCopyModal('favorites', countFavorites());
-        // Don't switch mode yet - wait for modal response
-        modeSelect.value = currentMode;
-        return;
-    }
-
-    currentMode = newMode;
-    currentSharedId = isSharedMode() ? currentMode.substring(7) : null;
-    saveMode();
-    // Restore category nav if leaving streamable mode
-    updateStreamableUI();
-    renderNominees();
-    updateProgress();
-    updateShareDeleteButton();
-    updateSharedBanner();
-    // Sync navigation sidebar/drawer
-    updateActiveMenuItem(currentMode);
-    updateCurrentModeLabel(currentMode);
-    updateNavShareVisibility();
-}
-
 // Setup event listeners
 function setupEventListeners() {
     categorySelect.addEventListener('change', (e) => {
@@ -2109,7 +2111,6 @@ function setupEventListeners() {
     nextBtnBottom.addEventListener('click', () => nextCategory(true));
     hardRefreshBtn.addEventListener('click', hardRefresh);
     browseByCategory.addEventListener('click', showCategoryScreen);
-    modeSelect.addEventListener('change', handleModeChange);
 
     // Keyboard navigation
     document.addEventListener('keydown', (e) => {

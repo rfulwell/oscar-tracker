@@ -32,7 +32,7 @@ async function measureRerenderPerformance() {
         await page.waitForSelector('#films-list .film', { state: 'visible' });
     }
 
-    await page.locator('#mode-select').selectOption('predictions');
+    await page.click('.menu-item[data-mode="predictions"]');
 
     // Warm up JIT
     console.log('\n⏳ Warming up JIT compiler...');

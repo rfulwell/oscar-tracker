@@ -28,36 +28,33 @@ test.describe('Predictions Mode', () => {
             // Wait for the app to initialize and show category screen
             await goToCategoryScreen(page);
 
-            const modeSelect = page.locator('#mode-select');
-            await expect(modeSelect).toHaveValue('watched');
+            await expect(page.locator('.menu-item[data-mode="watched"]')).toHaveClass(/active/);
         });
 
-        test('should switch to predictions mode via dropdown', async ({ page }) => {
+        test('should switch to predictions mode via navigation', async ({ page }) => {
             await goToCategoryScreen(page);
 
-            const modeSelect = page.locator('#mode-select');
-            await modeSelect.selectOption('predictions');
+            await page.click('.menu-item[data-mode="predictions"]');
 
-            await expect(modeSelect).toHaveValue('predictions');
+            await expect(page.locator('.menu-item[data-mode="predictions"]')).toHaveClass(/active/);
         });
 
         test('should persist mode selection across page reload', async ({ page }) => {
             await goToCategoryScreen(page);
 
             // Switch to predictions mode
-            await page.locator('#mode-select').selectOption('predictions');
+            await page.click('.menu-item[data-mode="predictions"]');
 
             // Reload page
             await page.reload();
 
             // Should still be in predictions mode
-            const modeSelect = page.locator('#mode-select');
-            await expect(modeSelect).toHaveValue('predictions');
+            await expect(page.locator('.menu-item[data-mode="predictions"]')).toHaveClass(/active/);
         });
 
         test('should show star icons in predictions mode', async ({ page }) => {
             await goToCategoryScreen(page);
-            await page.locator('#mode-select').selectOption('predictions');
+            await page.click('.menu-item[data-mode="predictions"]');
 
             // Check that checkbox contains a star polygon (not a checkmark polyline)
             const checkbox = page.locator('#films-list .film .checkbox').first();
@@ -69,7 +66,7 @@ test.describe('Predictions Mode', () => {
             await goToCategoryScreen(page);
 
             // Ensure we're in watched mode
-            await page.locator('#mode-select').selectOption('watched');
+            await page.click('.menu-item[data-mode="watched"]');
 
             // Check that checkbox contains a checkmark polyline (not a star)
             const checkbox = page.locator('#films-list .film .checkbox').first();
@@ -82,7 +79,7 @@ test.describe('Predictions Mode', () => {
 
         test('should select a nominee when clicked', async ({ page }) => {
             await goToCategoryScreen(page);
-            await page.locator('#mode-select').selectOption('predictions');
+            await page.click('.menu-item[data-mode="predictions"]');
 
             const firstFilm = page.locator('#films-list .film').first();
             await firstFilm.click();
@@ -93,7 +90,7 @@ test.describe('Predictions Mode', () => {
 
         test('should deselect when clicking the same nominee again', async ({ page }) => {
             await goToCategoryScreen(page);
-            await page.locator('#mode-select').selectOption('predictions');
+            await page.click('.menu-item[data-mode="predictions"]');
 
             const firstFilm = page.locator('#films-list .film').first();
 
@@ -109,7 +106,7 @@ test.describe('Predictions Mode', () => {
 
         test('should only allow one selection per category', async ({ page }) => {
             await goToCategoryScreen(page);
-            await page.locator('#mode-select').selectOption('predictions');
+            await page.click('.menu-item[data-mode="predictions"]');
 
             const films = page.locator('#films-list .film');
             const firstFilm = films.first();
@@ -132,7 +129,7 @@ test.describe('Predictions Mode', () => {
 
         test('should use radio role for accessibility in predictions mode', async ({ page }) => {
             await goToCategoryScreen(page);
-            await page.locator('#mode-select').selectOption('predictions');
+            await page.click('.menu-item[data-mode="predictions"]');
 
             const firstFilm = page.locator('#films-list .film').first();
             await expect(firstFilm).toHaveAttribute('role', 'radio');
@@ -140,7 +137,7 @@ test.describe('Predictions Mode', () => {
 
         test('should use checkbox role in watched mode', async ({ page }) => {
             await goToCategoryScreen(page);
-            await page.locator('#mode-select').selectOption('watched');
+            await page.click('.menu-item[data-mode="watched"]');
 
             const firstFilm = page.locator('#films-list .film').first();
             await expect(firstFilm).toHaveAttribute('role', 'checkbox');
@@ -151,7 +148,7 @@ test.describe('Predictions Mode', () => {
 
         test('should show empty circle when no prediction made', async ({ page }) => {
             await goToCategoryScreen(page);
-            await page.locator('#mode-select').selectOption('predictions');
+            await page.click('.menu-item[data-mode="predictions"]');
 
             const progress = page.locator('#progress');
             await expect(progress).toHaveText('○');
@@ -159,7 +156,7 @@ test.describe('Predictions Mode', () => {
 
         test('should show checkmark when prediction is made', async ({ page }) => {
             await goToCategoryScreen(page);
-            await page.locator('#mode-select').selectOption('predictions');
+            await page.click('.menu-item[data-mode="predictions"]');
 
             // Make a prediction
             await page.locator('#films-list .film').first().click();
@@ -170,7 +167,7 @@ test.describe('Predictions Mode', () => {
 
         test('should update title with prediction count', async ({ page }) => {
             await goToCategoryScreen(page);
-            await page.locator('#mode-select').selectOption('predictions');
+            await page.click('.menu-item[data-mode="predictions"]');
 
             // Initially no predictions
             await expect(page).toHaveTitle('Oscar Tracker');
@@ -184,7 +181,7 @@ test.describe('Predictions Mode', () => {
 
         test('should show empty circle after clearing prediction', async ({ page }) => {
             await goToCategoryScreen(page);
-            await page.locator('#mode-select').selectOption('predictions');
+            await page.click('.menu-item[data-mode="predictions"]');
 
             const firstFilm = page.locator('#films-list .film').first();
 
@@ -201,7 +198,7 @@ test.describe('Predictions Mode', () => {
 
         test('should persist prediction across page reload', async ({ page }) => {
             await goToCategoryScreen(page);
-            await page.locator('#mode-select').selectOption('predictions');
+            await page.click('.menu-item[data-mode="predictions"]');
 
             // Get the first film's ID and select it
             const firstFilm = page.locator('#films-list .film').first();
@@ -218,7 +215,7 @@ test.describe('Predictions Mode', () => {
 
         test('should store predictions in localStorage', async ({ page }) => {
             await goToCategoryScreen(page);
-            await page.locator('#mode-select').selectOption('predictions');
+            await page.click('.menu-item[data-mode="predictions"]');
 
             // Make a prediction
             await page.locator('#films-list .film').first().click();
@@ -234,7 +231,7 @@ test.describe('Predictions Mode', () => {
 
         test('should clear prediction from localStorage when deselected', async ({ page }) => {
             await goToCategoryScreen(page);
-            await page.locator('#mode-select').selectOption('predictions');
+            await page.click('.menu-item[data-mode="predictions"]');
 
             const firstFilm = page.locator('#films-list .film').first();
 
@@ -255,7 +252,7 @@ test.describe('Predictions Mode', () => {
 
         test('should maintain predictions when navigating categories', async ({ page }) => {
             await goToCategoryScreen(page);
-            await page.locator('#mode-select').selectOption('predictions');
+            await page.click('.menu-item[data-mode="predictions"]');
 
             // Make prediction in first category
             const firstFilm = page.locator('#films-list .film').first();
@@ -275,7 +272,7 @@ test.describe('Predictions Mode', () => {
 
         test('should have separate predictions per category', async ({ page }) => {
             await goToCategoryScreen(page);
-            await page.locator('#mode-select').selectOption('predictions');
+            await page.click('.menu-item[data-mode="predictions"]');
 
             // Make prediction in Best Picture
             await page.locator('#films-list .film').first().click();
@@ -298,7 +295,7 @@ test.describe('Predictions Mode', () => {
 
         test('should show correct progress indicator per category', async ({ page }) => {
             await goToCategoryScreen(page);
-            await page.locator('#mode-select').selectOption('predictions');
+            await page.click('.menu-item[data-mode="predictions"]');
 
             // Make prediction in first category
             await page.locator('#films-list .film').first().click();
@@ -315,7 +312,7 @@ test.describe('Predictions Mode', () => {
 
         test('should use category dropdown to navigate', async ({ page }) => {
             await goToCategoryScreen(page);
-            await page.locator('#mode-select').selectOption('predictions');
+            await page.click('.menu-item[data-mode="predictions"]');
 
             // Make prediction in first category
             await page.locator('#films-list .film').first().click();
@@ -340,7 +337,7 @@ test.describe('Predictions Mode', () => {
 
         test('should select prediction with Enter key', async ({ page }) => {
             await goToCategoryScreen(page);
-            await page.locator('#mode-select').selectOption('predictions');
+            await page.click('.menu-item[data-mode="predictions"]');
 
             const firstFilm = page.locator('#films-list .film').first();
             await firstFilm.focus();
@@ -351,7 +348,7 @@ test.describe('Predictions Mode', () => {
 
         test('should select prediction with Space key', async ({ page }) => {
             await goToCategoryScreen(page);
-            await page.locator('#mode-select').selectOption('predictions');
+            await page.click('.menu-item[data-mode="predictions"]');
 
             const firstFilm = page.locator('#films-list .film').first();
             await firstFilm.focus();
@@ -362,7 +359,7 @@ test.describe('Predictions Mode', () => {
 
         test('should navigate categories with arrow keys', async ({ page }) => {
             await goToCategoryScreen(page);
-            await page.locator('#mode-select').selectOption('predictions');
+            await page.click('.menu-item[data-mode="predictions"]');
 
             // Make prediction
             await page.locator('#films-list .film').first().click();
@@ -385,7 +382,7 @@ test.describe('Predictions Mode', () => {
 
         test('should apply predicted class styling', async ({ page }) => {
             await goToCategoryScreen(page);
-            await page.locator('#mode-select').selectOption('predictions');
+            await page.click('.menu-item[data-mode="predictions"]');
 
             const firstFilm = page.locator('#films-list .film').first();
             await firstFilm.click();
@@ -401,7 +398,7 @@ test.describe('Predictions Mode', () => {
 
         test('should have gold checkbox when predicted', async ({ page }) => {
             await goToCategoryScreen(page);
-            await page.locator('#mode-select').selectOption('predictions');
+            await page.click('.menu-item[data-mode="predictions"]');
 
             const firstFilm = page.locator('#films-list .film').first();
 
@@ -433,7 +430,7 @@ test.describe('Predictions Mode', () => {
             await page.locator('#films-list .film').first().click();
 
             // Switch to predictions mode
-            await page.locator('#mode-select').selectOption('predictions');
+            await page.click('.menu-item[data-mode="predictions"]');
 
             // First film should NOT be predicted
             const firstFilm = page.locator('#films-list .film').first();
@@ -442,13 +439,13 @@ test.describe('Predictions Mode', () => {
 
         test('predictions should not affect watched items', async ({ page }) => {
             await goToCategoryScreen(page);
-            await page.locator('#mode-select').selectOption('predictions');
+            await page.click('.menu-item[data-mode="predictions"]');
 
             // Make a prediction
             await page.locator('#films-list .film').first().click();
 
             // Switch to watched mode
-            await page.locator('#mode-select').selectOption('watched');
+            await page.click('.menu-item[data-mode="watched"]');
 
             // First film should NOT be watched
             const firstFilm = page.locator('#films-list .film').first();
@@ -462,7 +459,7 @@ test.describe('Predictions Mode', () => {
             await page.locator('#films-list .film').first().click();
 
             // Switch to predictions, select second film
-            await page.locator('#mode-select').selectOption('predictions');
+            await page.click('.menu-item[data-mode="predictions"]');
             await page.locator('#films-list .film').nth(1).click();
 
             // Check localStorage
@@ -483,7 +480,7 @@ test.describe('Predictions Mode', () => {
 
         test('should handle rapid clicking without errors', async ({ page }) => {
             await goToCategoryScreen(page);
-            await page.locator('#mode-select').selectOption('predictions');
+            await page.click('.menu-item[data-mode="predictions"]');
 
             const films = page.locator('#films-list .film');
 
@@ -499,16 +496,16 @@ test.describe('Predictions Mode', () => {
 
         test('should handle mode switching while prediction is selected', async ({ page }) => {
             await goToCategoryScreen(page);
-            await page.locator('#mode-select').selectOption('predictions');
+            await page.click('.menu-item[data-mode="predictions"]');
 
             // Make prediction
             await page.locator('#films-list .film').first().click();
 
             // Switch to watched mode
-            await page.locator('#mode-select').selectOption('watched');
+            await page.click('.menu-item[data-mode="watched"]');
 
             // Switch back to predictions
-            await page.locator('#mode-select').selectOption('predictions');
+            await page.click('.menu-item[data-mode="predictions"]');
 
             // Prediction should still be there
             await expect(page.locator('#films-list .film').first()).toHaveClass(/predicted/);
@@ -516,7 +513,7 @@ test.describe('Predictions Mode', () => {
 
         test('should maintain predictions through all categories', async ({ page }) => {
             await goToCategoryScreen(page);
-            await page.locator('#mode-select').selectOption('predictions');
+            await page.click('.menu-item[data-mode="predictions"]');
 
             // Make predictions in all categories
             const categoryCount = 21;
@@ -543,7 +540,7 @@ test.describe('Predictions Mode', () => {
 
         test('should NOT re-render entire list when selecting a prediction', async ({ page }) => {
             await goToCategoryScreen(page);
-            await page.locator('#mode-select').selectOption('predictions');
+            await page.click('.menu-item[data-mode="predictions"]');
 
             // Mark all film elements with a unique data attribute to detect re-rendering
             // If the list is re-rendered via innerHTML, these markers will be lost
@@ -569,7 +566,7 @@ test.describe('Predictions Mode', () => {
 
         test('should NOT re-render list when changing prediction within same category', async ({ page }) => {
             await goToCategoryScreen(page);
-            await page.locator('#mode-select').selectOption('predictions');
+            await page.click('.menu-item[data-mode="predictions"]');
 
             // Select first film
             await page.locator('#films-list .film').first().click();
@@ -599,7 +596,7 @@ test.describe('Predictions Mode', () => {
 
         test('should NOT re-render list when clearing a prediction', async ({ page }) => {
             await goToCategoryScreen(page);
-            await page.locator('#mode-select').selectOption('predictions');
+            await page.click('.menu-item[data-mode="predictions"]');
 
             // Select first film
             await page.locator('#films-list .film').first().click();

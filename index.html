@@ -60,12 +60,6 @@
             <p class="subtitle">98th <a href="https://www.oscars.org/" target="_blank" rel="noopener noreferrer" class="subtitle-link">Academy Awards<sup>®</sup></a> · 2026</p>
             <div class="ceremony-info">
                 <span>March 15 on ABC</span>
-                <span class="separator">|</span>
-                <select class="mode-select" id="mode-select" aria-label="Select tracking mode">
-                    <option value="watched">Watched</option>
-                    <option value="favorites">Favorites</option>
-                    <option value="predictions">Predictions</option>
-                </select>
                 <span class="current-mode-label" id="current-mode-label">Watched</span>
                 <button class="hamburger-btn" id="hamburger-btn" aria-label="Open navigation menu" aria-expanded="false" aria-controls="nav-drawer">
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -153,6 +147,10 @@
             </ul>
 
             <div class="nav-divider" id="nav-share-divider" style="display: none;"></div>
+
+            <!-- Shared Lists (dynamically populated) -->
+            <div class="nav-divider nav-shared-divider" id="nav-shared-divider" style="display: none;"></div>
+            <ul class="nav-menu nav-menu-shared" id="nav-shared-lists"></ul>
 
             <ul class="nav-menu nav-menu-secondary">
                 <li>
