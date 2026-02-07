@@ -102,4 +102,85 @@ test.describe('Sticky Header', () => {
         expect(ceremonyBox.y).toBeLessThanOrEqual(50);
     });
 
+    test('ceremony-info should stay visible when scrolling up and down (mobile)', async ({ page }) => {
+        await page.setViewportSize({ width: 390, height: 844 });
+        await completeOnboarding(page);
+
+        const ceremonyInfo = page.locator('.ceremony-info');
+
+        // Scroll down
+        await page.evaluate(() => window.scrollBy(0, 500));
+        await page.waitForTimeout(300);
+
+        // Check still visible at top
+        let box = await ceremonyInfo.boundingBox();
+        expect(box).not.toBeNull();
+        expect(box.y).toBeLessThanOrEqual(50);
+
+        // Scroll down more
+        await page.evaluate(() => window.scrollBy(0, 300));
+        await page.waitForTimeout(300);
+
+        // Still at top
+        box = await ceremonyInfo.boundingBox();
+        expect(box.y).toBeLessThanOrEqual(50);
+
+        // Scroll back up
+        await page.evaluate(() => window.scrollBy(0, -400));
+        await page.waitForTimeout(300);
+
+        // Still visible
+        box = await ceremonyInfo.boundingBox();
+        expect(box.y).toBeGreaterThanOrEqual(0);
+        expect(box.y).toBeLessThanOrEqual(100);
+    });
+
+    test('ceremony-info and category header should be visible after bottom nav auto-scroll (mobile)', async ({ page }) => {
+        await page.setViewportSize({ width: 390, height: 844 });
+        await completeOnboarding(page);
+
+        // First scroll down manually to middle of page
+        await page.evaluate(() => window.scrollBy(0, 300));
+        await page.waitForTimeout(200);
+
+        // Click next category button at bottom (which triggers auto-scroll)
+        await page.click('#next-category-bottom');
+        await page.waitForTimeout(500);
+
+        // Take screenshot after auto-scroll
+        await page.screenshot({ path: 'test-results/after-auto-scroll.png' });
+
+        // Ceremony info should be visible at top
+        const ceremonyInfo = page.locator('.ceremony-info');
+        const ceremonyBox = await ceremonyInfo.boundingBox();
+        expect(ceremonyBox).not.toBeNull();
+        expect(ceremonyBox.y).toBeGreaterThanOrEqual(0);
+        expect(ceremonyBox.y).toBeLessThanOrEqual(50);
+
+        // Category header should also be visible
+        const categoryHeader = page.locator('.category-header');
+        const categoryBox = await categoryHeader.boundingBox();
+        expect(categoryBox).not.toBeNull();
+        expect(categoryBox.y).toBeGreaterThan(0); // Below the sticky header
+    });
+
+    test('ceremony-info should be visible after using bottom category dropdown (mobile)', async ({ page }) => {
+        await page.setViewportSize({ width: 390, height: 844 });
+        await completeOnboarding(page);
+
+        // Use bottom dropdown to change category (triggers auto-scroll)
+        await page.locator('.category-footer select').selectOption('5'); // Supporting Actress
+        await page.waitForTimeout(500);
+
+        // Take screenshot
+        await page.screenshot({ path: 'test-results/after-dropdown-scroll.png' });
+
+        // Ceremony info should be visible at top
+        const ceremonyInfo = page.locator('.ceremony-info');
+        const ceremonyBox = await ceremonyInfo.boundingBox();
+        expect(ceremonyBox).not.toBeNull();
+        expect(ceremonyBox.y).toBeGreaterThanOrEqual(0);
+        expect(ceremonyBox.y).toBeLessThanOrEqual(50);
+    });
+
 });
