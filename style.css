@@ -137,6 +137,13 @@ body {
     font-weight: 300;
     color: var(--color-white-dim);
     margin-top: var(--spacing-xs);
+    position: sticky;
+    top: 0;
+    background: var(--color-black);
+    padding: var(--spacing-sm) var(--spacing-md);
+    margin-left: calc(-1 * var(--spacing-md));
+    margin-right: calc(-1 * var(--spacing-md));
+    z-index: 100;
 }
 
 .ceremony-info .separator {
