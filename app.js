@@ -564,6 +564,9 @@ function showCategoryScreen() {
     categoryScreen.style.display = '';
     renderNominees();
     updateProgress();
+    const headerTop = categoryHeader.getBoundingClientRect().top + window.scrollY;
+    const offset = 16;
+    window.scrollTo({ top: headerTop - offset, behavior: 'smooth' });
 }
 
 // ============================================
