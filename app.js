@@ -564,8 +564,10 @@ function showCategoryScreen(scrollToTop = true) {
     renderNominees();
     updateProgress();
     if (scrollToTop) {
+        const stickyHeader = document.querySelector('.ceremony-info');
+        const stickyHeight = stickyHeader ? stickyHeader.offsetHeight : 0;
         const headerTop = categoryHeader.getBoundingClientRect().top + window.scrollY;
-        const offset = 16;
+        const offset = stickyHeight + 8; // Account for sticky header + small margin
         window.scrollTo({ top: headerTop - offset, behavior: 'smooth' });
     }
 }
@@ -2074,8 +2076,10 @@ function navigateToCategory(index, scrollToTop = false) {
     renderNominees();
     updateProgress();
     if (scrollToTop) {
+        const stickyHeader = document.querySelector('.ceremony-info');
+        const stickyHeight = stickyHeader ? stickyHeader.offsetHeight : 0;
         const headerTop = categoryHeader.getBoundingClientRect().top + window.scrollY;
-        const offset = 16; // Small margin above the header
+        const offset = stickyHeight + 8; // Account for sticky header + small margin
         window.scrollTo({ top: headerTop - offset, behavior: 'smooth' });
     }
 }

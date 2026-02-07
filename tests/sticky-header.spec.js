@@ -135,7 +135,7 @@ test.describe('Sticky Header', () => {
         expect(box.y).toBeLessThanOrEqual(100);
     });
 
-    test('ceremony-info and category header should be visible after bottom nav auto-scroll (mobile)', async ({ page }) => {
+    test('ceremony-info and category header should be fully visible after bottom nav auto-scroll (mobile)', async ({ page }) => {
         await page.setViewportSize({ width: 390, height: 844 });
         await completeOnboarding(page);
 
@@ -157,11 +157,67 @@ test.describe('Sticky Header', () => {
         expect(ceremonyBox.y).toBeGreaterThanOrEqual(0);
         expect(ceremonyBox.y).toBeLessThanOrEqual(50);
 
-        // Category header should also be visible
+        // Category header should be fully visible below sticky header
         const categoryHeader = page.locator('.category-header');
         const categoryBox = await categoryHeader.boundingBox();
         expect(categoryBox).not.toBeNull();
-        expect(categoryBox.y).toBeGreaterThan(0); // Below the sticky header
+        // Category header should start below the sticky header (not cut off)
+        expect(categoryBox.y).toBeGreaterThanOrEqual(ceremonyBox.y + ceremonyBox.height);
+        // And should be fully visible in viewport (top of category header visible)
+        expect(categoryBox.y).toBeLessThan(200);
+
+        // Prev button should be visible
+        const prevBtn = page.locator('#prev-category');
+        await expect(prevBtn).toBeVisible();
+        const prevBox = await prevBtn.boundingBox();
+        expect(prevBox.y).toBeGreaterThanOrEqual(0);
+
+        // Next button should be visible
+        const nextBtn = page.locator('#next-category');
+        await expect(nextBtn).toBeVisible();
+        const nextBox = await nextBtn.boundingBox();
+        expect(nextBox.y).toBeGreaterThanOrEqual(0);
+
+        // Category dropdown (with "Best [Category]") should be visible
+        const categorySelect = page.locator('#category-select');
+        await expect(categorySelect).toBeVisible();
+        const selectBox = await categorySelect.boundingBox();
+        expect(selectBox.y).toBeGreaterThanOrEqual(0);
+
+        // "Best" prefix label in top category header should be visible
+        const bestPrefix = page.locator('.category-header .category-prefix');
+        await expect(bestPrefix).toBeVisible();
+        await expect(bestPrefix).toHaveText('Best');
+    });
+
+    test('full category nav with "Best" label visible after auto-scroll (mobile)', async ({ page }) => {
+        await page.setViewportSize({ width: 390, height: 844 });
+        await completeOnboarding(page);
+
+        // Scroll to bottom of list
+        await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
+        await page.waitForTimeout(300);
+
+        // Use bottom nav to go to next category (triggers auto-scroll)
+        await page.click('#next-category-bottom');
+        await page.waitForTimeout(500);
+
+        // Take screenshot
+        await page.screenshot({ path: 'test-results/category-nav-visible.png' });
+
+        // The "Best" prefix label in top category header should be visible
+        const bestPrefix = page.locator('.category-header .category-prefix');
+        await expect(bestPrefix).toBeVisible();
+        await expect(bestPrefix).toHaveText('Best');
+
+        // The entire category header row should be in viewport
+        const categoryHeader = page.locator('.category-header');
+        const headerBox = await categoryHeader.boundingBox();
+        expect(headerBox).not.toBeNull();
+        // The top of category header should be visible (y >= 0)
+        expect(headerBox.y).toBeGreaterThanOrEqual(0);
+        // And fully on screen (bottom of header within viewport)
+        expect(headerBox.y + headerBox.height).toBeLessThan(844);
     });
 
     test('ceremony-info should be visible after using bottom category dropdown (mobile)', async ({ page }) => {
