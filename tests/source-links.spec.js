@@ -183,6 +183,24 @@ test.describe('Source Links', () => {
             const sourceLink = page.locator('#source-link-bottom');
             await expect(sourceLink).toBeVisible();
         });
+
+        test('source link should be on same line as progress count on mobile', async ({ page }) => {
+            await page.setViewportSize({ width: 375, height: 667 });
+            await completeOnboarding(page);
+
+            const progress = page.locator('#progress');
+            const sourceLink = page.locator('#source-link-top');
+
+            const progressBox = await progress.boundingBox();
+            const sourceLinkBox = await sourceLink.boundingBox();
+
+            expect(progressBox).not.toBeNull();
+            expect(sourceLinkBox).not.toBeNull();
+
+            // They should be on the same line (Y positions should be very close)
+            // Allow 5px tolerance for vertical alignment differences
+            expect(Math.abs(progressBox.y - sourceLinkBox.y)).toBeLessThan(10);
+        });
     });
 
     test.describe('Link Styling', () => {

@@ -1,5 +1,5 @@
 // Service Worker for Awards Tracker PWA
-const SW_VERSION = '8';
+const SW_VERSION = '9';
 const CACHE_NAME = `awards-tracker-v${SW_VERSION}`;
 
 const ASSETS_TO_CACHE = [

@@ -549,6 +549,13 @@ body {
     height: 18px;
 }
 
+.progress-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--spacing-xs);
+}
+
 .progress {
     font-size: 0.8125rem;
     font-weight: 500;
@@ -562,7 +569,6 @@ body {
     font-weight: 400;
     color: var(--color-gold);
     text-decoration: none;
-    margin-left: var(--spacing-sm);
     opacity: 0.8;
     transition: opacity 0.2s ease;
     white-space: nowrap;
