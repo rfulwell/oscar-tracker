@@ -362,9 +362,11 @@ body {
 /* Dedication text */
 .nav-dedication {
     padding: var(--spacing-sm) var(--spacing-md);
+    padding-bottom: var(--spacing-lg);
     font-size: 0.75rem;
     color: var(--color-text-secondary);
     text-align: center;
+    margin-top: auto;
 }
 
 /* Sidebar toggle (hidden on mobile) */
@@ -1032,11 +1034,6 @@ body {
 
     .sidebar-toggle-divider {
         display: block;
-    }
-
-    .nav-dedication {
-        margin-top: auto;
-        padding-bottom: var(--spacing-md);
     }
 
     .nav-drawer.collapsed .menu-text {
