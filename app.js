@@ -81,7 +81,7 @@ const CATEGORIES = [
             { id: 'supp-actress-mosaku', title: 'Wunmi Mosaku', subtitle: 'Sinners' },
             { id: 'supp-actress-fanning', title: 'Elle Fanning', subtitle: 'Sentimental Value' },
             { id: 'supp-actress-lilleaas', title: 'Inga Ibsdotter Lilleaas', subtitle: 'Sentimental Value' },
-            { id: 'supp-actress-paltrow', title: 'Gwyneth Paltrow', subtitle: 'Marty Supreme' }
+            { id: 'supp-actress-madigan', title: 'Amy Madigan', subtitle: 'Weapons' }
         ]
     },
     {
@@ -103,7 +103,7 @@ const CATEGORIES = [
             { id: 'adapt-traindreams', title: 'Train Dreams', subtitle: 'Clint Bentley & Greg Kwedar' },
             { id: 'adapt-frankenstein', title: 'Frankenstein', subtitle: 'Guillermo del Toro' },
             { id: 'adapt-hamnet', title: 'Hamnet', subtitle: 'Chloé Zhao' },
-            { id: 'adapt-secretagent', title: 'The Secret Agent', subtitle: 'Fernando Meirelles' }
+            { id: 'adapt-bugonia', title: 'Bugonia', subtitle: 'Will Tracy' }
         ]
     },
     {
@@ -145,9 +145,9 @@ const CATEGORIES = [
         nominees: [
             { id: 'cin-frankenstein', title: 'Frankenstein', subtitle: 'Dan Laustsen' },
             { id: 'cin-marty', title: 'Marty Supreme', subtitle: 'Darius Khondji' },
-            { id: 'cin-onebattle', title: 'One Battle After Another', subtitle: 'Ari Wegner' },
+            { id: 'cin-onebattle', title: 'One Battle After Another', subtitle: 'Michael Bauman' },
             { id: 'cin-sinners', title: 'Sinners', subtitle: 'Autumn Durald Arkapaw' },
-            { id: 'cin-traindreams', title: 'Train Dreams', subtitle: 'Lol Crawley' }
+            { id: 'cin-traindreams', title: 'Train Dreams', subtitle: 'Adolpho Veloso' }
         ]
     },
     {
@@ -243,10 +243,10 @@ const CATEGORIES = [
         name: 'Best Casting',
         nominees: [
             { id: 'cast-hamnet', title: 'Hamnet', subtitle: 'Nina Gold' },
-            { id: 'cast-marty', title: 'Marty Supreme', subtitle: 'Francine Maisler' },
+            { id: 'cast-marty', title: 'Marty Supreme', subtitle: 'Jennifer Venditti' },
             { id: 'cast-onebattle', title: 'One Battle After Another', subtitle: 'Cassandra Kulukundis' },
-            { id: 'cast-sentimental', title: 'Sentimental Value', subtitle: 'Kjersti Paulsen' },
-            { id: 'cast-sinners', title: 'Sinners', subtitle: 'Kim Coleman' }
+            { id: 'cast-secretagent', title: 'The Secret Agent', subtitle: 'Gabriel Domingues' },
+            { id: 'cast-sinners', title: 'Sinners', subtitle: 'Francine Maisler' }
         ]
     }
 ];
@@ -266,14 +266,14 @@ const PREDICTIONS_COPY_DISMISSED_KEY = 'oscar-tracker-predictions-copy-dismissed
 const FILM_NOMINEES = {
     'sinners': ['sinners', 'dir-coogler', 'actor-jordan', 'supp-actor-lindo', 'supp-actress-mosaku', 'orig-sinners', 'cin-sinners', 'edit-sinners', 'prod-sinners', 'cost-sinners', 'makeup-sinners', 'score-sinners', 'song-ilied', 'sound-sinners', 'vfx-sinners', 'cast-sinners'],
     'one-battle-after-another': ['one-battle-after-another', 'dir-anderson', 'actor-dicaprio', 'supp-actor-deltoro', 'supp-actor-penn', 'supp-actress-taylor', 'adapt-onebattle', 'cin-onebattle', 'edit-onebattle', 'prod-onebattle', 'score-onebattle', 'sound-onebattle', 'cast-onebattle'],
-    'marty-supreme': ['marty-supreme', 'dir-safdie', 'actor-chalamet', 'supp-actress-paltrow', 'orig-marty', 'cin-marty', 'edit-marty', 'prod-marty', 'cost-marty', 'cast-marty'],
+    'marty-supreme': ['marty-supreme', 'dir-safdie', 'actor-chalamet', 'orig-marty', 'cin-marty', 'edit-marty', 'prod-marty', 'cost-marty', 'cast-marty'],
     'hamnet': ['hamnet', 'dir-zhao', 'actress-buckley', 'adapt-hamnet', 'prod-hamnet', 'cost-hamnet', 'score-hamnet', 'cast-hamnet'],
     'frankenstein': ['frankenstein', 'supp-actor-elordi', 'adapt-frankenstein', 'cin-frankenstein', 'prod-frankenstein', 'cost-frankenstein', 'makeup-frankenstein', 'score-frankenstein', 'sound-frankenstein'],
-    'sentimental-value': ['sentimental-value', 'dir-trier', 'actress-reinsve', 'supp-actor-skarsgard', 'supp-actress-fanning', 'supp-actress-lilleaas', 'orig-sentimental', 'intl-sentimental', 'edit-sentimental', 'cast-sentimental'],
+    'sentimental-value': ['sentimental-value', 'dir-trier', 'actress-reinsve', 'supp-actor-skarsgard', 'supp-actress-fanning', 'supp-actress-lilleaas', 'orig-sentimental', 'intl-sentimental', 'edit-sentimental'],
     'train-dreams': ['train-dreams', 'adapt-traindreams', 'cin-traindreams', 'song-traindreams'],
-    'bugonia': ['bugonia', 'actress-stone', 'score-bugonia'],
+    'bugonia': ['bugonia', 'actress-stone', 'adapt-bugonia', 'score-bugonia'],
     'f1': ['f1', 'edit-f1', 'sound-f1', 'vfx-f1'],
-    'secret-agent': ['secret-agent', 'actor-moura', 'adapt-secretagent', 'intl-secretagent'],
+    'secret-agent': ['secret-agent', 'actor-moura', 'intl-secretagent', 'cast-secretagent'],
     'it-was-just-an-accident': ['orig-accident', 'intl-accident'],
     'arco': ['anim-arco'],
     'little-amelie': ['anim-amelie'],
@@ -289,6 +289,7 @@ const FILM_NOMINEES = {
     'alabama-solution': ['doc-alabama'],
     'come-see-me': ['doc-goodlight'],
     'perfect-neighbor': ['doc-neighbor'],
+    'weapons': ['supp-actress-madigan'],
     'smashing-machine': ['makeup-smashing'],
     'ugly-stepsister': ['makeup-ugly'],
     'jurassic-world-rebirth': ['vfx-jurassic'],
@@ -307,14 +308,14 @@ for (const [filmKey, nomineeIds] of Object.entries(FILM_NOMINEES)) {
 const ALL_FILMS = [
     { key: 'sinners', title: 'Sinners', nominations: 16 },
     { key: 'one-battle-after-another', title: 'One Battle After Another', nominations: 13 },
-    { key: 'marty-supreme', title: 'Marty Supreme', nominations: 10 },
-    { key: 'sentimental-value', title: 'Sentimental Value', nominations: 10 },
+    { key: 'marty-supreme', title: 'Marty Supreme', nominations: 9 },
+    { key: 'sentimental-value', title: 'Sentimental Value', nominations: 9 },
     { key: 'frankenstein', title: 'Frankenstein', nominations: 9 },
     { key: 'hamnet', title: 'Hamnet', nominations: 8 },
     { key: 'train-dreams', title: 'Train Dreams', nominations: 4 },
     { key: 'f1', title: 'F1', nominations: 4 },
     { key: 'secret-agent', title: 'The Secret Agent', nominations: 4 },
-    { key: 'bugonia', title: 'Bugonia', nominations: 3 },
+    { key: 'bugonia', title: 'Bugonia', nominations: 4 },
     { key: 'sirat', title: 'Sirât', nominations: 2 },
     { key: 'blue-moon', title: 'Blue Moon', nominations: 2 },
     { key: 'it-was-just-an-accident', title: 'It Was Just an Accident', nominations: 2 },
@@ -333,7 +334,8 @@ const ALL_FILMS = [
     { key: 'smashing-machine', title: 'The Smashing Machine', nominations: 1 },
     { key: 'ugly-stepsister', title: 'The Ugly Stepsister', nominations: 1 },
     { key: 'jurassic-world-rebirth', title: 'Jurassic World Rebirth', nominations: 1 },
-    { key: 'lost-bus', title: 'The Lost Bus', nominations: 1 }
+    { key: 'lost-bus', title: 'The Lost Bus', nominations: 1 },
+    { key: 'weapons', title: 'Weapons', nominations: 1 }
 ].sort((a, b) => b.nominations - a.nominations);
 
 // Streaming service availability for films (subscription streaming only, not rent/buy)

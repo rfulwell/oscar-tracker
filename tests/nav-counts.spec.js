@@ -149,7 +149,7 @@ test.describe('Navigation Counts', () => {
         // The count should be unique films, not nominee IDs
         // With the data above, we have ~11 unique films but 35+ nominee IDs
         expect(watched).toBeLessThanOrEqual(total);
-        expect(total).toBe(29);
+        expect(total).toBe(30);
 
         // Should be around 11 films (not 35)
         expect(watched).toBeLessThan(15);
@@ -198,7 +198,7 @@ test.describe('Navigation Counts', () => {
         expect(watched).toBeLessThanOrEqual(total);
 
         // Total should be 29 (number of unique films)
-        expect(total).toBe(29);
+        expect(total).toBe(30);
 
         // Take screenshot for debugging
         await page.screenshot({ path: 'test-results/nav-counts-multiple-watches.png' });
