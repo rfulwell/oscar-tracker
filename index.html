@@ -66,10 +66,120 @@
                     <option value="favorites">Favorites</option>
                     <option value="predictions">Predictions</option>
                 </select>
+                <span class="current-mode-label" id="current-mode-label">Watched</span>
+                <button class="hamburger-btn" id="hamburger-btn" aria-label="Open navigation menu" aria-expanded="false" aria-controls="nav-drawer">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="3" y1="6" x2="21" y2="6"/>
+                        <line x1="3" y1="12" x2="21" y2="12"/>
+                        <line x1="3" y1="18" x2="21" y2="18"/>
+                    </svg>
+                </button>
                 <button class="share-btn" id="share-btn" style="display: none;" disabled>Share</button>
                 <button class="delete-btn" id="delete-btn" style="display: none;">Delete</button>
             </div>
         </header>
+
+        <!-- Navigation Drawer -->
+        <nav id="nav-drawer" class="nav-drawer" role="navigation" aria-label="Main navigation">
+            <div class="drawer-header">
+                <button class="drawer-close" id="drawer-close" aria-label="Close navigation menu">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="18" y1="6" x2="6" y2="18"/>
+                        <line x1="6" y1="6" x2="18" y2="18"/>
+                    </svg>
+                </button>
+            </div>
+
+            <ul class="nav-menu">
+                <li>
+                    <a href="#" class="menu-item active" data-mode="watched">
+                        <span class="menu-icon">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                                <circle cx="12" cy="12" r="3"/>
+                            </svg>
+                        </span>
+                        <span class="menu-text">Watched</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="menu-item" data-mode="predictions">
+                        <span class="menu-icon">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+                            </svg>
+                        </span>
+                        <span class="menu-text">Predictions</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="menu-item" data-mode="favorites">
+                        <span class="menu-icon">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+                            </svg>
+                        </span>
+                        <span class="menu-text">Favorites</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="menu-item" data-mode="streamable">
+                        <span class="menu-icon">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polygon points="5 3 19 12 5 21 5 3"/>
+                            </svg>
+                        </span>
+                        <span class="menu-text">Streamable</span>
+                    </a>
+                </li>
+            </ul>
+
+            <div class="nav-divider"></div>
+
+            <!-- Share section (only visible in Predictions mode) -->
+            <ul class="nav-menu nav-menu-actions" id="nav-share-section" style="display: none;">
+                <li>
+                    <a href="#" class="menu-item" id="nav-share">
+                        <span class="menu-icon">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/>
+                                <polyline points="16 6 12 2 8 6"/>
+                                <line x1="12" y1="2" x2="12" y2="15"/>
+                            </svg>
+                        </span>
+                        <span class="menu-text">Share</span>
+                    </a>
+                </li>
+            </ul>
+
+            <div class="nav-divider" id="nav-share-divider" style="display: none;"></div>
+
+            <ul class="nav-menu nav-menu-secondary">
+                <li>
+                    <a href="#" class="menu-item" id="nav-about">
+                        <span class="menu-icon">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="12" r="10"/>
+                                <line x1="12" y1="16" x2="12" y2="12"/>
+                                <line x1="12" y1="8" x2="12.01" y2="8"/>
+                            </svg>
+                        </span>
+                        <span class="menu-text">About</span>
+                    </a>
+                </li>
+            </ul>
+
+            <!-- Sidebar collapse toggle (desktop only) -->
+            <button class="sidebar-toggle" id="sidebar-toggle" aria-label="Collapse sidebar">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="11 17 6 12 11 7"/>
+                    <line x1="6" y1="12" x2="18" y2="12"/>
+                </svg>
+            </button>
+        </nav>
+
+        <!-- Navigation Overlay (mobile only) -->
+        <div class="nav-overlay" id="nav-overlay"></div>
 
         <!-- First-time experience screen -->
         <main class="main onboarding-screen" id="onboarding-screen" style="display: none;">

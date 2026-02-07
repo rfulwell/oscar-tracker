@@ -197,6 +197,173 @@ body {
     }
 }
 
+/* =================================
+   Hamburger Button & Mode Label
+   ================================= */
+
+.current-mode-label {
+    color: var(--color-white);
+    font-family: var(--font-body);
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    padding: 6px 12px;
+    border-radius: 6px;
+    transition: background-color 150ms ease;
+}
+
+.current-mode-label:hover {
+    background: var(--color-black-lighter);
+}
+
+.hamburger-btn {
+    background: none;
+    border: none;
+    color: var(--color-white);
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 150ms ease;
+}
+
+.hamburger-btn:hover {
+    background: var(--color-black-lighter);
+}
+
+/* =================================
+   Navigation Drawer (Mobile)
+   ================================= */
+
+.nav-drawer {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 280px;
+    background: var(--color-black-light);
+    z-index: 1000;
+    transform: translateX(-100%);
+    transition: transform 300ms ease-out;
+    display: flex;
+    flex-direction: column;
+    padding-top: var(--safe-area-top);
+}
+
+.nav-drawer.open {
+    transform: translateX(0);
+}
+
+.drawer-header {
+    display: flex;
+    justify-content: flex-end;
+    padding: var(--spacing-md);
+    border-bottom: 1px solid var(--color-black-lighter);
+}
+
+.drawer-close {
+    background: none;
+    border: none;
+    color: var(--color-white-dim);
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: color 150ms ease, background-color 150ms ease;
+}
+
+.drawer-close:hover {
+    color: var(--color-white);
+    background: var(--color-black-lighter);
+}
+
+.nav-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.6);
+    z-index: 999;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 300ms ease-out;
+}
+
+.nav-overlay.visible {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+/* =================================
+   Navigation Menu Items
+   ================================= */
+
+.nav-menu {
+    list-style: none;
+    margin: 0;
+    padding: var(--spacing-sm) 0;
+}
+
+.menu-item {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    padding: var(--spacing-sm) var(--spacing-md);
+    color: var(--color-white-dim);
+    text-decoration: none;
+    font-family: var(--font-body);
+    font-size: 1rem;
+    font-weight: 500;
+    border-left: 3px solid transparent;
+    transition: color 150ms ease, background-color 150ms ease, border-color 150ms ease;
+    cursor: pointer;
+}
+
+.menu-item:hover {
+    color: var(--color-white);
+    background: var(--color-black-lighter);
+}
+
+.menu-item.active {
+    color: var(--color-gold);
+    border-left-color: var(--color-gold);
+}
+
+.menu-item.disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+.menu-icon {
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.menu-icon svg {
+    width: 20px;
+    height: 20px;
+}
+
+.nav-divider {
+    height: 1px;
+    background: var(--color-black-lighter);
+    margin: var(--spacing-xs) var(--spacing-md);
+}
+
+/* Sidebar toggle (hidden on mobile) */
+.sidebar-toggle {
+    display: none;
+}
+
 /* Main Content */
 .main {
     flex: 1;
@@ -800,6 +967,94 @@ body {
     .category-select:focus {
         border-color: var(--color-gold);
         box-shadow: 0 0 0 2px rgba(212, 175, 55, 0.2);
+    }
+
+    /* =================================
+       Desktop Sidebar Navigation
+       ================================= */
+
+    /* Hide mobile hamburger and mode label on desktop */
+    .hamburger-btn,
+    .current-mode-label {
+        display: none;
+    }
+
+    /* Keep dropdown visible for backwards compatibility */
+    /* .mode-select is still functional on desktop */
+
+    .nav-overlay {
+        display: none;
+    }
+
+    .nav-drawer {
+        position: fixed;
+        transform: translateX(0);
+        width: 200px;
+        border-right: 1px solid var(--color-black-lighter);
+        padding-top: var(--spacing-md);
+    }
+
+    .nav-drawer.collapsed {
+        width: 56px;
+    }
+
+    .drawer-header {
+        display: none;
+    }
+
+    .sidebar-toggle {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: absolute;
+        bottom: var(--spacing-md);
+        left: 50%;
+        transform: translateX(-50%);
+        background: none;
+        border: none;
+        color: var(--color-white-dim);
+        cursor: pointer;
+        padding: 8px;
+        border-radius: 8px;
+        transition: color 150ms ease, background-color 150ms ease;
+    }
+
+    .sidebar-toggle:hover {
+        color: var(--color-white);
+        background: var(--color-black-lighter);
+    }
+
+    .nav-drawer.collapsed .menu-text {
+        opacity: 0;
+        width: 0;
+        overflow: hidden;
+        white-space: nowrap;
+    }
+
+    .nav-drawer.collapsed .menu-item {
+        justify-content: center;
+        padding: var(--spacing-sm);
+        border-left: none;
+    }
+
+    .nav-drawer.collapsed .menu-item.active {
+        background: rgba(212, 175, 55, 0.1);
+        border-radius: 8px;
+        margin: 0 8px;
+    }
+
+    .nav-drawer.collapsed .nav-divider {
+        margin: var(--spacing-xs) 8px;
+    }
+
+    /* Adjust main content for sidebar */
+    .app {
+        margin-left: 200px;
+        transition: margin-left 200ms ease-out;
+    }
+
+    .app.sidebar-collapsed {
+        margin-left: 56px;
     }
 }
 

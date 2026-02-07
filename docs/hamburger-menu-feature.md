@@ -74,8 +74,11 @@ The mode dropdown (`#mode-select`) is located in the ceremony info section. User
 │                      │                              │
 │  ─────────────────   │      Tap to close            │
 │                      │                              │
-│  ⓘ  About            │                              │
+│  ↗  Share ───────────┼── Only visible in Predictions│
 │                      │                              │
+│  ─────────────────   │                              │
+│                      │                              │
+│  ⓘ  About            │                              │
 │                      │                              │
 └──────────────────────┴──────────────────────────────┘
         280px                    Remaining width
@@ -91,6 +94,8 @@ The mode dropdown (`#mode-select`) is located in the ceremony info section. User
 
 **Menu items:**
 - List types: Watched, Predictions, Favorites, Streamable
+- Visual divider
+- Share (conditional — only visible in Predictions mode, disabled if no predictions made)
 - Visual divider
 - About (opens about modal)
 
@@ -216,6 +221,7 @@ Each menu item has an associated icon:
 | Predictions| ⭐   | Star (same as UI)     |
 | Favorites  | ❤️   | Heart (same as UI)    |
 | Streamable | ▶️   | Play (streaming)      |
+| Share      | ↗   | Share/export arrow    |
 | About      | ⓘ   | Info circle           |
 
 **Icon implementation:** Use inline SVG for crisp rendering and color control. Match existing icon style (simple, monochrome with gold accent for active state).
@@ -252,6 +258,16 @@ Each menu item has an associated icon:
 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
   <polyline points="13 7 18 12 13 17"/>
   <line x1="6" y1="12" x2="18" y2="12"/>
+</svg>
+```
+
+### Share Icon
+
+```svg
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+  <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/>
+  <polyline points="16 6 12 2 8 6"/>
+  <line x1="12" y1="2" x2="12" y2="15"/>
 </svg>
 ```
 
@@ -464,6 +480,18 @@ The existing `currentMode` localStorage key remains unchanged. The dropdown elem
 
   <div class="nav-divider"></div>
 
+  <!-- Share section (only visible in Predictions mode) -->
+  <ul class="nav-menu nav-menu-actions" id="nav-share-section">
+    <li>
+      <a href="#" class="menu-item" id="nav-share">
+        <span class="menu-icon"><!-- Share SVG --></span>
+        <span class="menu-text">Share</span>
+      </a>
+    </li>
+  </ul>
+
+  <div class="nav-divider" id="nav-share-divider"></div>
+
   <ul class="nav-menu nav-menu-secondary">
     <li>
       <a href="#" class="menu-item" id="nav-about">
@@ -581,6 +609,12 @@ The existing `currentMode` localStorage key remains unchanged. The dropdown elem
 .menu-item.active {
   color: var(--color-gold);
   border-left-color: var(--color-gold);
+}
+
+.menu-item.disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  pointer-events: none;
 }
 
 .menu-icon {
@@ -731,6 +765,7 @@ function initNavigation() {
   const currentModeLabel = document.getElementById('current-mode-label');
   const menuItems = document.querySelectorAll('.menu-item[data-mode]');
   const aboutBtn = document.getElementById('nav-about');
+  const shareBtn = document.getElementById('nav-share');
 
   // Open drawer (mobile)
   hamburgerBtn?.addEventListener('click', openDrawer);
@@ -751,7 +786,16 @@ function initNavigation() {
       switchMode(mode);
       updateActiveMenuItem(mode);
       updateCurrentModeLabel(mode);
+      updateNavShareVisibility(mode);
     });
+  });
+
+  // Share button
+  shareBtn?.addEventListener('click', (e) => {
+    e.preventDefault();
+    if (!shareBtn.classList.contains('disabled')) {
+      showShareModal();
+    }
   });
 
   // About button
@@ -771,6 +815,7 @@ function initNavigation() {
 
   updateActiveMenuItem(currentMode);
   updateCurrentModeLabel(currentMode);
+  updateNavShareVisibility(currentMode);
 }
 
 // =================================
@@ -862,6 +907,29 @@ function switchMode(mode) {
   renderNominees();
   updateProgress();
   updateShareDeleteButton();
+}
+
+// =================================
+// Share Button Visibility
+// =================================
+
+function updateNavShareVisibility(mode) {
+  const shareSection = document.getElementById('nav-share-section');
+  const shareDivider = document.getElementById('nav-share-divider');
+  const shareBtn = document.getElementById('nav-share');
+
+  const isPredictionsMode = mode === 'predictions';
+
+  // Show/hide share section based on mode
+  if (shareSection) shareSection.style.display = isPredictionsMode ? '' : 'none';
+  if (shareDivider) shareDivider.style.display = isPredictionsMode ? '' : 'none';
+
+  // Update disabled state based on whether predictions exist
+  if (shareBtn && isPredictionsMode) {
+    const hasPredictions = hasAnyPredictions(predictions);
+    shareBtn.classList.toggle('disabled', !hasPredictions);
+    shareBtn.setAttribute('aria-disabled', !hasPredictions);
+  }
 }
 
 // =================================
@@ -1056,6 +1124,50 @@ test.describe('Navigation', () => {
 
   });
 
+  test.describe('Share Menu Item', () => {
+
+    test('share is hidden in watched mode', async ({ page }) => {
+      await page.goto('/');
+      await page.click('.menu-item[data-mode="watched"]');
+
+      await expect(page.locator('#nav-share-section')).not.toBeVisible();
+    });
+
+    test('share is visible in predictions mode', async ({ page }) => {
+      await page.goto('/');
+      await page.click('.menu-item[data-mode="predictions"]');
+
+      await expect(page.locator('#nav-share-section')).toBeVisible();
+    });
+
+    test('share is disabled when no predictions made', async ({ page }) => {
+      await page.goto('/');
+      await page.click('.menu-item[data-mode="predictions"]');
+
+      await expect(page.locator('#nav-share')).toHaveClass(/disabled/);
+    });
+
+    test('share is enabled when predictions exist', async ({ page }) => {
+      await page.goto('/');
+      await page.click('.menu-item[data-mode="predictions"]');
+
+      // Make a prediction
+      await page.click('#films-list .film:first-child');
+
+      await expect(page.locator('#nav-share')).not.toHaveClass(/disabled/);
+    });
+
+    test('share button opens share modal', async ({ page }) => {
+      await page.goto('/');
+      await page.click('.menu-item[data-mode="predictions"]');
+      await page.click('#films-list .film:first-child');
+      await page.click('#nav-share');
+
+      await expect(page.locator('#share-modal')).toBeVisible();
+    });
+
+  });
+
   test.describe('Accessibility', () => {
 
     test('hamburger button has aria-label', async ({ page }) => {
@@ -1075,6 +1187,13 @@ test.describe('Navigation', () => {
       await page.goto('/');
 
       await expect(page.locator('#nav-drawer')).toHaveAttribute('role', 'navigation');
+    });
+
+    test('disabled share has aria-disabled', async ({ page }) => {
+      await page.goto('/');
+      await page.click('.menu-item[data-mode="predictions"]');
+
+      await expect(page.locator('#nav-share')).toHaveAttribute('aria-disabled', 'true');
     });
 
   });

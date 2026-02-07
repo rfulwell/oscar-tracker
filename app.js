@@ -902,6 +902,211 @@ function updateShareDeleteButton() {
     }
 }
 
+// ============================================
+// NAVIGATION DRAWER/SIDEBAR
+// ============================================
+
+let isDrawerOpen = false;
+let isSidebarCollapsed = localStorage.getItem('sidebarCollapsed') === 'true';
+
+function initNavigation() {
+    const hamburgerBtn = document.getElementById('hamburger-btn');
+    const drawerClose = document.getElementById('drawer-close');
+    const navDrawer = document.getElementById('nav-drawer');
+    const navOverlay = document.getElementById('nav-overlay');
+    const sidebarToggle = document.getElementById('sidebar-toggle');
+    const currentModeLabel = document.getElementById('current-mode-label');
+    const menuItems = document.querySelectorAll('.menu-item[data-mode]');
+    const aboutBtn = document.getElementById('nav-about');
+    const shareNavBtn = document.getElementById('nav-share');
+
+    // Open drawer (mobile)
+    hamburgerBtn?.addEventListener('click', openDrawer);
+    currentModeLabel?.addEventListener('click', openDrawer);
+
+    // Close drawer (mobile)
+    drawerClose?.addEventListener('click', closeDrawer);
+    navOverlay?.addEventListener('click', closeDrawer);
+
+    // Toggle sidebar (desktop)
+    sidebarToggle?.addEventListener('click', toggleSidebar);
+
+    // Menu item clicks
+    menuItems.forEach(item => {
+        item.addEventListener('click', (e) => {
+            e.preventDefault();
+            const mode = item.dataset.mode;
+            handleNavModeSwitch(mode);
+        });
+    });
+
+    // Share button in nav
+    shareNavBtn?.addEventListener('click', (e) => {
+        e.preventDefault();
+        if (!shareNavBtn.classList.contains('disabled')) {
+            showShareModal();
+        }
+    });
+
+    // About button
+    aboutBtn?.addEventListener('click', (e) => {
+        e.preventDefault();
+        showAboutModal();
+    });
+
+    // Keyboard support
+    document.addEventListener('keydown', handleNavKeyDown);
+
+    // Initialize sidebar state on desktop
+    if (isSidebarCollapsed) {
+        navDrawer?.classList.add('collapsed');
+        document.querySelector('.app')?.classList.add('sidebar-collapsed');
+        updateSidebarToggleIcon();
+    }
+
+    // Initialize active state
+    updateActiveMenuItem(currentMode);
+    updateCurrentModeLabel(currentMode);
+    updateNavShareVisibility();
+}
+
+function openDrawer() {
+    const navDrawer = document.getElementById('nav-drawer');
+    const navOverlay = document.getElementById('nav-overlay');
+    const hamburgerBtn = document.getElementById('hamburger-btn');
+
+    navDrawer?.classList.add('open');
+    navOverlay?.classList.add('visible');
+    hamburgerBtn?.setAttribute('aria-expanded', 'true');
+    isDrawerOpen = true;
+
+    // Focus first menu item for accessibility
+    const firstItem = navDrawer?.querySelector('.menu-item');
+    firstItem?.focus();
+}
+
+function closeDrawer() {
+    const navDrawer = document.getElementById('nav-drawer');
+    const navOverlay = document.getElementById('nav-overlay');
+    const hamburgerBtn = document.getElementById('hamburger-btn');
+
+    navDrawer?.classList.remove('open');
+    navOverlay?.classList.remove('visible');
+    hamburgerBtn?.setAttribute('aria-expanded', 'false');
+    isDrawerOpen = false;
+}
+
+function toggleSidebar() {
+    const navDrawer = document.getElementById('nav-drawer');
+    const appContainer = document.querySelector('.app');
+
+    isSidebarCollapsed = !isSidebarCollapsed;
+
+    navDrawer?.classList.toggle('collapsed', isSidebarCollapsed);
+    appContainer?.classList.toggle('sidebar-collapsed', isSidebarCollapsed);
+
+    localStorage.setItem('sidebarCollapsed', isSidebarCollapsed.toString());
+    updateSidebarToggleIcon();
+}
+
+function updateSidebarToggleIcon() {
+    const toggle = document.getElementById('sidebar-toggle');
+    if (!toggle) return;
+
+    const collapseIcon = `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <polyline points="11 17 6 12 11 7"/>
+        <line x1="6" y1="12" x2="18" y2="12"/>
+    </svg>`;
+
+    const expandIcon = `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <polyline points="13 7 18 12 13 17"/>
+        <line x1="6" y1="12" x2="18" y2="12"/>
+    </svg>`;
+
+    toggle.innerHTML = isSidebarCollapsed ? expandIcon : collapseIcon;
+    toggle.setAttribute('aria-label', isSidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar');
+}
+
+function updateActiveMenuItem(mode) {
+    const menuItems = document.querySelectorAll('.menu-item[data-mode]');
+
+    menuItems.forEach(item => {
+        const isActive = item.dataset.mode === mode;
+        item.classList.toggle('active', isActive);
+        item.setAttribute('aria-current', isActive ? 'page' : 'false');
+    });
+}
+
+function updateCurrentModeLabel(mode) {
+    const label = document.getElementById('current-mode-label');
+    if (!label) return;
+
+    const modeNames = {
+        'watched': 'Watched',
+        'predictions': 'Predictions',
+        'favorites': 'Favorites',
+        'streamable': 'Streamable'
+    };
+
+    // Handle shared modes
+    if (mode.startsWith('shared:')) {
+        const list = getCurrentSharedList();
+        label.textContent = list ? `${list.name}'s Picks` : 'Shared';
+    } else {
+        label.textContent = modeNames[mode] || mode;
+    }
+}
+
+function updateNavShareVisibility() {
+    const shareSection = document.getElementById('nav-share-section');
+    const shareDivider = document.getElementById('nav-share-divider');
+    const shareBtn = document.getElementById('nav-share');
+
+    const isPredictionsMode = currentMode === 'predictions';
+
+    // Show/hide share section based on mode
+    if (shareSection) shareSection.style.display = isPredictionsMode ? '' : 'none';
+    if (shareDivider) shareDivider.style.display = isPredictionsMode ? '' : 'none';
+
+    // Update disabled state based on whether predictions exist
+    if (shareBtn && isPredictionsMode) {
+        const hasPredictions = hasAnyPredictions(predictions);
+        shareBtn.classList.toggle('disabled', !hasPredictions);
+        shareBtn.setAttribute('aria-disabled', (!hasPredictions).toString());
+    }
+}
+
+function handleNavModeSwitch(mode) {
+    // Update state
+    currentMode = mode;
+    saveMode();
+
+    // Update UI
+    updateActiveMenuItem(mode);
+    updateCurrentModeLabel(mode);
+    updateNavShareVisibility();
+    updateModeDropdown();
+    updateStreamableUI();
+    renderNominees();
+    updateProgress();
+    updateShareDeleteButton();
+    updateSharedBanner();
+
+    // Handle onboarding screen logic
+    if (mode === 'watched' && watchedItems.size === 0) {
+        showOnboardingScreen();
+    } else {
+        showCategoryScreen();
+    }
+}
+
+function handleNavKeyDown(e) {
+    if (e.key === 'Escape' && isDrawerOpen) {
+        closeDrawer();
+        document.getElementById('hamburger-btn')?.focus();
+    }
+}
+
 // Update shared banner visibility
 function updateSharedBanner() {
     const banner = document.getElementById('shared-banner');
@@ -1182,6 +1387,7 @@ function init() {
     loadMode();
     renderCategoryOptions();
     updateModeDropdown();
+    initNavigation();
     setupEventListeners();
     registerServiceWorker();
     startTipRotation();
@@ -1726,6 +1932,7 @@ function togglePrediction(nomineeId) {
     savePredictions();
     updateProgress();
     updateShareDeleteButton();
+    updateNavShareVisibility();
 }
 
 // Toggle favorite for current category
@@ -1880,6 +2087,10 @@ function handleModeChange(e) {
     updateProgress();
     updateShareDeleteButton();
     updateSharedBanner();
+    // Sync navigation sidebar/drawer
+    updateActiveMenuItem(currentMode);
+    updateCurrentModeLabel(currentMode);
+    updateNavShareVisibility();
 }
 
 // Setup event listeners
