@@ -359,6 +359,15 @@ body {
     margin: var(--spacing-xs) var(--spacing-md);
 }
 
+/* Dedication text */
+.nav-dedication {
+    padding: var(--spacing-md);
+    font-size: 0.75rem;
+    color: var(--color-text-secondary);
+    text-align: center;
+    margin-top: auto;
+}
+
 /* Sidebar toggle (hidden on mobile) */
 .sidebar-toggle {
     display: none;
