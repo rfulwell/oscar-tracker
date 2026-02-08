@@ -2116,6 +2116,8 @@ body.modal-open {
         right: 0;
         transform: none;
         border-left: 1px solid var(--color-black-lighter);
+        overflow-y: auto;
+        display: block;
     }
 
     .search-view.sidebar-collapsed {
@@ -2126,6 +2128,7 @@ body.modal-open {
         max-width: 680px;
         margin: 0 auto;
         padding: var(--spacing-lg);
+        overflow: visible;
     }
 
     .search-header {
