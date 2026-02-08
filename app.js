@@ -2128,14 +2128,23 @@ function navigateFromSearch(categoryIndex) {
 
     // Switch mode if needed
     if (currentMode !== targetMode && !isSharedMode()) {
-        switchMode(targetMode);
+        currentMode = targetMode;
+        currentSharedId = null;
+        saveMode();
+        updateActiveMenuItem(targetMode);
+        updateCurrentModeLabel(targetMode);
+        updateNavShareVisibility();
+        updateStreamableUI();
+        updateShareDeleteButton();
+        updateSharedBanner();
     }
 
-    // Navigate to category
-    currentCategoryIndex = categoryIndex;
-    renderNominees();
-    updateProgress();
-    updateCategorySelect();
+    // Show category screen first
+    onboardingScreen.style.display = 'none';
+    categoryScreen.style.display = '';
+
+    // Use navigateToCategory which properly updates selects and renders
+    navigateToCategory(categoryIndex, false);
 
     // Scroll to top
     window.scrollTo(0, 0);
