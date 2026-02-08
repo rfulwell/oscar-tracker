@@ -248,6 +248,39 @@ const CATEGORIES = [
             { id: 'cast-secretagent', title: 'The Secret Agent', subtitle: 'Gabriel Domingues' },
             { id: 'cast-sinners', title: 'Sinners', subtitle: 'Francine Maisler' }
         ]
+    },
+    {
+        id: 'best-animated-short',
+        name: 'Best Animated Short Film',
+        nominees: [
+            { id: 'ashort-butterfly', title: 'Butterfly', subtitle: 'Florence Miailhe & Ron Dyens' },
+            { id: 'ashort-forevergreen', title: 'Forevergreen', subtitle: 'Nathan Engelhardt & Jeremy Spears' },
+            { id: 'ashort-pearls', title: 'The Girl Who Cried Pearls', subtitle: 'Chris Lavis & Maciek Szczerbowski' },
+            { id: 'ashort-retirement', title: 'Retirement Plan', subtitle: 'John Kelly & Andrew Freedman' },
+            { id: 'ashort-sisters', title: 'The Three Sisters', subtitle: 'Konstantin Bronzit' }
+        ]
+    },
+    {
+        id: 'best-documentary-short',
+        name: 'Best Documentary Short Film',
+        nominees: [
+            { id: 'dshort-empty', title: 'All the Empty Rooms', subtitle: 'Joshua Seftel & Conall Jones' },
+            { id: 'dshort-camera', title: 'Armed Only with a Camera: The Life and Death of Brent Renaud', subtitle: 'Craig Renaud & Juan Arredondo' },
+            { id: 'dshort-children', title: 'Children No More: "Were and Are Gone"', subtitle: 'Hilla Medalia & Sheila Nevins' },
+            { id: 'dshort-devil', title: 'The Devil Is Busy', subtitle: 'Christalyn Hampton & Geeta Gandbhir' },
+            { id: 'dshort-strange', title: 'Perfectly a Strangeness', subtitle: 'Alison McAlpine' }
+        ]
+    },
+    {
+        id: 'best-live-action-short',
+        name: 'Best Live Action Short Film',
+        nominees: [
+            { id: 'lshort-butcher', title: "Butcher's Stain", subtitle: 'Meyer Levinson-Blount & Oron Caspi' },
+            { id: 'lshort-dorothy', title: 'A Friend of Dorothy', subtitle: 'Lee Knight & James Dean' },
+            { id: 'lshort-austen', title: "Jane Austen's Period Drama", subtitle: 'Julia Aks & Steve Pinder' },
+            { id: 'lshort-singers', title: 'The Singers', subtitle: 'Sam A. Davis & Jack Piatt' },
+            { id: 'lshort-saliva', title: 'Two People Exchanging Saliva', subtitle: 'Alexandre Singh & Natalie Musteata' }
+        ]
     }
 ];
 
