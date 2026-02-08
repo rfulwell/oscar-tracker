@@ -90,7 +90,7 @@ const CATEGORIES = [
         nominees: [
             { id: 'orig-sinners', title: 'Sinners', subtitle: 'Ryan Coogler' },
             { id: 'orig-sentimental', title: 'Sentimental Value', subtitle: 'Eskil Vogt & Joachim Trier' },
-            { id: 'orig-bluemoon', title: 'Blue Moon', subtitle: 'Richard Linklater' },
+            { id: 'orig-bluemoon', title: 'Blue Moon', subtitle: 'Robert Kaplow' },
             { id: 'orig-marty', title: 'Marty Supreme', subtitle: 'Ronald Bronstein & Josh Safdie' },
             { id: 'orig-accident', title: 'It Was Just an Accident', subtitle: 'Jafar Panahi' }
         ]
@@ -135,8 +135,8 @@ const CATEGORIES = [
             { id: 'doc-alabama', title: 'The Alabama Solution', subtitle: 'Andrew Jarecki & Charlotte Kaufman' },
             { id: 'doc-goodlight', title: 'Come See Me in the Good Light', subtitle: 'Ryan White' },
             { id: 'doc-rocks', title: 'Cutting through Rocks', subtitle: 'Sara Khaki & Mohammadreza Eyni' },
-            { id: 'doc-putin', title: 'Mr. Nobody against Putin', subtitle: 'Vera Krichevskaya' },
-            { id: 'doc-neighbor', title: 'The Perfect Neighbor', subtitle: 'Geeta Gandbhir & Alison Payne' }
+            { id: 'doc-putin', title: 'Mr. Nobody against Putin', subtitle: 'David Borenstein, Pavel Talankin, Helle Faber & Alžběta Karásková' },
+            { id: 'doc-neighbor', title: 'The Perfect Neighbor', subtitle: 'Geeta Gandbhir, Alisa Payne, Nikon Kwantu & Sam Bisbee' }
         ]
     },
     {
@@ -177,9 +177,9 @@ const CATEGORIES = [
         name: 'Best Costume Design',
         nominees: [
             { id: 'cost-avatar', title: 'Avatar: Fire and Ash', subtitle: 'Deborah L. Scott' },
-            { id: 'cost-frankenstein', title: 'Frankenstein', subtitle: 'Luis Sequeira' },
-            { id: 'cost-hamnet', title: 'Hamnet', subtitle: 'Sandy Powell' },
-            { id: 'cost-marty', title: 'Marty Supreme', subtitle: 'Courtney Hoffman' },
+            { id: 'cost-frankenstein', title: 'Frankenstein', subtitle: 'Kate Hawley' },
+            { id: 'cost-hamnet', title: 'Hamnet', subtitle: 'Malgosia Turzanska' },
+            { id: 'cost-marty', title: 'Marty Supreme', subtitle: 'Miyako Bellizzi' },
             { id: 'cost-sinners', title: 'Sinners', subtitle: 'Ruth E. Carter' }
         ]
     },
@@ -220,11 +220,11 @@ const CATEGORIES = [
         id: 'best-sound',
         name: 'Best Sound',
         nominees: [
-            { id: 'sound-f1', title: 'F1', subtitle: 'Mark Weingarten & James H. Mather' },
-            { id: 'sound-frankenstein', title: 'Frankenstein', subtitle: 'Randy Thom & Gary Rydstrom' },
-            { id: 'sound-onebattle', title: 'One Battle After Another', subtitle: 'Richard King' },
-            { id: 'sound-sinners', title: 'Sinners', subtitle: 'Steve Boeddeker & Brandon Proctor' },
-            { id: 'sound-sirat', title: 'Sirât', subtitle: 'Olivier Goinard' }
+            { id: 'sound-f1', title: 'F1', subtitle: 'Gareth John, Al Nelson, Gwendolyn Yates Whittle, Gary A. Rizzo & Juan Peralta' },
+            { id: 'sound-frankenstein', title: 'Frankenstein', subtitle: 'Greg Chapman, Nathan Robitaille, Nelson Ferreira, Christian Cooke & Brad Zoern' },
+            { id: 'sound-onebattle', title: 'One Battle After Another', subtitle: 'José Antonio García, Christopher Scarabosio & Tony Villaflor' },
+            { id: 'sound-sinners', title: 'Sinners', subtitle: 'Chris Welcker, Benjamin A. Burtt, Felipe Pacheco, Brandon Proctor & Steve Boeddeker' },
+            { id: 'sound-sirat', title: 'Sirât', subtitle: 'Amanda Villavieja, Laia Casanovas & Yasmina Praderas' }
         ]
     },
     {
@@ -232,10 +232,10 @@ const CATEGORIES = [
         name: 'Best Visual Effects',
         nominees: [
             { id: 'vfx-avatar', title: 'Avatar: Fire and Ash', subtitle: 'Joe Letteri & Eric Saindon' },
-            { id: 'vfx-f1', title: 'F1', subtitle: 'Alex Wuttke' },
+            { id: 'vfx-f1', title: 'F1', subtitle: 'Ryan Tudhope, Nicolas Chevallier, Robert Harrington & Keith Dawson' },
             { id: 'vfx-jurassic', title: 'Jurassic World Rebirth', subtitle: 'David Vickery' },
-            { id: 'vfx-lostbus', title: 'The Lost Bus', subtitle: 'Charmaine Chan' },
-            { id: 'vfx-sinners', title: 'Sinners', subtitle: 'Erik Henry' }
+            { id: 'vfx-lostbus', title: 'The Lost Bus', subtitle: 'Charlie Noble, David Zaretti, Russell Bowen & Brandon K. McLaughlin' },
+            { id: 'vfx-sinners', title: 'Sinners', subtitle: 'Michael Ralla, Espen Nordahl, Guido Wolter & Donnie Dean' }
         ]
     },
     {
