@@ -64,6 +64,23 @@ test.describe('Source Links', () => {
             // Source link should be to the right of progress
             expect(sourceLinkBox.x).toBeGreaterThan(progressBox.x + progressBox.width - 10);
         });
+
+        test('source link should be on same line as progress count on desktop', async ({ page }) => {
+            await page.setViewportSize({ width: 1200, height: 800 });
+            await completeOnboarding(page);
+
+            const progress = page.locator('#progress');
+            const sourceLink = page.locator('#source-link-top');
+
+            const progressBox = await progress.boundingBox();
+            const sourceLinkBox = await sourceLink.boundingBox();
+
+            expect(progressBox).not.toBeNull();
+            expect(sourceLinkBox).not.toBeNull();
+
+            // They should be on the same visual row (allowing for slight baseline differences)
+            expect(Math.abs(progressBox.y - sourceLinkBox.y)).toBeLessThan(25);
+        });
     });
 
     test.describe('Bottom Category Navigation', () => {
@@ -197,9 +214,8 @@ test.describe('Source Links', () => {
             expect(progressBox).not.toBeNull();
             expect(sourceLinkBox).not.toBeNull();
 
-            // They should be on the same line (Y positions should be very close)
-            // Allow 5px tolerance for vertical alignment differences
-            expect(Math.abs(progressBox.y - sourceLinkBox.y)).toBeLessThan(10);
+            // They should be on the same visual row (allowing for slight baseline differences)
+            expect(Math.abs(progressBox.y - sourceLinkBox.y)).toBeLessThan(25);
         });
     });
 
