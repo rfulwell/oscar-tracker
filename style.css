@@ -1092,6 +1092,17 @@ body {
         display: none;
     }
 
+    /* Position search button absolutely so it doesn't break centering */
+    .ceremony-info {
+        position: relative;
+    }
+
+    .ceremony-info .search-btn {
+        position: absolute;
+        right: var(--spacing-md);
+        margin-left: 0;
+    }
+
     /* Keep dropdown visible for backwards compatibility */
     /* .mode-select is still functional on desktop */
 
