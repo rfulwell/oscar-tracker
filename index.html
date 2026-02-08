@@ -64,6 +64,12 @@
         <div class="ceremony-info">
             <span>March 15 on ABC</span>
             <span class="current-mode-label" id="current-mode-label">Watched</span>
+            <button class="search-btn" id="search-btn" aria-label="Search films">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                </svg>
+            </button>
             <button class="hamburger-btn" id="hamburger-btn" aria-label="Open navigation menu" aria-expanded="false" aria-controls="nav-drawer">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <line x1="3" y1="6" x2="21" y2="6"/>
@@ -280,7 +286,7 @@
                 </div>
             </section>
         </main>
-        
+
         <footer class="footer">
             <p id="tip-text"><span class="tip-label">Tip:</span> <span id="tip-content">Tap a film to mark as watched</span></p>
             <a href="#" class="about-link" id="about-link">About</a>
@@ -426,6 +432,40 @@
                 <button class="btn btn-secondary" id="copy-no">No</button>
                 <button class="btn btn-primary" id="copy-yes">Yes</button>
             </div>
+        </div>
+    </div>
+
+    <!-- Search View (outside .app for proper overlay) -->
+    <div id="search-view" class="search-view" style="display: none;">
+        <div class="search-header">
+            <button class="search-back" id="search-back" aria-label="Back">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="15 18 9 12 15 6"></polyline>
+                </svg>
+            </button>
+            <input type="text" class="search-input" id="search-input"
+                   placeholder="Search films..." autocomplete="off"
+                   role="searchbox" aria-label="Search Oscar-nominated films">
+            <button class="search-close" id="search-close" aria-label="Close search">&times;</button>
+        </div>
+
+        <div class="search-film-header" id="search-film-header" style="display: none;">
+            <div class="search-film-title" id="search-film-title"></div>
+            <div class="search-film-count" id="search-film-count"></div>
+            <div class="search-film-streaming" id="search-film-streaming"></div>
+        </div>
+
+        <div class="search-content" id="search-content">
+            <div class="search-section-label" id="search-section-label">Matching films</div>
+            <ul class="search-results" id="search-results" role="list">
+                <!-- Results rendered here -->
+            </ul>
+        </div>
+
+        <div class="search-empty" id="search-empty" style="display: none;">
+            <div class="search-empty-icon">🎬</div>
+            <div class="search-empty-title">No nominations found</div>
+            <div class="search-empty-subtitle">Better luck next year!</div>
         </div>
     </div>
 

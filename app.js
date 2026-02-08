@@ -454,6 +454,12 @@ let pendingSharedData = null; // Temp storage for duplicate handling
 let favorites = {}; // { categoryId: nomineeId }
 let pendingCopyTarget = null; // 'favorites' | 'predictions' - for copy modal
 
+// Search state
+let searchActive = false;         // Whether search view is shown
+let searchQuery = '';             // Current search text
+let searchSourceMode = null;      // Mode to return to after search
+let searchSelectedFilm = null;    // Film key being viewed, or null for search input
+
 // DOM Elements
 const filmsList = document.getElementById('films-list');
 const progressEl = document.getElementById('progress');
@@ -1842,6 +1848,299 @@ function getStreamingIconHtmlForFilm(filmKey) {
     </a>`;
 }
 
+// ========================================
+// Search Feature Functions
+// ========================================
+
+// Get all categories where a film has nominations
+function getFilmCategories(filmKey) {
+    const nomineeIds = FILM_NOMINEES[filmKey];
+    if (!nomineeIds) return [];
+
+    return nomineeIds.map(nomineeId => {
+        const category = CATEGORIES.find(cat =>
+            cat.nominees.some(n => n.id === nomineeId)
+        );
+        if (!category) return null;
+
+        const nominee = category.nominees.find(n => n.id === nomineeId);
+        return {
+            categoryId: category.id,
+            categoryName: category.name,
+            categoryIndex: CATEGORIES.indexOf(category),
+            nomineeId: nominee.id,
+            nomineeTitle: nominee.title,
+            nomineeSubtitle: nominee.subtitle
+        };
+    }).filter(Boolean);
+}
+
+// Filter films by search query
+function searchFilms(query) {
+    const q = query.toLowerCase().trim();
+    if (!q) return ALL_FILMS;
+
+    return ALL_FILMS.filter(film =>
+        film.title.toLowerCase().includes(q)
+    );
+}
+
+// Get selection state for a nominee in current mode
+function getSearchSelectionState(nomineeId) {
+    if (searchSourceMode === 'watched' || searchSourceMode === 'streamable') {
+        return watchedItems.has(nomineeId) ? 'watched' : null;
+    } else if (searchSourceMode === 'favorites') {
+        const category = CATEGORIES.find(cat =>
+            cat.nominees.some(n => n.id === nomineeId)
+        );
+        return category && favorites[category.id] === nomineeId ? 'favorited' : null;
+    } else if (searchSourceMode === 'predictions') {
+        const category = CATEGORIES.find(cat =>
+            cat.nominees.some(n => n.id === nomineeId)
+        );
+        return category && predictions[category.id] === nomineeId ? 'predicted' : null;
+    }
+    return null;
+}
+
+// Show search input view
+function showSearchInput() {
+    searchActive = true;
+    searchSourceMode = currentMode;
+    searchSelectedFilm = null;
+    searchQuery = '';
+
+    const searchView = document.getElementById('search-view');
+    const searchInput = document.getElementById('search-input');
+    const searchFilmHeader = document.getElementById('search-film-header');
+    const searchContent = document.getElementById('search-content');
+    const searchEmpty = document.getElementById('search-empty');
+
+    searchView.style.display = 'flex';
+    searchFilmHeader.style.display = 'none';
+    searchContent.style.display = 'block';
+    searchEmpty.style.display = 'none';
+
+    searchInput.value = '';
+    searchInput.classList.remove('readonly');
+    searchInput.readOnly = false;
+    searchInput.placeholder = 'Search films...';
+    searchInput.focus();
+
+    renderSearchFilmList('');
+}
+
+// Show search results for a specific film
+function showSearch(filmKey) {
+    searchActive = true;
+    searchSourceMode = currentMode;
+    searchSelectedFilm = filmKey;
+
+    const searchView = document.getElementById('search-view');
+    const searchInput = document.getElementById('search-input');
+    const searchFilmHeader = document.getElementById('search-film-header');
+    const searchContent = document.getElementById('search-content');
+    const searchEmpty = document.getElementById('search-empty');
+
+    const film = ALL_FILMS.find(f => f.key === filmKey);
+    if (!film) return;
+
+    searchView.style.display = 'flex';
+    searchFilmHeader.style.display = 'block';
+    searchContent.style.display = 'block';
+    searchEmpty.style.display = 'none';
+
+    searchInput.value = film.title;
+    searchInput.classList.add('readonly');
+    searchInput.readOnly = true;
+
+    renderSearchFilmHeader(filmKey);
+    renderSearchCategoryList(filmKey);
+}
+
+// Hide search view
+function hideSearch() {
+    searchActive = false;
+    searchSelectedFilm = null;
+    searchQuery = '';
+
+    const searchView = document.getElementById('search-view');
+    searchView.style.display = 'none';
+}
+
+// Go back from film categories to search input
+function searchGoBack() {
+    if (searchSelectedFilm) {
+        // Go back to search input
+        searchSelectedFilm = null;
+        const searchInput = document.getElementById('search-input');
+        const searchFilmHeader = document.getElementById('search-film-header');
+
+        searchInput.value = searchQuery;
+        searchInput.classList.remove('readonly');
+        searchInput.readOnly = false;
+        searchInput.placeholder = 'Search films...';
+        searchFilmHeader.style.display = 'none';
+
+        renderSearchFilmList(searchQuery);
+        searchInput.focus();
+    } else {
+        // Close search entirely
+        hideSearch();
+    }
+}
+
+// Render film header in search results
+function renderSearchFilmHeader(filmKey) {
+    const film = ALL_FILMS.find(f => f.key === filmKey);
+    if (!film) return;
+
+    const titleEl = document.getElementById('search-film-title');
+    const countEl = document.getElementById('search-film-count');
+    const streamingEl = document.getElementById('search-film-streaming');
+
+    titleEl.textContent = film.title;
+    const nomText = film.nominations === 1 ? '1 nomination' : `${film.nominations} nominations`;
+    countEl.textContent = nomText;
+
+    // Streaming info
+    const service = FILM_STREAMING[filmKey];
+    if (service) {
+        const config = STREAMING_SERVICES[service];
+        if (config) {
+            streamingEl.innerHTML = `<img src="${config.icon}" alt="${config.name}" class="streaming-icon-small"> Streaming on ${config.name}`;
+            streamingEl.style.display = 'inline-flex';
+        } else {
+            streamingEl.style.display = 'none';
+        }
+    } else {
+        streamingEl.style.display = 'none';
+    }
+}
+
+// Render list of matching films (search input view)
+function renderSearchFilmList(query) {
+    const results = searchFilms(query);
+    const resultsEl = document.getElementById('search-results');
+    const emptyEl = document.getElementById('search-empty');
+    const contentEl = document.getElementById('search-content');
+    const labelEl = document.getElementById('search-section-label');
+
+    if (results.length === 0) {
+        contentEl.style.display = 'none';
+        emptyEl.style.display = 'block';
+        return;
+    }
+
+    contentEl.style.display = 'block';
+    emptyEl.style.display = 'none';
+    labelEl.textContent = query ? 'Matching films' : 'All films';
+
+    const arrowSvg = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>`;
+
+    resultsEl.innerHTML = results.map(film => {
+        const service = FILM_STREAMING[film.key];
+        let subtitle = '';
+        if (service) {
+            const config = STREAMING_SERVICES[service];
+            subtitle = config ? `Streaming on ${config.name}` : '';
+        }
+        if (!subtitle) {
+            // Use first category as subtitle
+            const categories = getFilmCategories(film.key);
+            if (categories.length > 0) {
+                subtitle = categories[0].categoryName;
+            }
+        }
+
+        return `
+        <li class="search-result" data-film="${film.key}" role="listitem">
+            <div class="search-result-info">
+                <div class="search-result-title">${film.title}</div>
+                <div class="search-result-subtitle">${subtitle}</div>
+            </div>
+            <div class="search-result-count">${film.nominations}</div>
+            <div class="search-result-arrow">${arrowSvg}</div>
+        </li>
+    `}).join('');
+
+    // Add click handlers
+    resultsEl.querySelectorAll('.search-result').forEach(el => {
+        el.addEventListener('click', () => {
+            const filmKey = el.dataset.film;
+            searchQuery = query; // Save current query for back navigation
+            showSearch(filmKey);
+        });
+    });
+}
+
+// Render list of categories for a film (film results view)
+function renderSearchCategoryList(filmKey) {
+    const categories = getFilmCategories(filmKey);
+    const resultsEl = document.getElementById('search-results');
+    const labelEl = document.getElementById('search-section-label');
+
+    labelEl.textContent = 'Categories';
+
+    resultsEl.innerHTML = categories.map(cat => {
+        const state = getSearchSelectionState(cat.nomineeId);
+        const stateClass = state ? 'checked' : 'empty';
+        const stateIcon = state ? '✓' : '○';
+
+        // For person categories (director, actor, etc.), show the person name (subtitle is the film)
+        // For film categories (picture, screenplay), show the studio/writer (subtitle)
+        // Use subtitle if it's different from the film title, otherwise use title
+        const film = ALL_FILMS.find(f => f.key === filmKey);
+        const displaySubtitle = cat.nomineeSubtitle && cat.nomineeSubtitle !== film?.title
+            ? cat.nomineeSubtitle
+            : cat.nomineeTitle;
+
+        return `
+        <li class="category-result" data-category-index="${cat.categoryIndex}" role="listitem">
+            <div class="category-result-state ${stateClass}">${stateIcon}</div>
+            <div class="category-result-info">
+                <div class="category-result-name">${cat.categoryName}</div>
+                <div class="category-result-nominee">${displaySubtitle}</div>
+            </div>
+        </li>
+    `}).join('');
+
+    // Add click handlers
+    resultsEl.querySelectorAll('.category-result').forEach(el => {
+        el.addEventListener('click', () => {
+            const categoryIndex = parseInt(el.dataset.categoryIndex, 10);
+            navigateFromSearch(categoryIndex);
+        });
+    });
+}
+
+// Navigate to a category from search results
+function navigateFromSearch(categoryIndex) {
+    hideSearch();
+
+    // Switch to appropriate mode
+    let targetMode = searchSourceMode;
+    if (targetMode === 'streamable') {
+        targetMode = 'watched'; // Streamable has no category view
+    }
+
+    // Switch mode if needed
+    if (currentMode !== targetMode && !isSharedMode()) {
+        switchMode(targetMode);
+    }
+
+    // Navigate to category
+    currentCategoryIndex = categoryIndex;
+    renderNominees();
+    updateProgress();
+    updateCategorySelect();
+
+    // Scroll to top
+    window.scrollTo(0, 0);
+}
+
 // Render the streamable flat list (all streamable films in one view)
 function renderStreamableList() {
     const streamableFilms = ALL_FILMS.filter(f => FILM_STREAMING[f.key]);
@@ -1875,7 +2174,16 @@ function renderStreamableList() {
         </li>
     `}).join('');
 
-    // No click handlers - read-only mode
+    // Add click handlers to open search for the film
+    filmsList.querySelectorAll('.film.streamable').forEach(el => {
+        el.style.cursor = 'pointer';
+        el.addEventListener('click', (e) => {
+            // Don't trigger if clicking on streaming icon link
+            if (e.target.closest('.streaming-icon')) return;
+            const filmKey = el.dataset.film;
+            if (filmKey) showSearch(filmKey);
+        });
+    });
 }
 
 // Render nominees list
@@ -2195,8 +2503,45 @@ function setupEventListeners() {
     hardRefreshBtn.addEventListener('click', hardRefresh);
     browseByCategory.addEventListener('click', showCategoryScreen);
 
+    // Search button event listener
+    const searchBtn = document.getElementById('search-btn');
+    if (searchBtn) {
+        searchBtn.addEventListener('click', showSearchInput);
+    }
+
+    // Search input event listener (debounced)
+    const searchInput = document.getElementById('search-input');
+    let searchDebounceTimer = null;
+    if (searchInput) {
+        searchInput.addEventListener('input', (e) => {
+            if (searchInput.readOnly) return;
+            clearTimeout(searchDebounceTimer);
+            searchDebounceTimer = setTimeout(() => {
+                renderSearchFilmList(e.target.value);
+            }, 150);
+        });
+    }
+
+    // Search back button
+    const searchBack = document.getElementById('search-back');
+    if (searchBack) {
+        searchBack.addEventListener('click', searchGoBack);
+    }
+
+    // Search close button
+    const searchClose = document.getElementById('search-close');
+    if (searchClose) {
+        searchClose.addEventListener('click', hideSearch);
+    }
+
     // Keyboard navigation
     document.addEventListener('keydown', (e) => {
+        // Close search on Escape
+        if (e.key === 'Escape' && searchActive) {
+            hideSearch();
+            return;
+        }
+
         // Close modals on Escape
         if (e.key === 'Escape') {
             if (aboutModal && !aboutModal.hidden) {

@@ -1750,3 +1750,324 @@ body.modal-open {
     margin-top: 0.25rem;
     margin-bottom: var(--spacing-md);
 }
+
+/* ========================================
+   Search Feature Styles
+   ======================================== */
+
+/* Search button in ceremony info bar */
+.search-btn {
+    background: none;
+    border: none;
+    color: var(--color-white-dim);
+    cursor: pointer;
+    padding: 4px;
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: color 0.2s;
+    margin-left: auto;
+}
+
+.search-btn:hover {
+    color: var(--color-gold);
+}
+
+.search-btn svg {
+    width: 20px;
+    height: 20px;
+}
+
+/* Search view container - full screen overlay */
+.search-view {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: var(--color-black);
+    z-index: 1500;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+/* Search header */
+.search-header {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    padding: var(--spacing-sm) var(--spacing-md);
+    border-bottom: 1px solid var(--color-black-lighter);
+    flex-shrink: 0;
+}
+
+.search-back,
+.search-close {
+    background: none;
+    border: none;
+    color: var(--color-white-dim);
+    cursor: pointer;
+    padding: 4px;
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: color 0.2s;
+}
+
+.search-back:hover,
+.search-close:hover {
+    color: var(--color-white);
+}
+
+.search-back svg {
+    width: 20px;
+    height: 20px;
+}
+
+.search-close {
+    font-size: 1.5rem;
+    line-height: 1;
+}
+
+.search-input {
+    flex: 1;
+    background: var(--color-black-light);
+    border: 1px solid var(--color-black-lighter);
+    border-radius: 8px;
+    color: var(--color-white);
+    font-family: var(--font-body);
+    font-size: 0.9375rem;
+    padding: 10px 14px;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+.search-input:focus {
+    border-color: var(--color-gold);
+}
+
+.search-input::placeholder {
+    color: var(--color-white-dimmer);
+}
+
+.search-input.readonly {
+    text-align: center;
+    font-weight: 500;
+    cursor: default;
+}
+
+/* Search content area */
+.search-content {
+    flex: 1;
+    overflow-y: auto;
+    padding: var(--spacing-md);
+}
+
+.search-section-label {
+    font-size: 0.8125rem;
+    color: var(--color-white-dim);
+    margin-bottom: var(--spacing-sm);
+    padding-left: 4px;
+}
+
+/* Search results list */
+.search-results {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+/* Film search result row */
+.search-result {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+    padding: var(--spacing-md);
+    background: var(--color-black-light);
+    border: 1px solid var(--color-black-lighter);
+    border-radius: 10px;
+    margin-bottom: var(--spacing-xs);
+    cursor: pointer;
+    transition: background 0.15s, border-color 0.15s;
+}
+
+.search-result:hover {
+    background: var(--color-black-lighter);
+    border-color: var(--color-gold-dark);
+}
+
+.search-result-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.search-result-title {
+    font-weight: 500;
+    font-size: 0.9375rem;
+    color: var(--color-white);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.search-result-subtitle {
+    font-size: 0.8125rem;
+    color: var(--color-white-dim);
+    margin-top: 2px;
+}
+
+.search-result-count {
+    font-size: 0.875rem;
+    color: var(--color-white-dimmer);
+    flex-shrink: 0;
+    background: var(--color-black-lighter);
+    padding: 4px 10px;
+    border-radius: 12px;
+}
+
+.search-result-arrow {
+    color: var(--color-white-dimmer);
+    flex-shrink: 0;
+}
+
+.search-result-arrow svg {
+    width: 16px;
+    height: 16px;
+}
+
+/* Category result row (when viewing a film's categories) */
+.category-result {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    padding: var(--spacing-md);
+    background: var(--color-black-light);
+    border: 1px solid var(--color-black-lighter);
+    border-radius: 10px;
+    margin-bottom: var(--spacing-xs);
+    cursor: pointer;
+    transition: background 0.15s, border-color 0.15s;
+}
+
+.category-result:hover {
+    background: var(--color-black-lighter);
+    border-color: var(--color-gold-dark);
+}
+
+.category-result-state {
+    width: 24px;
+    height: 24px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+}
+
+.category-result-state.checked {
+    color: var(--color-gold);
+}
+
+.category-result-state.empty {
+    color: var(--color-white-dimmer);
+}
+
+.category-result-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.category-result-name {
+    font-weight: 500;
+    font-size: 0.9375rem;
+    color: var(--color-white);
+}
+
+.category-result-nominee {
+    font-size: 0.8125rem;
+    color: var(--color-white-dim);
+    margin-top: 2px;
+}
+
+/* Film header in results view */
+.search-film-header {
+    text-align: center;
+    padding: var(--spacing-md);
+    border-bottom: 1px solid var(--color-black-lighter);
+    flex-shrink: 0;
+}
+
+.search-film-title {
+    font-family: var(--font-display);
+    font-size: 1.375rem;
+    font-weight: 600;
+    color: var(--color-white);
+}
+
+.search-film-count {
+    font-size: 0.875rem;
+    color: var(--color-gold);
+    margin-top: 4px;
+}
+
+.search-film-streaming {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+    margin-top: var(--spacing-sm);
+    font-size: 0.8125rem;
+    color: var(--color-white-dim);
+    background: var(--color-black-lighter);
+    padding: 6px 12px;
+    border-radius: 16px;
+}
+
+.search-film-streaming .streaming-icon-small {
+    width: 18px;
+    height: 18px;
+    border-radius: 4px;
+}
+
+/* Empty state */
+.search-empty {
+    text-align: center;
+    padding: var(--spacing-xl) var(--spacing-md);
+    margin-top: var(--spacing-xl);
+}
+
+.search-empty-icon {
+    font-size: 3.5rem;
+    margin-bottom: var(--spacing-md);
+    opacity: 0.8;
+}
+
+.search-empty-title {
+    font-family: var(--font-display);
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: var(--color-white);
+    margin-bottom: var(--spacing-xs);
+}
+
+.search-empty-subtitle {
+    font-size: 0.875rem;
+    color: var(--color-white-dim);
+    font-style: italic;
+}
+
+/* Hide search on sidebar visible (desktop) */
+@media (min-width: 768px) {
+    .search-view {
+        max-width: 480px;
+        left: 50%;
+        transform: translateX(-50%);
+        border-left: 1px solid var(--color-black-lighter);
+        border-right: 1px solid var(--color-black-lighter);
+    }
+}
