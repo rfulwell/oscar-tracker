@@ -1075,7 +1075,7 @@ body {
     .nav-drawer {
         position: fixed;
         transform: translateX(0);
-        width: 200px;
+        width: 260px;
         border-right: 1px solid var(--color-black-lighter);
         padding-top: var(--spacing-md);
     }
@@ -1141,7 +1141,7 @@ body {
 
     /* Adjust main content for sidebar */
     .app {
-        margin-left: 200px;
+        margin-left: 260px;
         transition: margin-left 200ms ease-out;
     }
 
