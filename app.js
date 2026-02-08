@@ -1926,11 +1926,16 @@ function showSearchInput() {
     const searchContent = document.getElementById('search-content');
     const searchEmpty = document.getElementById('search-empty');
 
-    searchView.style.display = 'flex';
+    searchView.classList.add('active');
     searchView.classList.toggle('sidebar-collapsed', isSidebarCollapsed);
     searchFilmHeader.style.display = 'none';
     searchContent.style.display = 'block';
     searchEmpty.style.display = 'none';
+
+    // Prevent body scroll on desktop when search is open
+    if (window.innerWidth >= 768) {
+        document.body.classList.add('modal-open');
+    }
 
     searchInput.value = '';
     searchInput.classList.remove('readonly');
@@ -1956,11 +1961,16 @@ function showSearch(filmKey) {
     const film = ALL_FILMS.find(f => f.key === filmKey);
     if (!film) return;
 
-    searchView.style.display = 'flex';
+    searchView.classList.add('active');
     searchView.classList.toggle('sidebar-collapsed', isSidebarCollapsed);
     searchFilmHeader.style.display = 'block';
     searchContent.style.display = 'block';
     searchEmpty.style.display = 'none';
+
+    // Prevent body scroll on desktop when search is open
+    if (window.innerWidth >= 768) {
+        document.body.classList.add('modal-open');
+    }
 
     searchInput.value = film.title;
     searchInput.classList.add('readonly');
@@ -1977,7 +1987,10 @@ function hideSearch() {
     searchQuery = '';
 
     const searchView = document.getElementById('search-view');
-    searchView.style.display = 'none';
+    searchView.classList.remove('active');
+
+    // Restore body scroll
+    document.body.classList.remove('modal-open');
 }
 
 // Go back from film categories to search input

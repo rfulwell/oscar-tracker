@@ -1432,7 +1432,9 @@ body {
 }
 
 /* Body scroll lock when modal is open */
-body.modal-open {
+body.modal-open,
+body.modal-open html,
+html:has(body.modal-open) {
     overflow: hidden;
 }
 
@@ -1837,9 +1839,13 @@ body.modal-open {
     bottom: 0;
     background: var(--color-black);
     z-index: 1500;
-    display: flex;
+    display: none;
     flex-direction: column;
     overflow: hidden;
+}
+
+.search-view.active {
+    display: flex;
 }
 
 /* Search header */
@@ -2111,7 +2117,7 @@ body.modal-open {
 
 /* Desktop search view - integrate with sidebar layout */
 @media (min-width: 768px) {
-    .search-view {
+    .search-view.active {
         left: 260px;
         right: 0;
         transform: none;
