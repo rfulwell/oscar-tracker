@@ -175,8 +175,8 @@ test.describe('Predictions Mode', () => {
             // Make a prediction
             await page.locator('#films-list .film').first().click();
 
-            // Title should show 1/21 (1 prediction out of 21 categories)
-            await expect(page).toHaveTitle(/Oscar Tracker \(1\/21\)/);
+            // Title should show 1/24 (1 prediction out of 24 categories)
+            await expect(page).toHaveTitle(/Oscar Tracker \(1\/24\)/);
         });
 
         test('should show empty circle after clearing prediction', async ({ page }) => {
@@ -516,7 +516,7 @@ test.describe('Predictions Mode', () => {
             await page.click('.menu-item[data-mode="predictions"]');
 
             // Make predictions in all categories
-            const categoryCount = 21;
+            const categoryCount = 24;
             for (let i = 0; i < categoryCount; i++) {
                 await page.locator('#films-list .film').first().click();
                 if (i < categoryCount - 1) {
@@ -532,7 +532,7 @@ test.describe('Predictions Mode', () => {
             expect(Object.keys(predictions).length).toBe(categoryCount);
 
             // Title should show full count
-            await expect(page).toHaveTitle(/Oscar Tracker \(21\/21\)/);
+            await expect(page).toHaveTitle(/Oscar Tracker \(24\/24\)/);
         });
     });
 

@@ -231,9 +231,9 @@ const CATEGORIES = [
         id: 'best-visual-effects',
         name: 'Best Visual Effects',
         nominees: [
-            { id: 'vfx-avatar', title: 'Avatar: Fire and Ash', subtitle: 'Joe Letteri & Eric Saindon' },
+            { id: 'vfx-avatar', title: 'Avatar: Fire and Ash', subtitle: 'Joe Letteri, Richard Baneham, Eric Saindon & Daniel Barrett' },
             { id: 'vfx-f1', title: 'F1', subtitle: 'Ryan Tudhope, Nicolas Chevallier, Robert Harrington & Keith Dawson' },
-            { id: 'vfx-jurassic', title: 'Jurassic World Rebirth', subtitle: 'David Vickery' },
+            { id: 'vfx-jurassic', title: 'Jurassic World Rebirth', subtitle: 'David Vickery, Stephen Aplin, Charmaine Chan & Neil Corbould' },
             { id: 'vfx-lostbus', title: 'The Lost Bus', subtitle: 'Charlie Noble, David Zaretti, Russell Bowen & Brandon K. McLaughlin' },
             { id: 'vfx-sinners', title: 'Sinners', subtitle: 'Michael Ralla, Espen Nordahl, Guido Wolter & Donnie Dean' }
         ]
@@ -612,7 +612,7 @@ function showCategoryScreen(scrollToTop = true) {
 // SHARING FEATURE
 // ============================================
 
-// Encode predictions to compact string (21 chars, one per category)
+// Encode predictions to compact string (24 chars, one per category)
 function encodePredictions(preds) {
     return CATEGORIES.map(cat => {
         const nomineeId = preds[cat.id];
@@ -624,7 +624,7 @@ function encodePredictions(preds) {
 
 // Decode compact string to predictions object
 function decodePredictions(encoded) {
-    if (!encoded || typeof encoded !== 'string' || encoded.length !== 21) {
+    if (!encoded || typeof encoded !== 'string' || encoded.length !== CATEGORIES.length) {
         return {};
     }
     const preds = {};
@@ -643,8 +643,8 @@ function decodePredictions(encoded) {
 
 // Check if encoded string is valid
 function isValidEncodedString(str) {
-    if (!str || typeof str !== 'string' || str.length !== 21) return false;
-    return /^[0-9\-]{21}$/.test(str);
+    if (!str || typeof str !== 'string' || str.length !== CATEGORIES.length) return false;
+    return /^[0-9\-]+$/.test(str) && str.length === CATEGORIES.length;
 }
 
 // Generate full share URL

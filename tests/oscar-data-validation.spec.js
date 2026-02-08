@@ -89,7 +89,7 @@ const OFFICIAL_OSCAR_DATA = {
         nominees: [
             { title: 'Sinners', detail: 'Ryan Coogler' },
             { title: 'Sentimental Value', detail: 'Eskil Vogt & Joachim Trier' },
-            { title: 'Blue Moon', detail: 'Richard Linklater' },
+            { title: 'Blue Moon', detail: 'Robert Kaplow' },
             { title: 'Marty Supreme', detail: 'Ronald Bronstein & Josh Safdie' },
             { title: 'It Was Just an Accident', detail: 'Jafar Panahi' }
         ]
@@ -134,8 +134,8 @@ const OFFICIAL_OSCAR_DATA = {
             { title: 'The Alabama Solution', detail: 'Andrew Jarecki & Charlotte Kaufman' },
             { title: 'Come See Me in the Good Light', detail: 'Ryan White' },
             { title: 'Cutting through Rocks', detail: 'Sara Khaki & Mohammadreza Eyni' },
-            { title: 'Mr. Nobody against Putin', detail: 'Vera Krichevskaya' },
-            { title: 'The Perfect Neighbor', detail: 'Geeta Gandbhir & Alison Payne' }
+            { title: 'Mr. Nobody against Putin', detail: 'David Borenstein, Pavel Talankin, Helle Faber & Alžběta Karásková' },
+            { title: 'The Perfect Neighbor', detail: 'Geeta Gandbhir, Alisa Payne, Nikon Kwantu & Sam Bisbee' }
         ]
     },
     'Cinematography': {
@@ -176,9 +176,9 @@ const OFFICIAL_OSCAR_DATA = {
         count: 5,
         nominees: [
             { title: 'Avatar: Fire and Ash', detail: 'Deborah L. Scott' },
-            { title: 'Frankenstein', detail: 'Luis Sequeira' },
-            { title: 'Hamnet', detail: 'Sandy Powell' },
-            { title: 'Marty Supreme', detail: 'Courtney Hoffman' },
+            { title: 'Frankenstein', detail: 'Kate Hawley' },
+            { title: 'Hamnet', detail: 'Malgosia Turzanska' },
+            { title: 'Marty Supreme', detail: 'Miyako Bellizzi' },
             { title: 'Sinners', detail: 'Ruth E. Carter' }
         ]
     },
@@ -219,22 +219,22 @@ const OFFICIAL_OSCAR_DATA = {
         fullName: 'Best Sound',
         count: 5,
         nominees: [
-            { title: 'F1', detail: 'Mark Weingarten & James H. Mather' },
-            { title: 'Frankenstein', detail: 'Randy Thom & Gary Rydstrom' },
-            { title: 'One Battle After Another', detail: 'Richard King' },
-            { title: 'Sinners', detail: 'Steve Boeddeker & Brandon Proctor' },
-            { title: 'Sirât', detail: 'Olivier Goinard' }
+            { title: 'F1', detail: 'Gareth John, Al Nelson, Gwendolyn Yates Whittle, Gary A. Rizzo & Juan Peralta' },
+            { title: 'Frankenstein', detail: 'Greg Chapman, Nathan Robitaille, Nelson Ferreira, Christian Cooke & Brad Zoern' },
+            { title: 'One Battle After Another', detail: 'José Antonio García, Christopher Scarabosio & Tony Villaflor' },
+            { title: 'Sinners', detail: 'Chris Welcker, Benjamin A. Burtt, Felipe Pacheco, Brandon Proctor & Steve Boeddeker' },
+            { title: 'Sirât', detail: 'Amanda Villavieja, Laia Casanovas & Yasmina Praderas' }
         ]
     },
     'Visual Effects': {
         fullName: 'Best Visual Effects',
         count: 5,
         nominees: [
-            { title: 'Avatar: Fire and Ash', detail: 'Joe Letteri & Eric Saindon' },
-            { title: 'F1', detail: 'Alex Wuttke' },
-            { title: 'Jurassic World Rebirth', detail: 'David Vickery' },
-            { title: 'The Lost Bus', detail: 'Charmaine Chan' },
-            { title: 'Sinners', detail: 'Erik Henry' }
+            { title: 'Avatar: Fire and Ash', detail: 'Joe Letteri, Richard Baneham, Eric Saindon & Daniel Barrett' },
+            { title: 'F1', detail: 'Ryan Tudhope, Nicolas Chevallier, Robert Harrington & Keith Dawson' },
+            { title: 'Jurassic World Rebirth', detail: 'David Vickery, Stephen Aplin, Charmaine Chan & Neil Corbould' },
+            { title: 'The Lost Bus', detail: 'Charlie Noble, David Zaretti, Russell Bowen & Brandon K. McLaughlin' },
+            { title: 'Sinners', detail: 'Michael Ralla, Espen Nordahl, Guido Wolter & Donnie Dean' }
         ]
     },
     'Casting': {
@@ -247,11 +247,44 @@ const OFFICIAL_OSCAR_DATA = {
             { title: 'The Secret Agent', detail: 'Gabriel Domingues' },
             { title: 'Sinners', detail: 'Francine Maisler' }
         ]
+    },
+    'Animated Short Film': {
+        fullName: 'Best Animated Short Film',
+        count: 5,
+        nominees: [
+            { title: 'Butterfly', detail: 'Florence Miailhe & Ron Dyens' },
+            { title: 'Forevergreen', detail: 'Nathan Engelhardt & Jeremy Spears' },
+            { title: 'The Girl Who Cried Pearls', detail: 'Chris Lavis & Maciek Szczerbowski' },
+            { title: 'Retirement Plan', detail: 'John Kelly & Andrew Freedman' },
+            { title: 'The Three Sisters', detail: 'Konstantin Bronzit' }
+        ]
+    },
+    'Documentary Short Film': {
+        fullName: 'Best Documentary Short Film',
+        count: 5,
+        nominees: [
+            { title: 'All the Empty Rooms', detail: 'Joshua Seftel & Conall Jones' },
+            { title: 'Armed Only with a Camera: The Life and Death of Brent Renaud', detail: 'Craig Renaud & Juan Arredondo' },
+            { title: 'Children No More: "Were and Are Gone"', detail: 'Hilla Medalia & Sheila Nevins' },
+            { title: 'The Devil Is Busy', detail: 'Christalyn Hampton & Geeta Gandbhir' },
+            { title: 'Perfectly a Strangeness', detail: 'Alison McAlpine' }
+        ]
+    },
+    'Live Action Short Film': {
+        fullName: 'Best Live Action Short Film',
+        count: 5,
+        nominees: [
+            { title: "Butcher's Stain", detail: 'Meyer Levinson-Blount & Oron Caspi' },
+            { title: 'A Friend of Dorothy', detail: 'Lee Knight & James Dean' },
+            { title: "Jane Austen's Period Drama", detail: 'Julia Aks & Steve Pinder' },
+            { title: 'The Singers', detail: 'Sam A. Davis & Jack Piatt' },
+            { title: 'Two People Exchanging Saliva', detail: 'Alexandre Singh & Natalie Musteata' }
+        ]
     }
 };
 
 // Total expected categories and nominees
-const EXPECTED_CATEGORY_COUNT = 21;
+const EXPECTED_CATEGORY_COUNT = 24;
 const EXPECTED_TOTAL_NOMINEES = Object.values(OFFICIAL_OSCAR_DATA).reduce(
     (sum, cat) => sum + cat.count, 0
 );
@@ -308,7 +341,7 @@ async function getCategoryNames(page) {
 
 test.describe('Oscar Data Validation - Global', () => {
 
-    test('app should have correct number of categories (21)', async ({ page }) => {
+    test('app should have correct number of categories (24)', async ({ page }) => {
         await completeOnboarding(page);
         const count = await getCategoryCount(page);
         expect(count).toBe(EXPECTED_CATEGORY_COUNT);

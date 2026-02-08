@@ -371,10 +371,10 @@ test.describe('98th Academy Awards Nominee Data Verification', () => {
         }
     });
 
-    // Verify total category count (21 categories total)
-    test('app has all 21 official categories', async ({ page }) => {
+    // Verify total category count (24 categories total)
+    test('app has all 24 official categories', async ({ page }) => {
         const categoryOptions = await page.locator('#category-select option').count();
-        expect(categoryOptions).toBe(21);
+        expect(categoryOptions).toBe(24);
     });
 
     // Verify Best Casting category exists (new for 2026)

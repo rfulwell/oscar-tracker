@@ -28,8 +28,8 @@ test.describe('Navigation Counts', () => {
 
         // Initial counts should show 0 for watched
         await expect(page.locator('#nav-count-watched')).toContainText('0/');
-        await expect(page.locator('#nav-count-predictions')).toContainText('0/21');
-        await expect(page.locator('#nav-count-favorites')).toContainText('0/21');
+        await expect(page.locator('#nav-count-predictions')).toContainText('0/24');
+        await expect(page.locator('#nav-count-favorites')).toContainText('0/24');
 
         // Take screenshot
         await page.screenshot({ path: 'test-results/nav-counts-initial.png' });
@@ -63,14 +63,14 @@ test.describe('Navigation Counts', () => {
         await page.waitForTimeout(200);
 
         const predictionsCount = page.locator('#nav-count-predictions');
-        await expect(predictionsCount).toContainText('0/21');
+        await expect(predictionsCount).toContainText('0/24');
 
         // Make a prediction
         await page.click('#films-list .film:first-child');
         await page.waitForTimeout(200);
 
         // Count should increase
-        await expect(predictionsCount).toContainText('1/21');
+        await expect(predictionsCount).toContainText('1/24');
     });
 
     test('should update favorites count when favorite is selected', async ({ page }) => {
@@ -82,14 +82,14 @@ test.describe('Navigation Counts', () => {
         await page.waitForTimeout(200);
 
         const favoritesCount = page.locator('#nav-count-favorites');
-        await expect(favoritesCount).toContainText('0/21');
+        await expect(favoritesCount).toContainText('0/24');
 
         // Select a favorite
         await page.click('#films-list .film:first-child');
         await page.waitForTimeout(200);
 
         // Count should increase
-        await expect(favoritesCount).toContainText('1/21');
+        await expect(favoritesCount).toContainText('1/24');
     });
 
     test('should update streamable count when streamable film is watched', async ({ page }) => {
