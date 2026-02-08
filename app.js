@@ -939,10 +939,19 @@ function initNavigation() {
         });
     });
 
-    // Share button in nav
+    // Search button in nav
+    const searchNavBtn = document.getElementById('nav-search');
+    searchNavBtn?.addEventListener('click', (e) => {
+        e.preventDefault();
+        closeDrawer();
+        showSearchInput();
+    });
+
+    // Share button in nav (always visible, opens share modal)
     shareNavBtn?.addEventListener('click', (e) => {
         e.preventDefault();
         if (!shareNavBtn.classList.contains('disabled')) {
+            closeDrawer();
             showShareModal();
         }
     });
@@ -1065,14 +1074,12 @@ function updateNavShareVisibility() {
     const shareDivider = document.getElementById('nav-share-divider');
     const shareBtn = document.getElementById('nav-share');
 
-    const isPredictionsMode = currentMode === 'predictions';
-
-    // Show/hide share section based on mode
-    if (shareSection) shareSection.style.display = isPredictionsMode ? '' : 'none';
-    if (shareDivider) shareDivider.style.display = isPredictionsMode ? '' : 'none';
+    // Share section is always visible now
+    if (shareSection) shareSection.style.display = '';
+    if (shareDivider) shareDivider.style.display = 'none'; // Hide the extra divider
 
     // Update disabled state based on whether predictions exist
-    if (shareBtn && isPredictionsMode) {
+    if (shareBtn) {
         const hasPredictions = hasAnyPredictions(predictions);
         shareBtn.classList.toggle('disabled', !hasPredictions);
         shareBtn.setAttribute('aria-disabled', (!hasPredictions).toString());

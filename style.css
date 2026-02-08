@@ -343,6 +343,16 @@ body {
     cursor: not-allowed;
 }
 
+/* Share button - gold styling */
+.menu-item.menu-item-share {
+    color: var(--color-gold);
+}
+
+.menu-item.menu-item-share:hover {
+    color: var(--color-gold);
+    background: var(--color-black-lighter);
+}
+
 .menu-icon {
     width: 24px;
     height: 24px;
