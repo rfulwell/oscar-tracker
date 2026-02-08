@@ -343,17 +343,17 @@
                     <div class="nav-subtitle">98th Academy Awards</div>
                 </div>
 
-                <!-- NEW: Search in nav -->
-                <div class="nav-search">
-                    <div class="nav-search-wrapper">
-                        <svg class="nav-search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <circle cx="11" cy="11" r="8"></circle>
-                            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-                        </svg>
-                        <input type="text" class="nav-search-input" placeholder="Search films...">
-                    </div>
+                <!-- NEW: Search button styled like other nav items -->
+                <div class="nav-item">
+                    <svg class="nav-item-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                    </svg>
+                    <span class="nav-item-text">Search Films</span>
                 </div>
-                <div class="annotation">Search bar added to navigation</div>
+                <div class="annotation">Search button matches nav style</div>
+
+                <div class="nav-divider"></div>
 
                 <div class="nav-section">
                     <div class="nav-section-label">Track Progress</div>
@@ -422,10 +422,10 @@
     <div class="description">
         <h3>Proposed Changes</h3>
         <ul>
-            <li><strong>Search Bar:</strong> Added at the top of the navigation drawer, below the header. Clicking it opens the full search overlay.</li>
-            <li><strong>Share Button:</strong> Always visible in the navigation (highlighted in gold). Opens the share modal for predictions.</li>
-            <li><strong>Placement:</strong> Share is positioned between the mode options and shared lists for logical flow.</li>
-            <li><strong>Mobile:</strong> Search icon remains in the ceremony info bar for quick access without opening the drawer.</li>
+            <li><strong>Search Films:</strong> Added as a nav item at the top, matching the style of other buttons. Clicking opens the full search overlay.</li>
+            <li><strong>Share Predictions:</strong> Always visible in the navigation (highlighted in gold). Opens the share modal.</li>
+            <li><strong>Placement:</strong> Search at top, Share between mode options and shared lists.</li>
+            <li><strong>Mobile:</strong> Search icon remains in the ceremony info bar for quick access.</li>
         </ul>
     </div>
 </body>
