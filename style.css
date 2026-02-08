@@ -2109,13 +2109,54 @@ body.modal-open {
     font-style: italic;
 }
 
-/* Hide search on sidebar visible (desktop) */
+/* Desktop search view - integrate with sidebar layout */
 @media (min-width: 768px) {
     .search-view {
-        max-width: 480px;
-        left: 50%;
-        transform: translateX(-50%);
+        left: 260px;
+        right: 0;
+        transform: none;
         border-left: 1px solid var(--color-black-lighter);
-        border-right: 1px solid var(--color-black-lighter);
+    }
+
+    .search-view.sidebar-collapsed {
+        left: 56px;
+    }
+
+    .search-content {
+        max-width: 680px;
+        margin: 0 auto;
+        padding: var(--spacing-lg);
+    }
+
+    .search-header {
+        max-width: 680px;
+        margin: 0 auto;
+        padding: var(--spacing-md) var(--spacing-lg);
+    }
+
+    .search-film-header {
+        max-width: 680px;
+        margin: 0 auto;
+    }
+
+    /* Match search result styling to film items on desktop */
+    .search-result {
+        padding: var(--spacing-md) var(--spacing-lg);
+        border-radius: 8px;
+    }
+
+    .search-result-title {
+        font-size: 1.125rem;
+        font-weight: 600;
+    }
+
+    .category-result {
+        padding: var(--spacing-md) var(--spacing-lg);
+        border-radius: 8px;
+    }
+
+    .category-result-name {
+        font-size: 1.125rem;
+        font-weight: 600;
     }
 }

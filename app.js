@@ -969,6 +969,7 @@ function initNavigation() {
     if (isSidebarCollapsed) {
         navDrawer?.classList.add('collapsed');
         document.querySelector('.app')?.classList.add('sidebar-collapsed');
+        document.getElementById('search-view')?.classList.add('sidebar-collapsed');
         updateSidebarToggleIcon();
     }
 
@@ -1009,11 +1010,13 @@ function closeDrawer() {
 function toggleSidebar() {
     const navDrawer = document.getElementById('nav-drawer');
     const appContainer = document.querySelector('.app');
+    const searchView = document.getElementById('search-view');
 
     isSidebarCollapsed = !isSidebarCollapsed;
 
     navDrawer?.classList.toggle('collapsed', isSidebarCollapsed);
     appContainer?.classList.toggle('sidebar-collapsed', isSidebarCollapsed);
+    searchView?.classList.toggle('sidebar-collapsed', isSidebarCollapsed);
 
     localStorage.setItem('sidebarCollapsed', isSidebarCollapsed.toString());
     updateSidebarToggleIcon();
@@ -1924,6 +1927,7 @@ function showSearchInput() {
     const searchEmpty = document.getElementById('search-empty');
 
     searchView.style.display = 'flex';
+    searchView.classList.toggle('sidebar-collapsed', isSidebarCollapsed);
     searchFilmHeader.style.display = 'none';
     searchContent.style.display = 'block';
     searchEmpty.style.display = 'none';
@@ -1953,6 +1957,7 @@ function showSearch(filmKey) {
     if (!film) return;
 
     searchView.style.display = 'flex';
+    searchView.classList.toggle('sidebar-collapsed', isSidebarCollapsed);
     searchFilmHeader.style.display = 'block';
     searchContent.style.display = 'block';
     searchEmpty.style.display = 'none';
