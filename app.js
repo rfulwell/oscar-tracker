@@ -1932,10 +1932,8 @@ function showSearchInput() {
     searchContent.style.display = 'block';
     searchEmpty.style.display = 'none';
 
-    // Prevent body scroll on desktop when search is open
-    if (window.innerWidth >= 768) {
-        document.body.classList.add('modal-open');
-    }
+    // Prevent body scroll when search is open
+    document.body.classList.add('modal-open');
 
     searchInput.value = '';
     searchInput.classList.remove('readonly');
@@ -1967,10 +1965,8 @@ function showSearch(filmKey) {
     searchContent.style.display = 'block';
     searchEmpty.style.display = 'none';
 
-    // Prevent body scroll on desktop when search is open
-    if (window.innerWidth >= 768) {
-        document.body.classList.add('modal-open');
-    }
+    // Prevent body scroll when search is open
+    document.body.classList.add('modal-open');
 
     searchInput.value = film.title;
     searchInput.classList.add('readonly');
