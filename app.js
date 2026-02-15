@@ -1914,7 +1914,7 @@ function getSearchSelectionState(nomineeId) {
 }
 
 // Show search input view
-function showSearchInput() {
+function showSearchInput(skipHistory = false) {
     searchActive = true;
     searchSourceMode = currentMode;
     searchSelectedFilm = null;
@@ -1942,10 +1942,16 @@ function showSearchInput() {
     searchInput.focus();
 
     renderSearchFilmList('');
+
+    // Push history state for back gesture support
+    if (!skipHistory) {
+        history.pushState({ search: 'input' }, '');
+    }
 }
 
 // Show search results for a specific film
-function showSearch(filmKey) {
+function showSearch(filmKey, skipHistory = false) {
+    const wasSearchActive = searchActive;
     searchActive = true;
     searchSourceMode = currentMode;
     searchSelectedFilm = filmKey;
@@ -1974,10 +1980,21 @@ function showSearch(filmKey) {
 
     renderSearchFilmHeader(filmKey);
     renderSearchCategoryList(filmKey);
+
+    // Push history state for back gesture support
+    if (!skipHistory) {
+        // If search wasn't open, push input state first, then film state
+        if (!wasSearchActive) {
+            history.pushState({ search: 'input' }, '');
+        }
+        history.pushState({ search: 'film', filmKey }, '');
+    }
 }
 
 // Hide search view
-function hideSearch() {
+function hideSearch(skipHistory = false) {
+    if (!searchActive) return;
+
     searchActive = false;
     searchSelectedFilm = null;
     searchQuery = '';
@@ -1987,28 +2004,45 @@ function hideSearch() {
 
     // Restore body scroll
     document.body.classList.remove('modal-open');
+
+    // Go back in history to remove our pushed states
+    if (!skipHistory && history.state && history.state.search) {
+        history.back();
+    }
 }
 
 // Go back from film categories to search input
 function searchGoBack() {
     if (searchSelectedFilm) {
         // Go back to search input
-        searchSelectedFilm = null;
-        const searchInput = document.getElementById('search-input');
-        const searchFilmHeader = document.getElementById('search-film-header');
-
-        searchInput.value = searchQuery;
-        searchInput.classList.remove('readonly');
-        searchInput.readOnly = false;
-        searchInput.placeholder = 'Search films...';
-        searchFilmHeader.style.display = 'none';
-
-        renderSearchFilmList(searchQuery);
-        searchInput.focus();
+        searchGoBackInternal();
+        // Update history to match (replaceState to avoid extra entry)
+        if (history.state && history.state.search === 'film') {
+            history.replaceState({ search: 'input' }, '');
+        }
     } else {
         // Close search entirely
         hideSearch();
     }
+}
+
+// Internal back function (called by button click and popstate handler)
+function searchGoBackInternal() {
+    if (!searchSelectedFilm) return;
+
+    // Go back to search input
+    searchSelectedFilm = null;
+    const searchInput = document.getElementById('search-input');
+    const searchFilmHeader = document.getElementById('search-film-header');
+
+    searchInput.value = searchQuery;
+    searchInput.classList.remove('readonly');
+    searchInput.readOnly = false;
+    searchInput.placeholder = 'Search films...';
+    searchFilmHeader.style.display = 'none';
+
+    renderSearchFilmList(searchQuery);
+    searchInput.focus();
 }
 
 // Render film header in search results
@@ -2563,6 +2597,23 @@ function setupEventListeners() {
     if (searchClose) {
         searchClose.addEventListener('click', hideSearch);
     }
+
+    // Handle browser back button/gesture for search navigation
+    window.addEventListener('popstate', (e) => {
+        if (!searchActive) return;
+
+        if (e.state && e.state.search === 'input') {
+            // Back from film view to search input (via browser back)
+            if (searchSelectedFilm) {
+                searchGoBackInternal();
+            }
+        } else if (e.state && e.state.search === 'film') {
+            // Forward navigation or restored state - no action needed
+        } else {
+            // Back from search input to main view (no search state)
+            hideSearch(true);
+        }
+    });
 
     // Keyboard navigation
     document.addEventListener('keydown', (e) => {
