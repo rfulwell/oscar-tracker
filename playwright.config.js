@@ -17,9 +17,10 @@ module.exports = defineConfig({
             name: 'chromium',
             use: {
                 ...devices['Desktop Chrome'],
-                launchOptions: {
-                    executablePath: '/root/.cache/ms-playwright/chromium-1194/chrome-linux/chrome',
-                },
+                // Set CHROMIUM_PATH to use a preinstalled browser instead of Playwright's own
+                ...(process.env.CHROMIUM_PATH && {
+                    launchOptions: { executablePath: process.env.CHROMIUM_PATH },
+                }),
             },
         },
     ],

@@ -2789,6 +2789,13 @@ function registerServiceWorker() {
             try {
                 const registration = await navigator.serviceWorker.register('sw.js');
                 console.log('ServiceWorker registered:', registration.scope);
+
+                // Installed apps can stay open for days; check for a new deploy on each return
+                document.addEventListener('visibilitychange', () => {
+                    if (document.visibilityState === 'visible') {
+                        registration.update().catch(() => {});
+                    }
+                });
             } catch (e) {
                 console.warn('ServiceWorker registration failed:', e);
             }
