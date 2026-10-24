@@ -34,6 +34,10 @@ npx playwright test --debug
 
 Tests start a local HTTP server on port 3000 and run against the live app. Each test clears localStorage to ensure isolation.
 
+- **Official data source**: `The 98th Academy Awards _ 2026.html` is a saved copy of the official nominations page. When `oscar-data-validation.spec.js` and `app.js` disagree, check both against it rather than assuming either is right.
+- **Measure layout in one step**: opening the category view starts a smooth scroll, so reading two elements' positions with separate `boundingBox()` calls can catch the page mid-scroll. Measure them together in a single `page.evaluate()` (see `getBoxes()` in `source-links.spec.js`).
+- **Share links are one character per category** (24 for 2026). Test links must match `CATEGORIES.length` or the app ignores them.
+
 ### Coverage
 
 - **predictions.spec.js**: Predictions mode functionality (mode switching, single-select behavior, persistence, progress display, performance regression tests)
