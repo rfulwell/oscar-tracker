@@ -2,8 +2,9 @@
 // 98th Academy Awards (2026)
 
 // Version and Changelog
-const APP_VERSION = '1.1.0';
+const APP_VERSION = '1.2.0';
 const CHANGELOG = [
+    { version: '1.2.0', description: 'Streamable list — see what\'s streaming and where' },
     { version: '1.1.0', description: 'Share predictions with friends via URL' },
     { version: '1.0.0', description: 'Initial release - track watched films and make predictions' }
 ];
@@ -80,7 +81,7 @@ const CATEGORIES = [
             { id: 'supp-actress-mosaku', title: 'Wunmi Mosaku', subtitle: 'Sinners' },
             { id: 'supp-actress-fanning', title: 'Elle Fanning', subtitle: 'Sentimental Value' },
             { id: 'supp-actress-lilleaas', title: 'Inga Ibsdotter Lilleaas', subtitle: 'Sentimental Value' },
-            { id: 'supp-actress-paltrow', title: 'Gwyneth Paltrow', subtitle: 'Marty Supreme' }
+            { id: 'supp-actress-madigan', title: 'Amy Madigan', subtitle: 'Weapons' }
         ]
     },
     {
@@ -89,7 +90,7 @@ const CATEGORIES = [
         nominees: [
             { id: 'orig-sinners', title: 'Sinners', subtitle: 'Ryan Coogler' },
             { id: 'orig-sentimental', title: 'Sentimental Value', subtitle: 'Eskil Vogt & Joachim Trier' },
-            { id: 'orig-bluemoon', title: 'Blue Moon', subtitle: 'Richard Linklater' },
+            { id: 'orig-bluemoon', title: 'Blue Moon', subtitle: 'Robert Kaplow' },
             { id: 'orig-marty', title: 'Marty Supreme', subtitle: 'Ronald Bronstein & Josh Safdie' },
             { id: 'orig-accident', title: 'It Was Just an Accident', subtitle: 'Jafar Panahi' }
         ]
@@ -102,7 +103,7 @@ const CATEGORIES = [
             { id: 'adapt-traindreams', title: 'Train Dreams', subtitle: 'Clint Bentley & Greg Kwedar' },
             { id: 'adapt-frankenstein', title: 'Frankenstein', subtitle: 'Guillermo del Toro' },
             { id: 'adapt-hamnet', title: 'Hamnet', subtitle: 'Chloé Zhao' },
-            { id: 'adapt-secretagent', title: 'The Secret Agent', subtitle: 'Fernando Meirelles' }
+            { id: 'adapt-bugonia', title: 'Bugonia', subtitle: 'Will Tracy' }
         ]
     },
     {
@@ -121,10 +122,10 @@ const CATEGORIES = [
         name: 'Best International Feature',
         nominees: [
             { id: 'intl-sentimental', title: 'Sentimental Value', subtitle: 'Norway' },
-            { id: 'intl-amelie', title: 'Little Amélie or the Character of Rain', subtitle: 'France' },
-            { id: 'intl-accident', title: 'It Was Just an Accident', subtitle: 'Iran' },
-            { id: 'intl-stillhere', title: 'I\'m Still Here', subtitle: 'Brazil' },
-            { id: 'intl-arco', title: 'Arco', subtitle: 'France' }
+            { id: 'intl-secretagent', title: 'The Secret Agent', subtitle: 'Brazil' },
+            { id: 'intl-sirat', title: 'Sirât', subtitle: 'Spain' },
+            { id: 'intl-hind', title: 'The Voice of Hind Rajab', subtitle: 'Tunisia' },
+            { id: 'intl-accident', title: 'It Was Just an Accident', subtitle: 'France' }
         ]
     },
     {
@@ -134,8 +135,8 @@ const CATEGORIES = [
             { id: 'doc-alabama', title: 'The Alabama Solution', subtitle: 'Andrew Jarecki & Charlotte Kaufman' },
             { id: 'doc-goodlight', title: 'Come See Me in the Good Light', subtitle: 'Ryan White' },
             { id: 'doc-rocks', title: 'Cutting through Rocks', subtitle: 'Sara Khaki & Mohammadreza Eyni' },
-            { id: 'doc-putin', title: 'Mr. Nobody against Putin', subtitle: 'Vera Krichevskaya' },
-            { id: 'doc-seeds', title: 'Seeds', subtitle: 'Brittany Shyne' }
+            { id: 'doc-putin', title: 'Mr. Nobody against Putin', subtitle: 'David Borenstein, Pavel Talankin, Helle Faber & Alžběta Karásková' },
+            { id: 'doc-neighbor', title: 'The Perfect Neighbor', subtitle: 'Geeta Gandbhir, Alisa Payne, Nikon Kwantu & Sam Bisbee' }
         ]
     },
     {
@@ -144,9 +145,9 @@ const CATEGORIES = [
         nominees: [
             { id: 'cin-frankenstein', title: 'Frankenstein', subtitle: 'Dan Laustsen' },
             { id: 'cin-marty', title: 'Marty Supreme', subtitle: 'Darius Khondji' },
-            { id: 'cin-onebattle', title: 'One Battle After Another', subtitle: 'Ari Wegner' },
+            { id: 'cin-onebattle', title: 'One Battle After Another', subtitle: 'Michael Bauman' },
             { id: 'cin-sinners', title: 'Sinners', subtitle: 'Autumn Durald Arkapaw' },
-            { id: 'cin-traindreams', title: 'Train Dreams', subtitle: 'Lol Crawley' }
+            { id: 'cin-traindreams', title: 'Train Dreams', subtitle: 'Adolpho Veloso' }
         ]
     },
     {
@@ -176,9 +177,9 @@ const CATEGORIES = [
         name: 'Best Costume Design',
         nominees: [
             { id: 'cost-avatar', title: 'Avatar: Fire and Ash', subtitle: 'Deborah L. Scott' },
-            { id: 'cost-frankenstein', title: 'Frankenstein', subtitle: 'Luis Sequeira' },
-            { id: 'cost-hamnet', title: 'Hamnet', subtitle: 'Sandy Powell' },
-            { id: 'cost-marty', title: 'Marty Supreme', subtitle: 'Courtney Hoffman' },
+            { id: 'cost-frankenstein', title: 'Frankenstein', subtitle: 'Kate Hawley' },
+            { id: 'cost-hamnet', title: 'Hamnet', subtitle: 'Malgosia Turzanska' },
+            { id: 'cost-marty', title: 'Marty Supreme', subtitle: 'Miyako Bellizzi' },
             { id: 'cost-sinners', title: 'Sinners', subtitle: 'Ruth E. Carter' }
         ]
     },
@@ -219,22 +220,22 @@ const CATEGORIES = [
         id: 'best-sound',
         name: 'Best Sound',
         nominees: [
-            { id: 'sound-f1', title: 'F1', subtitle: 'Mark Weingarten & James H. Mather' },
-            { id: 'sound-frankenstein', title: 'Frankenstein', subtitle: 'Randy Thom & Gary Rydstrom' },
-            { id: 'sound-onebattle', title: 'One Battle After Another', subtitle: 'Richard King' },
-            { id: 'sound-sinners', title: 'Sinners', subtitle: 'Steve Boeddeker & Brandon Proctor' },
-            { id: 'sound-sirat', title: 'Sirât', subtitle: 'Olivier Goinard' }
+            { id: 'sound-f1', title: 'F1', subtitle: 'Gareth John, Al Nelson, Gwendolyn Yates Whittle, Gary A. Rizzo & Juan Peralta' },
+            { id: 'sound-frankenstein', title: 'Frankenstein', subtitle: 'Greg Chapman, Nathan Robitaille, Nelson Ferreira, Christian Cooke & Brad Zoern' },
+            { id: 'sound-onebattle', title: 'One Battle After Another', subtitle: 'José Antonio García, Christopher Scarabosio & Tony Villaflor' },
+            { id: 'sound-sinners', title: 'Sinners', subtitle: 'Chris Welcker, Benjamin A. Burtt, Felipe Pacheco, Brandon Proctor & Steve Boeddeker' },
+            { id: 'sound-sirat', title: 'Sirât', subtitle: 'Amanda Villavieja, Laia Casanovas & Yasmina Praderas' }
         ]
     },
     {
         id: 'best-visual-effects',
         name: 'Best Visual Effects',
         nominees: [
-            { id: 'vfx-avatar', title: 'Avatar: Fire and Ash', subtitle: 'Joe Letteri & Eric Saindon' },
-            { id: 'vfx-f1', title: 'F1', subtitle: 'Alex Wuttke' },
-            { id: 'vfx-jurassic', title: 'Jurassic World Rebirth', subtitle: 'David Vickery' },
-            { id: 'vfx-lostbus', title: 'The Lost Bus', subtitle: 'Charmaine Chan' },
-            { id: 'vfx-sinners', title: 'Sinners', subtitle: 'Erik Henry' }
+            { id: 'vfx-avatar', title: 'Avatar: Fire and Ash', subtitle: 'Joe Letteri, Richard Baneham, Eric Saindon & Daniel Barrett' },
+            { id: 'vfx-f1', title: 'F1', subtitle: 'Ryan Tudhope, Nicolas Chevallier, Robert Harrington & Keith Dawson' },
+            { id: 'vfx-jurassic', title: 'Jurassic World Rebirth', subtitle: 'David Vickery, Stephen Aplin, Charmaine Chan & Neil Corbould' },
+            { id: 'vfx-lostbus', title: 'The Lost Bus', subtitle: 'Charlie Noble, David Zaretti, Russell Bowen & Brandon K. McLaughlin' },
+            { id: 'vfx-sinners', title: 'Sinners', subtitle: 'Michael Ralla, Espen Nordahl, Guido Wolter & Donnie Dean' }
         ]
     },
     {
@@ -242,10 +243,43 @@ const CATEGORIES = [
         name: 'Best Casting',
         nominees: [
             { id: 'cast-hamnet', title: 'Hamnet', subtitle: 'Nina Gold' },
-            { id: 'cast-marty', title: 'Marty Supreme', subtitle: 'Francine Maisler' },
+            { id: 'cast-marty', title: 'Marty Supreme', subtitle: 'Jennifer Venditti' },
             { id: 'cast-onebattle', title: 'One Battle After Another', subtitle: 'Cassandra Kulukundis' },
-            { id: 'cast-sentimental', title: 'Sentimental Value', subtitle: 'Kjersti Paulsen' },
-            { id: 'cast-sinners', title: 'Sinners', subtitle: 'Kim Coleman' }
+            { id: 'cast-secretagent', title: 'The Secret Agent', subtitle: 'Gabriel Domingues' },
+            { id: 'cast-sinners', title: 'Sinners', subtitle: 'Francine Maisler' }
+        ]
+    },
+    {
+        id: 'best-animated-short',
+        name: 'Best Animated Short Film',
+        nominees: [
+            { id: 'ashort-butterfly', title: 'Butterfly', subtitle: 'Florence Miailhe & Ron Dyens' },
+            { id: 'ashort-forevergreen', title: 'Forevergreen', subtitle: 'Nathan Engelhardt & Jeremy Spears' },
+            { id: 'ashort-pearls', title: 'The Girl Who Cried Pearls', subtitle: 'Chris Lavis & Maciek Szczerbowski' },
+            { id: 'ashort-retirement', title: 'Retirement Plan', subtitle: 'John Kelly & Andrew Freedman' },
+            { id: 'ashort-sisters', title: 'The Three Sisters', subtitle: 'Konstantin Bronzit' }
+        ]
+    },
+    {
+        id: 'best-documentary-short',
+        name: 'Best Documentary Short Film',
+        nominees: [
+            { id: 'dshort-empty', title: 'All the Empty Rooms', subtitle: 'Joshua Seftel & Conall Jones' },
+            { id: 'dshort-camera', title: 'Armed Only with a Camera: The Life and Death of Brent Renaud', subtitle: 'Craig Renaud & Juan Arredondo' },
+            { id: 'dshort-children', title: 'Children No More: "Were and Are Gone"', subtitle: 'Hilla Medalia & Sheila Nevins' },
+            { id: 'dshort-devil', title: 'The Devil Is Busy', subtitle: 'Christalyn Hampton & Geeta Gandbhir' },
+            { id: 'dshort-strange', title: 'Perfectly a Strangeness', subtitle: 'Alison McAlpine' }
+        ]
+    },
+    {
+        id: 'best-live-action-short',
+        name: 'Best Live Action Short Film',
+        nominees: [
+            { id: 'lshort-butcher', title: "Butcher's Stain", subtitle: 'Meyer Levinson-Blount & Oron Caspi' },
+            { id: 'lshort-dorothy', title: 'A Friend of Dorothy', subtitle: 'Lee Knight & James Dean' },
+            { id: 'lshort-austen', title: "Jane Austen's Period Drama", subtitle: 'Julia Aks & Steve Pinder' },
+            { id: 'lshort-singers', title: 'The Singers', subtitle: 'Sam A. Davis & Jack Piatt' },
+            { id: 'lshort-saliva', title: 'Two People Exchanging Saliva', subtitle: 'Alexandre Singh & Natalie Musteata' }
         ]
     }
 ];
@@ -265,21 +299,34 @@ const PREDICTIONS_COPY_DISMISSED_KEY = 'oscar-tracker-predictions-copy-dismissed
 const FILM_NOMINEES = {
     'sinners': ['sinners', 'dir-coogler', 'actor-jordan', 'supp-actor-lindo', 'supp-actress-mosaku', 'orig-sinners', 'cin-sinners', 'edit-sinners', 'prod-sinners', 'cost-sinners', 'makeup-sinners', 'score-sinners', 'song-ilied', 'sound-sinners', 'vfx-sinners', 'cast-sinners'],
     'one-battle-after-another': ['one-battle-after-another', 'dir-anderson', 'actor-dicaprio', 'supp-actor-deltoro', 'supp-actor-penn', 'supp-actress-taylor', 'adapt-onebattle', 'cin-onebattle', 'edit-onebattle', 'prod-onebattle', 'score-onebattle', 'sound-onebattle', 'cast-onebattle'],
-    'marty-supreme': ['marty-supreme', 'dir-safdie', 'actor-chalamet', 'supp-actress-paltrow', 'orig-marty', 'cin-marty', 'edit-marty', 'prod-marty', 'cost-marty', 'cast-marty'],
+    'marty-supreme': ['marty-supreme', 'dir-safdie', 'actor-chalamet', 'orig-marty', 'cin-marty', 'edit-marty', 'prod-marty', 'cost-marty', 'cast-marty'],
     'hamnet': ['hamnet', 'dir-zhao', 'actress-buckley', 'adapt-hamnet', 'prod-hamnet', 'cost-hamnet', 'score-hamnet', 'cast-hamnet'],
     'frankenstein': ['frankenstein', 'supp-actor-elordi', 'adapt-frankenstein', 'cin-frankenstein', 'prod-frankenstein', 'cost-frankenstein', 'makeup-frankenstein', 'score-frankenstein', 'sound-frankenstein'],
-    'sentimental-value': ['sentimental-value', 'dir-trier', 'actress-reinsve', 'supp-actor-skarsgard', 'supp-actress-fanning', 'supp-actress-lilleaas', 'orig-sentimental', 'intl-sentimental', 'edit-sentimental', 'cast-sentimental'],
+    'sentimental-value': ['sentimental-value', 'dir-trier', 'actress-reinsve', 'supp-actor-skarsgard', 'supp-actress-fanning', 'supp-actress-lilleaas', 'orig-sentimental', 'intl-sentimental', 'edit-sentimental'],
     'train-dreams': ['train-dreams', 'adapt-traindreams', 'cin-traindreams', 'song-traindreams'],
-    'bugonia': ['bugonia', 'actress-stone', 'score-bugonia'],
+    'bugonia': ['bugonia', 'actress-stone', 'adapt-bugonia', 'score-bugonia'],
     'f1': ['f1', 'edit-f1', 'sound-f1', 'vfx-f1'],
-    'secret-agent': ['secret-agent', 'actor-moura', 'adapt-secretagent'],
+    'secret-agent': ['secret-agent', 'actor-moura', 'intl-secretagent', 'cast-secretagent'],
     'it-was-just-an-accident': ['orig-accident', 'intl-accident'],
-    'arco': ['anim-arco', 'intl-arco'],
-    'little-amelie': ['anim-amelie', 'intl-amelie'],
+    'arco': ['anim-arco'],
+    'little-amelie': ['anim-amelie'],
     'kpop-demon-hunters': ['anim-kpop', 'song-golden'],
     'avatar-fire-and-ash': ['cost-avatar', 'vfx-avatar'],
     'blue-moon': ['actor-hawke', 'orig-bluemoon'],
-    'im-still-here': ['intl-stillhere']
+    'sirat': ['intl-sirat', 'sound-sirat'],
+    'voice-of-hind-rajab': ['intl-hind'],
+    'if-i-had-legs': ['actress-byrne'],
+    'song-sung-blue': ['actress-hudson'],
+    'elio': ['anim-elio'],
+    'zootopia-2': ['anim-zootopia2'],
+    'alabama-solution': ['doc-alabama'],
+    'come-see-me': ['doc-goodlight'],
+    'perfect-neighbor': ['doc-neighbor'],
+    'weapons': ['supp-actress-madigan'],
+    'smashing-machine': ['makeup-smashing'],
+    'ugly-stepsister': ['makeup-ugly'],
+    'jurassic-world-rebirth': ['vfx-jurassic'],
+    'lost-bus': ['vfx-lostbus']
 };
 
 // Build reverse lookup: nominee ID -> film key
@@ -294,32 +341,88 @@ for (const [filmKey, nomineeIds] of Object.entries(FILM_NOMINEES)) {
 const ALL_FILMS = [
     { key: 'sinners', title: 'Sinners', nominations: 16 },
     { key: 'one-battle-after-another', title: 'One Battle After Another', nominations: 13 },
-    { key: 'marty-supreme', title: 'Marty Supreme', nominations: 10 },
+    { key: 'marty-supreme', title: 'Marty Supreme', nominations: 9 },
+    { key: 'sentimental-value', title: 'Sentimental Value', nominations: 9 },
     { key: 'frankenstein', title: 'Frankenstein', nominations: 9 },
-    { key: 'sentimental-value', title: 'Sentimental Value', nominations: 10 },
     { key: 'hamnet', title: 'Hamnet', nominations: 8 },
     { key: 'train-dreams', title: 'Train Dreams', nominations: 4 },
     { key: 'f1', title: 'F1', nominations: 4 },
-    { key: 'bugonia', title: 'Bugonia', nominations: 3 },
-    { key: 'secret-agent', title: 'The Secret Agent', nominations: 3 },
+    { key: 'secret-agent', title: 'The Secret Agent', nominations: 4 },
+    { key: 'bugonia', title: 'Bugonia', nominations: 4 },
+    { key: 'sirat', title: 'Sirât', nominations: 2 },
     { key: 'blue-moon', title: 'Blue Moon', nominations: 2 },
     { key: 'it-was-just-an-accident', title: 'It Was Just an Accident', nominations: 2 },
-    { key: 'arco', title: 'Arco', nominations: 2 },
-    { key: 'little-amelie', title: 'The Little Amelie', nominations: 2 },
     { key: 'kpop-demon-hunters', title: 'KPop Demon Hunters', nominations: 2 },
     { key: 'avatar-fire-and-ash', title: 'Avatar: Fire and Ash', nominations: 2 },
-    { key: 'im-still-here', title: "I'm Still Here", nominations: 1 }
+    { key: 'arco', title: 'Arco', nominations: 1 },
+    { key: 'little-amelie', title: 'Little Amélie or the Character of Rain', nominations: 1 },
+    { key: 'voice-of-hind-rajab', title: 'The Voice of Hind Rajab', nominations: 1 },
+    { key: 'if-i-had-legs', title: 'If I Had Legs I\'d Kick You', nominations: 1 },
+    { key: 'song-sung-blue', title: 'Song Sung Blue', nominations: 1 },
+    { key: 'elio', title: 'Elio', nominations: 1 },
+    { key: 'zootopia-2', title: 'Zootopia 2', nominations: 1 },
+    { key: 'alabama-solution', title: 'The Alabama Solution', nominations: 1 },
+    { key: 'come-see-me', title: 'Come See Me in the Good Light', nominations: 1 },
+    { key: 'perfect-neighbor', title: 'The Perfect Neighbor', nominations: 1 },
+    { key: 'smashing-machine', title: 'The Smashing Machine', nominations: 1 },
+    { key: 'ugly-stepsister', title: 'The Ugly Stepsister', nominations: 1 },
+    { key: 'jurassic-world-rebirth', title: 'Jurassic World Rebirth', nominations: 1 },
+    { key: 'lost-bus', title: 'The Lost Bus', nominations: 1 },
+    { key: 'weapons', title: 'Weapons', nominations: 1 }
 ].sort((a, b) => b.nominations - a.nominations);
 
-// Streaming service availability for films
-// Based on research: Netflix, Max, and Apple TV+ are top services with Oscar nominees
+// Streaming service availability for films (subscription streaming only, not rent/buy)
 const FILM_STREAMING = {
     'sinners': 'max',
     'one-battle-after-another': 'max',
+    'if-i-had-legs': 'max',
+    'smashing-machine': 'max',
+    'alabama-solution': 'max',
     'frankenstein': 'netflix',
     'train-dreams': 'netflix',
     'kpop-demon-hunters': 'netflix',
-    'f1': 'appletv'
+    'perfect-neighbor': 'netflix',
+    'f1': 'appletv',
+    'come-see-me': 'appletv',
+    'lost-bus': 'appletv',
+    'bugonia': 'peacock',
+    'jurassic-world-rebirth': 'peacock',
+    'ugly-stepsister': 'hulu',
+    'elio': 'disneyplus'
+};
+
+// Streaming service configuration
+const STREAMING_SERVICES = {
+    netflix: {
+        urlTemplate: 'https://www.netflix.com/search?q={title}',
+        icon: '/icons/netflix.svg',
+        name: 'Netflix'
+    },
+    max: {
+        urlTemplate: 'https://play.max.com/search?q={title}',
+        icon: '/icons/max.svg',
+        name: 'Max'
+    },
+    appletv: {
+        urlTemplate: 'https://tv.apple.com/search?term={title}',
+        icon: '/icons/appletv.svg',
+        name: 'Apple TV+'
+    },
+    peacock: {
+        urlTemplate: 'https://www.peacocktv.com/watch/search?q={title}',
+        icon: '/icons/peacock.svg',
+        name: 'Peacock'
+    },
+    hulu: {
+        urlTemplate: 'https://www.hulu.com/search?q={title}',
+        icon: '/icons/hulu.svg',
+        name: 'Hulu'
+    },
+    disneyplus: {
+        urlTemplate: 'https://www.disneyplus.com/search/{title}',
+        icon: '/icons/disneyplus.svg',
+        name: 'Disney+'
+    }
 };
 
 // Get streaming service for a nominee (if available)
@@ -351,6 +454,12 @@ let pendingSharedData = null; // Temp storage for duplicate handling
 let favorites = {}; // { categoryId: nomineeId }
 let pendingCopyTarget = null; // 'favorites' | 'predictions' - for copy modal
 
+// Search state
+let searchActive = false;         // Whether search view is shown
+let searchQuery = '';             // Current search text
+let searchSourceMode = null;      // Mode to return to after search
+let searchSelectedFilm = null;    // Film key being viewed, or null for search input
+
 // DOM Elements
 const filmsList = document.getElementById('films-list');
 const progressEl = document.getElementById('progress');
@@ -368,7 +477,6 @@ const categoryScreen = document.getElementById('category-screen');
 const allFilmsList = document.getElementById('all-films-list');
 const browseByCategory = document.getElementById('browse-by-category');
 const tipContent = document.getElementById('tip-content');
-const modeSelect = document.getElementById('mode-select');
 const aboutLink = document.getElementById('about-link');
 const aboutModal = document.getElementById('about-modal');
 const aboutClose = document.getElementById('about-close');
@@ -441,6 +549,7 @@ function toggleFilmWatched(filmKey, filmEl) {
     }
 
     saveWatchedItems();
+    updateNavCounts();
     updateTip();
 }
 
@@ -491,18 +600,25 @@ function showOnboardingScreen() {
 }
 
 // Show category screen
-function showCategoryScreen() {
+function showCategoryScreen(scrollToTop = true) {
     onboardingScreen.style.display = 'none';
     categoryScreen.style.display = '';
     renderNominees();
     updateProgress();
+    if (scrollToTop) {
+        const stickyHeader = document.querySelector('.ceremony-info');
+        const stickyHeight = stickyHeader ? stickyHeader.offsetHeight : 0;
+        const headerTop = categoryHeader.getBoundingClientRect().top + window.scrollY;
+        const offset = stickyHeight + 8; // Account for sticky header + small margin
+        window.scrollTo({ top: headerTop - offset, behavior: 'smooth' });
+    }
 }
 
 // ============================================
 // SHARING FEATURE
 // ============================================
 
-// Encode predictions to compact string (21 chars, one per category)
+// Encode predictions to compact string (24 chars, one per category)
 function encodePredictions(preds) {
     return CATEGORIES.map(cat => {
         const nomineeId = preds[cat.id];
@@ -514,7 +630,7 @@ function encodePredictions(preds) {
 
 // Decode compact string to predictions object
 function decodePredictions(encoded) {
-    if (!encoded || typeof encoded !== 'string' || encoded.length !== 21) {
+    if (!encoded || typeof encoded !== 'string' || encoded.length !== CATEGORIES.length) {
         return {};
     }
     const preds = {};
@@ -533,8 +649,8 @@ function decodePredictions(encoded) {
 
 // Check if encoded string is valid
 function isValidEncodedString(str) {
-    if (!str || typeof str !== 'string' || str.length !== 21) return false;
-    return /^[0-9\-]{21}$/.test(str);
+    if (!str || typeof str !== 'string' || str.length !== CATEGORIES.length) return false;
+    return /^[0-9\-]+$/.test(str) && str.length === CATEGORIES.length;
 }
 
 // Generate full share URL
@@ -626,6 +742,7 @@ function addSharedList(name, preds) {
     };
     sharedLists.push(newList);
     saveSharedLists();
+    renderSharedListsNav();
     return newList;
 }
 
@@ -643,6 +760,7 @@ function updateSharedList(id, preds) {
 function removeSharedList(id) {
     sharedLists = sharedLists.filter(l => l.id !== id);
     saveSharedLists();
+    renderSharedListsNav();
 }
 
 // Get next available name with number suffix
@@ -729,7 +847,8 @@ function switchToSharedList(id) {
     currentMode = `shared:${id}`;
     currentSharedId = id;
     saveMode();
-    updateModeDropdown();
+    updateActiveMenuItem(currentMode);
+    updateCurrentModeLabel(currentMode);
     renderNominees();
     updateProgress();
     updateShareDeleteButton();
@@ -743,7 +862,6 @@ function handleIncomingShare(shareData) {
     if (!existing) {
         // New person - add and switch
         const newList = addSharedList(shareData.name, shareData.predictions);
-        updateModeDropdown();
         switchToSharedList(newList.id);
         // Clear URL params
         window.history.replaceState({}, '', window.location.pathname);
@@ -760,48 +878,6 @@ function handleIncomingShare(shareData) {
 }
 
 // Update mode dropdown with shared lists
-function updateModeDropdown() {
-    const select = modeSelect;
-    if (!select) return;
-
-    // Clear existing options
-    select.innerHTML = '';
-
-    // Add base options
-    const watchedOpt = document.createElement('option');
-    watchedOpt.value = 'watched';
-    watchedOpt.textContent = 'Watched';
-    select.appendChild(watchedOpt);
-
-    const favoritesOpt = document.createElement('option');
-    favoritesOpt.value = 'favorites';
-    favoritesOpt.textContent = 'Favorites';
-    select.appendChild(favoritesOpt);
-
-    const predictionsOpt = document.createElement('option');
-    predictionsOpt.value = 'predictions';
-    predictionsOpt.textContent = 'Predictions';
-    select.appendChild(predictionsOpt);
-
-    // Add separator and shared lists if any
-    if (sharedLists.length > 0) {
-        const separator = document.createElement('option');
-        separator.disabled = true;
-        separator.textContent = '──────────';
-        select.appendChild(separator);
-
-        sharedLists.forEach(list => {
-            const opt = document.createElement('option');
-            opt.value = `shared:${list.id}`;
-            opt.textContent = `${list.name}'s Picks`;
-            select.appendChild(opt);
-        });
-    }
-
-    // Set current value
-    select.value = currentMode;
-}
-
 // Update share/delete button visibility and state
 function updateShareDeleteButton() {
     const shareBtn = document.getElementById('share-btn');
@@ -822,6 +898,335 @@ function updateShareDeleteButton() {
         // Watched mode - hide both
         if (shareBtn) shareBtn.style.display = 'none';
         if (deleteBtn) deleteBtn.style.display = 'none';
+    }
+}
+
+// ============================================
+// NAVIGATION DRAWER/SIDEBAR
+// ============================================
+
+let isDrawerOpen = false;
+let isSidebarCollapsed = localStorage.getItem('sidebarCollapsed') === 'true';
+
+function initNavigation() {
+    const hamburgerBtn = document.getElementById('hamburger-btn');
+    const drawerClose = document.getElementById('drawer-close');
+    const navDrawer = document.getElementById('nav-drawer');
+    const navOverlay = document.getElementById('nav-overlay');
+    const sidebarToggle = document.getElementById('sidebar-toggle');
+    const currentModeLabel = document.getElementById('current-mode-label');
+    const menuItems = document.querySelectorAll('.menu-item[data-mode]');
+    const aboutBtn = document.getElementById('nav-about');
+    const shareNavBtn = document.getElementById('nav-share');
+
+    // Open drawer (mobile)
+    hamburgerBtn?.addEventListener('click', openDrawer);
+    currentModeLabel?.addEventListener('click', openDrawer);
+
+    // Close drawer (mobile)
+    drawerClose?.addEventListener('click', closeDrawer);
+    navOverlay?.addEventListener('click', closeDrawer);
+
+    // Toggle sidebar (desktop)
+    sidebarToggle?.addEventListener('click', toggleSidebar);
+
+    // Menu item clicks
+    menuItems.forEach(item => {
+        item.addEventListener('click', (e) => {
+            e.preventDefault();
+            const mode = item.dataset.mode;
+            handleNavModeSwitch(mode);
+        });
+    });
+
+    // Search button in nav
+    const searchNavBtn = document.getElementById('nav-search');
+    searchNavBtn?.addEventListener('click', (e) => {
+        e.preventDefault();
+        closeDrawer();
+        showSearchInput();
+    });
+
+    // Share button in nav (always visible, opens share modal)
+    shareNavBtn?.addEventListener('click', (e) => {
+        e.preventDefault();
+        if (!shareNavBtn.classList.contains('disabled')) {
+            closeDrawer();
+            showShareModal();
+        }
+    });
+
+    // About button
+    aboutBtn?.addEventListener('click', (e) => {
+        e.preventDefault();
+        showAboutModal();
+    });
+
+    // Keyboard support
+    document.addEventListener('keydown', handleNavKeyDown);
+
+    // Initialize sidebar state on desktop
+    if (isSidebarCollapsed) {
+        navDrawer?.classList.add('collapsed');
+        document.querySelector('.app')?.classList.add('sidebar-collapsed');
+        document.getElementById('search-view')?.classList.add('sidebar-collapsed');
+        updateSidebarToggleIcon();
+    }
+
+    // Initialize active state and shared lists
+    renderSharedListsNav();
+    updateActiveMenuItem(currentMode);
+    updateCurrentModeLabel(currentMode);
+    updateNavShareVisibility();
+    updateNavCounts();
+}
+
+function openDrawer() {
+    const navDrawer = document.getElementById('nav-drawer');
+    const navOverlay = document.getElementById('nav-overlay');
+    const hamburgerBtn = document.getElementById('hamburger-btn');
+
+    navDrawer?.classList.add('open');
+    navOverlay?.classList.add('visible');
+    hamburgerBtn?.setAttribute('aria-expanded', 'true');
+    isDrawerOpen = true;
+
+    // Focus first menu item for accessibility
+    const firstItem = navDrawer?.querySelector('.menu-item');
+    firstItem?.focus();
+}
+
+function closeDrawer() {
+    const navDrawer = document.getElementById('nav-drawer');
+    const navOverlay = document.getElementById('nav-overlay');
+    const hamburgerBtn = document.getElementById('hamburger-btn');
+
+    navDrawer?.classList.remove('open');
+    navOverlay?.classList.remove('visible');
+    hamburgerBtn?.setAttribute('aria-expanded', 'false');
+    isDrawerOpen = false;
+}
+
+function toggleSidebar() {
+    const navDrawer = document.getElementById('nav-drawer');
+    const appContainer = document.querySelector('.app');
+    const searchView = document.getElementById('search-view');
+
+    isSidebarCollapsed = !isSidebarCollapsed;
+
+    navDrawer?.classList.toggle('collapsed', isSidebarCollapsed);
+    appContainer?.classList.toggle('sidebar-collapsed', isSidebarCollapsed);
+    searchView?.classList.toggle('sidebar-collapsed', isSidebarCollapsed);
+
+    localStorage.setItem('sidebarCollapsed', isSidebarCollapsed.toString());
+    updateSidebarToggleIcon();
+}
+
+function updateSidebarToggleIcon() {
+    const toggle = document.getElementById('sidebar-toggle');
+    if (!toggle) return;
+
+    const collapseIcon = `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <polyline points="11 17 6 12 11 7"/>
+        <line x1="6" y1="12" x2="18" y2="12"/>
+    </svg>`;
+
+    const expandIcon = `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <polyline points="13 7 18 12 13 17"/>
+        <line x1="6" y1="12" x2="18" y2="12"/>
+    </svg>`;
+
+    toggle.innerHTML = isSidebarCollapsed ? expandIcon : collapseIcon;
+    toggle.setAttribute('aria-label', isSidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar');
+}
+
+function updateActiveMenuItem(mode) {
+    // Update all menu items including dynamically added shared lists
+    const menuItems = document.querySelectorAll('.menu-item[data-mode]');
+
+    menuItems.forEach(item => {
+        const itemMode = item.dataset.mode;
+        const isActive = itemMode === mode;
+        item.classList.toggle('active', isActive);
+        item.setAttribute('aria-current', isActive ? 'page' : 'false');
+    });
+}
+
+function updateCurrentModeLabel(mode) {
+    const label = document.getElementById('current-mode-label');
+    if (!label) return;
+
+    const modeNames = {
+        'watched': 'Watched',
+        'predictions': 'Predictions',
+        'favorites': 'Favorites',
+        'streamable': 'Streamable'
+    };
+
+    // Handle shared modes
+    if (mode.startsWith('shared:')) {
+        const list = getCurrentSharedList();
+        label.textContent = list ? `${list.name}'s Picks` : 'Shared';
+    } else {
+        label.textContent = modeNames[mode] || mode;
+    }
+}
+
+function updateNavShareVisibility() {
+    const shareSection = document.getElementById('nav-share-section');
+    const shareDivider = document.getElementById('nav-share-divider');
+    const shareBtn = document.getElementById('nav-share');
+
+    // Share section is always visible now
+    if (shareSection) shareSection.style.display = '';
+    if (shareDivider) shareDivider.style.display = 'none'; // Hide the extra divider
+
+    // Update disabled state based on whether predictions exist
+    if (shareBtn) {
+        const hasPredictions = hasAnyPredictions(predictions);
+        shareBtn.classList.toggle('disabled', !hasPredictions);
+        shareBtn.setAttribute('aria-disabled', (!hasPredictions).toString());
+    }
+}
+
+// Update navigation counts for all modes
+function updateNavCounts() {
+    const watchedCountEl = document.getElementById('nav-count-watched');
+    const predictionsCountEl = document.getElementById('nav-count-predictions');
+    const favoritesCountEl = document.getElementById('nav-count-favorites');
+    const streamableCountEl = document.getElementById('nav-count-streamable');
+
+    // Watched: unique films watched / total unique films
+    if (watchedCountEl) {
+        const watched = ALL_FILMS.filter(f => isFilmWatched(f.key)).length;
+        const total = ALL_FILMS.length;
+        watchedCountEl.textContent = `${watched}/${total}`;
+    }
+
+    // Predictions: categories predicted / total categories
+    if (predictionsCountEl) {
+        const predicted = countPredictions();
+        const total = CATEGORIES.length;
+        predictionsCountEl.textContent = `${predicted}/${total}`;
+    }
+
+    // Favorites: categories favorited / total categories
+    if (favoritesCountEl) {
+        const favorited = countFavorites();
+        const total = CATEGORIES.length;
+        favoritesCountEl.textContent = `${favorited}/${total}`;
+    }
+
+    // Streamable: streamable films watched / total streamable films
+    if (streamableCountEl) {
+        const watched = getStreamableWatchedCount();
+        const total = getStreamableTotalCount();
+        streamableCountEl.textContent = `${watched}/${total}`;
+    }
+}
+
+// Render shared lists in navigation
+function renderSharedListsNav() {
+    const container = document.getElementById('nav-shared-lists');
+    const divider = document.getElementById('nav-shared-divider');
+
+    if (!container) return;
+
+    // Clear existing items
+    container.innerHTML = '';
+
+    // Show/hide divider based on whether there are shared lists
+    if (divider) {
+        divider.style.display = sharedLists.length > 0 ? '' : 'none';
+    }
+
+    // Render each shared list
+    sharedLists.forEach(list => {
+        const li = document.createElement('li');
+        const a = document.createElement('a');
+        a.href = '#';
+        a.className = 'menu-item';
+        a.dataset.mode = `shared:${list.id}`;
+
+        // Check if this is the active shared list
+        if (currentMode === `shared:${list.id}`) {
+            a.classList.add('active');
+            a.setAttribute('aria-current', 'page');
+        }
+
+        a.innerHTML = `
+            <span class="menu-icon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                    <circle cx="9" cy="7" r="4"/>
+                    <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+                    <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                </svg>
+            </span>
+            <span class="menu-text">${escapeHtml(list.name)}'s Picks</span>
+        `;
+
+        a.addEventListener('click', (e) => {
+            e.preventDefault();
+            handleNavModeSwitch(`shared:${list.id}`);
+        });
+
+        li.appendChild(a);
+        container.appendChild(li);
+    });
+}
+
+// Escape HTML to prevent XSS
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
+function handleNavModeSwitch(mode) {
+    // Check if we should show copy modal before switching
+    if (mode === 'favorites' && shouldShowCopyToFavoritesModal()) {
+        pendingCopyTarget = 'favorites';
+        showCopyModal('predictions', countPredictions());
+        return;
+    } else if (mode === 'predictions' && shouldShowCopyToPredictionsModal()) {
+        pendingCopyTarget = 'predictions';
+        showCopyModal('favorites', countFavorites());
+        return;
+    }
+
+    // Update state
+    currentMode = mode;
+    currentSharedId = isSharedMode() ? currentMode.substring(7) : null;
+    saveMode();
+
+    // Close drawer on mobile after selection
+    if (isDrawerOpen && window.innerWidth < 768) {
+        closeDrawer();
+    }
+
+    // Update UI
+    updateActiveMenuItem(mode);
+    updateCurrentModeLabel(mode);
+    updateNavShareVisibility();
+    updateStreamableUI();
+    renderNominees();
+    updateProgress();
+    updateShareDeleteButton();
+    updateSharedBanner();
+
+    // Handle onboarding screen logic
+    if (mode === 'watched' && watchedItems.size === 0) {
+        showOnboardingScreen();
+    } else {
+        showCategoryScreen(false);
+    }
+}
+
+function handleNavKeyDown(e) {
+    if (e.key === 'Escape' && isDrawerOpen) {
+        closeDrawer();
+        document.getElementById('hamburger-btn')?.focus();
     }
 }
 
@@ -960,7 +1365,6 @@ function handleDuplicateKeepBoth() {
 
     const newName = getNextAvailableName(pendingSharedData.name);
     const newList = addSharedList(newName, pendingSharedData.predictions);
-    updateModeDropdown();
     switchToSharedList(newList.id);
     window.history.replaceState({}, '', window.location.pathname);
     hideDuplicateModal();
@@ -1044,8 +1448,10 @@ function handleCopyYes() {
     }
 
     hideCopyModal();
-    modeSelect.value = currentMode;
     saveMode();
+    updateActiveMenuItem(currentMode);
+    updateCurrentModeLabel(currentMode);
+    updateNavShareVisibility();
     renderNominees();
     updateProgress();
     updateShareDeleteButton();
@@ -1063,8 +1469,10 @@ function handleCopyNo() {
     }
 
     hideCopyModal();
-    modeSelect.value = currentMode;
     saveMode();
+    updateActiveMenuItem(currentMode);
+    updateCurrentModeLabel(currentMode);
+    updateNavShareVisibility();
     renderNominees();
     updateProgress();
     updateShareDeleteButton();
@@ -1083,7 +1491,9 @@ function handleDeleteConfirm() {
     currentSharedId = null;
     saveMode();
 
-    updateModeDropdown();
+    updateActiveMenuItem(currentMode);
+    updateCurrentModeLabel(currentMode);
+    updateNavShareVisibility();
     renderNominees();
     updateProgress();
     updateShareDeleteButton();
@@ -1104,7 +1514,7 @@ function init() {
     loadSharedLists();
     loadMode();
     renderCategoryOptions();
-    updateModeDropdown();
+    initNavigation();
     setupEventListeners();
     registerServiceWorker();
     startTipRotation();
@@ -1113,7 +1523,7 @@ function init() {
     const shareData = parseShareParams();
     if (shareData) {
         // Always show category screen for shared links
-        showCategoryScreen();
+        showCategoryScreen(false);
         handleIncomingShare(shareData);
         return;
     }
@@ -1124,10 +1534,12 @@ function init() {
         if (!list) {
             currentMode = 'watched';
             saveMode();
+            // Update nav after mode fallback
+            updateActiveMenuItem(currentMode);
+            updateCurrentModeLabel(currentMode);
         }
     }
 
-    updateModeDropdown();
     updateShareDeleteButton();
     updateSharedBanner();
 
@@ -1135,7 +1547,7 @@ function init() {
     if (currentMode === 'watched' && watchedItems.size === 0) {
         showOnboardingScreen();
     } else {
-        showCategoryScreen();
+        showCategoryScreen(false);
     }
 }
 
@@ -1294,12 +1706,14 @@ function countPredictions() {
 function copyPredictionsToFavorites() {
     favorites = { ...predictions };
     saveFavorites();
+    updateNavCounts();
 }
 
 // Copy favorites to predictions
 function copyFavoritesToPredictions() {
     predictions = { ...favorites };
     savePredictions();
+    updateNavCounts();
 }
 
 // Check if in favorites mode
@@ -1307,13 +1721,66 @@ function isFavoritesMode() {
     return currentMode === 'favorites';
 }
 
+// Check if in streamable mode
+function isStreamableMode() {
+    return currentMode === 'streamable';
+}
+
+// Update UI for streamable mode (hide category nav, show streamable header)
+function updateStreamableUI() {
+    const isStreamable = isStreamableMode();
+    const categoryHeader = document.querySelector('.category-header');
+    const categoryFooter = document.querySelector('.category-footer');
+    const streamableHeader = document.getElementById('streamable-header');
+
+    if (categoryHeader) categoryHeader.style.display = isStreamable ? 'none' : '';
+    if (categoryFooter) categoryFooter.style.display = isStreamable ? 'none' : '';
+
+    if (isStreamable) {
+        // Show or create streamable header
+        if (!streamableHeader) {
+            const header = document.createElement('div');
+            header.id = 'streamable-header';
+            header.className = 'streamable-header';
+            const watchedCount = getStreamableWatchedCount();
+            const totalCount = getStreamableTotalCount();
+            header.innerHTML = `
+                <span class="streamable-title">Now Streaming</span>
+                <span class="streamable-progress">${watchedCount} / ${totalCount} watched</span>
+            `;
+            filmsList.parentNode.insertBefore(header, filmsList);
+        } else {
+            streamableHeader.style.display = '';
+            updateStreamableProgress();
+        }
+    } else if (streamableHeader) {
+        streamableHeader.style.display = 'none';
+    }
+}
+
+function getStreamableTotalCount() {
+    return Object.keys(FILM_STREAMING).length;
+}
+
+function getStreamableWatchedCount() {
+    return Object.keys(FILM_STREAMING).filter(key => isFilmWatched(key)).length;
+}
+
+function updateStreamableProgress() {
+    const header = document.getElementById('streamable-header');
+    if (!header) return;
+    const progressEl = header.querySelector('.streamable-progress');
+    if (progressEl) {
+        progressEl.textContent = `${getStreamableWatchedCount()} / ${getStreamableTotalCount()} watched`;
+    }
+}
+
 // Load current mode from localStorage
 function loadMode() {
     try {
         const stored = localStorage.getItem(MODE_KEY);
-        if (stored && (stored === 'watched' || stored === 'favorites' || stored === 'predictions')) {
+        if (stored && (stored === 'watched' || stored === 'favorites' || stored === 'predictions' || stored === 'streamable')) {
             currentMode = stored;
-            modeSelect.value = currentMode;
         }
     } catch (e) {
         console.warn('Could not load mode:', e);
@@ -1350,16 +1817,9 @@ function getFilmTitle(nomineeId) {
     const filmKey = NOMINEE_TO_FILM[nomineeId];
     if (!filmKey) return null;
 
-    // Map film keys to their display titles
-    const filmTitles = {
-        'sinners': 'Sinners',
-        'one-battle-after-another': 'One Battle After Another',
-        'frankenstein': 'Frankenstein',
-        'train-dreams': 'Train Dreams',
-        'kpop-demon-hunters': 'KPop Demon Hunters',
-        'f1': 'F1'
-    };
-    return filmTitles[filmKey] || null;
+    // Look up title from ALL_FILMS
+    const film = ALL_FILMS.find(f => f.key === filmKey);
+    return film ? film.title : null;
 }
 
 // Generate streaming icon HTML with link
@@ -1370,36 +1830,435 @@ function getStreamingIconHtml(nomineeId) {
     const filmTitle = getFilmTitle(nomineeId);
     if (!filmTitle) return '';
 
-    const encodedTitle = encodeURIComponent(filmTitle);
-
-    const serviceConfig = {
-        netflix: {
-            url: `https://www.netflix.com/search?q=${encodedTitle}`,
-            icon: '/icons/netflix.svg',
-            name: 'Netflix'
-        },
-        max: {
-            url: `https://play.max.com/search?q=${encodedTitle}`,
-            icon: '/icons/max.svg',
-            name: 'Max'
-        },
-        appletv: {
-            url: `https://tv.apple.com/search?term=${encodedTitle}`,
-            icon: '/icons/appletv.svg',
-            name: 'Apple TV+'
-        }
-    };
-
-    const config = serviceConfig[service];
+    const config = STREAMING_SERVICES[service];
     if (!config) return '';
 
-    return `<a href="${config.url}" target="_blank" rel="noopener noreferrer" class="streaming-icon" title="Watch on ${config.name}" onclick="event.stopPropagation()">
+    const encodedTitle = encodeURIComponent(filmTitle);
+    const url = config.urlTemplate.replace('{title}', encodedTitle);
+    return `<a href="${url}" target="_blank" rel="noopener noreferrer" class="streaming-icon" title="Watch on ${config.name}" onclick="event.stopPropagation()">
         <img src="${config.icon}" alt="${config.name}">
     </a>`;
 }
 
+// Generate streaming icon HTML from a film key (not nominee ID)
+function getStreamingIconHtmlForFilm(filmKey) {
+    const service = FILM_STREAMING[filmKey];
+    if (!service) return '';
+
+    const film = ALL_FILMS.find(f => f.key === filmKey);
+    if (!film) return '';
+
+    const config = STREAMING_SERVICES[service];
+    if (!config) return '';
+
+    const encodedTitle = encodeURIComponent(film.title);
+    const url = config.urlTemplate.replace('{title}', encodedTitle);
+    return `<a href="${url}" target="_blank" rel="noopener noreferrer" class="streaming-icon" title="Watch on ${config.name}" onclick="event.stopPropagation()">
+        <img src="${config.icon}" alt="${config.name}">
+    </a>`;
+}
+
+// ========================================
+// Search Feature Functions
+// ========================================
+
+// Get all categories where a film has nominations
+function getFilmCategories(filmKey) {
+    const nomineeIds = FILM_NOMINEES[filmKey];
+    if (!nomineeIds) return [];
+
+    return nomineeIds.map(nomineeId => {
+        const category = CATEGORIES.find(cat =>
+            cat.nominees.some(n => n.id === nomineeId)
+        );
+        if (!category) return null;
+
+        const nominee = category.nominees.find(n => n.id === nomineeId);
+        return {
+            categoryId: category.id,
+            categoryName: category.name,
+            categoryIndex: CATEGORIES.indexOf(category),
+            nomineeId: nominee.id,
+            nomineeTitle: nominee.title,
+            nomineeSubtitle: nominee.subtitle
+        };
+    }).filter(Boolean);
+}
+
+// Filter films by search query
+function searchFilms(query) {
+    const q = query.toLowerCase().trim();
+    if (!q) return ALL_FILMS;
+
+    return ALL_FILMS.filter(film =>
+        film.title.toLowerCase().includes(q)
+    );
+}
+
+// Get selection state for a nominee in current mode
+function getSearchSelectionState(nomineeId) {
+    if (searchSourceMode === 'watched' || searchSourceMode === 'streamable') {
+        return watchedItems.has(nomineeId) ? 'watched' : null;
+    } else if (searchSourceMode === 'favorites') {
+        const category = CATEGORIES.find(cat =>
+            cat.nominees.some(n => n.id === nomineeId)
+        );
+        return category && favorites[category.id] === nomineeId ? 'favorited' : null;
+    } else if (searchSourceMode === 'predictions') {
+        const category = CATEGORIES.find(cat =>
+            cat.nominees.some(n => n.id === nomineeId)
+        );
+        return category && predictions[category.id] === nomineeId ? 'predicted' : null;
+    }
+    return null;
+}
+
+// Show search input view
+function showSearchInput(skipHistory = false) {
+    searchActive = true;
+    searchSourceMode = currentMode;
+    searchSelectedFilm = null;
+    searchQuery = '';
+
+    const searchView = document.getElementById('search-view');
+    const searchInput = document.getElementById('search-input');
+    const searchFilmHeader = document.getElementById('search-film-header');
+    const searchContent = document.getElementById('search-content');
+    const searchEmpty = document.getElementById('search-empty');
+
+    searchView.classList.add('active');
+    searchView.classList.toggle('sidebar-collapsed', isSidebarCollapsed);
+    searchFilmHeader.style.display = 'none';
+    searchContent.style.display = 'block';
+    searchEmpty.style.display = 'none';
+
+    // Prevent body scroll when search is open
+    document.body.classList.add('modal-open');
+
+    searchInput.value = '';
+    searchInput.classList.remove('readonly');
+    searchInput.readOnly = false;
+    searchInput.placeholder = 'Search films...';
+    searchInput.focus();
+
+    renderSearchFilmList('');
+
+    // Push history state for back gesture support
+    if (!skipHistory) {
+        history.pushState({ search: 'input' }, '');
+    }
+}
+
+// Show search results for a specific film
+function showSearch(filmKey, skipHistory = false) {
+    const wasSearchActive = searchActive;
+    searchActive = true;
+    searchSourceMode = currentMode;
+    searchSelectedFilm = filmKey;
+
+    const searchView = document.getElementById('search-view');
+    const searchInput = document.getElementById('search-input');
+    const searchFilmHeader = document.getElementById('search-film-header');
+    const searchContent = document.getElementById('search-content');
+    const searchEmpty = document.getElementById('search-empty');
+
+    const film = ALL_FILMS.find(f => f.key === filmKey);
+    if (!film) return;
+
+    searchView.classList.add('active');
+    searchView.classList.toggle('sidebar-collapsed', isSidebarCollapsed);
+    searchFilmHeader.style.display = 'block';
+    searchContent.style.display = 'block';
+    searchEmpty.style.display = 'none';
+
+    // Prevent body scroll when search is open
+    document.body.classList.add('modal-open');
+
+    searchInput.value = film.title;
+    searchInput.classList.add('readonly');
+    searchInput.readOnly = true;
+
+    renderSearchFilmHeader(filmKey);
+    renderSearchCategoryList(filmKey);
+
+    // Push history state for back gesture support
+    if (!skipHistory) {
+        // If search wasn't open, push input state first, then film state
+        if (!wasSearchActive) {
+            history.pushState({ search: 'input' }, '');
+        }
+        history.pushState({ search: 'film', filmKey }, '');
+    }
+}
+
+// Hide search view
+function hideSearch(skipHistory = false) {
+    if (!searchActive) return;
+
+    searchActive = false;
+    searchSelectedFilm = null;
+    searchQuery = '';
+
+    const searchView = document.getElementById('search-view');
+    searchView.classList.remove('active');
+
+    // Restore body scroll
+    document.body.classList.remove('modal-open');
+
+    // Go back in history to remove our pushed states
+    if (!skipHistory && history.state && history.state.search) {
+        history.back();
+    }
+}
+
+// Go back from film categories to search input
+function searchGoBack() {
+    if (searchSelectedFilm) {
+        // Go back to search input
+        searchGoBackInternal();
+        // Update history to match (replaceState to avoid extra entry)
+        if (history.state && history.state.search === 'film') {
+            history.replaceState({ search: 'input' }, '');
+        }
+    } else {
+        // Close search entirely
+        hideSearch();
+    }
+}
+
+// Internal back function (called by button click and popstate handler)
+function searchGoBackInternal() {
+    if (!searchSelectedFilm) return;
+
+    // Go back to search input
+    searchSelectedFilm = null;
+    const searchInput = document.getElementById('search-input');
+    const searchFilmHeader = document.getElementById('search-film-header');
+
+    searchInput.value = searchQuery;
+    searchInput.classList.remove('readonly');
+    searchInput.readOnly = false;
+    searchInput.placeholder = 'Search films...';
+    searchFilmHeader.style.display = 'none';
+
+    renderSearchFilmList(searchQuery);
+    searchInput.focus();
+}
+
+// Render film header in search results
+function renderSearchFilmHeader(filmKey) {
+    const film = ALL_FILMS.find(f => f.key === filmKey);
+    if (!film) return;
+
+    const titleEl = document.getElementById('search-film-title');
+    const countEl = document.getElementById('search-film-count');
+    const streamingEl = document.getElementById('search-film-streaming');
+
+    titleEl.textContent = film.title;
+    const nomText = film.nominations === 1 ? '1 nomination' : `${film.nominations} nominations`;
+    countEl.textContent = nomText;
+
+    // Streaming info
+    const service = FILM_STREAMING[filmKey];
+    if (service) {
+        const config = STREAMING_SERVICES[service];
+        if (config) {
+            streamingEl.innerHTML = `<img src="${config.icon}" alt="${config.name}" class="streaming-icon-small"> Streaming on ${config.name}`;
+            streamingEl.style.display = 'inline-flex';
+        } else {
+            streamingEl.style.display = 'none';
+        }
+    } else {
+        streamingEl.style.display = 'none';
+    }
+}
+
+// Render list of matching films (search input view)
+function renderSearchFilmList(query) {
+    const results = searchFilms(query);
+    const resultsEl = document.getElementById('search-results');
+    const emptyEl = document.getElementById('search-empty');
+    const contentEl = document.getElementById('search-content');
+    const labelEl = document.getElementById('search-section-label');
+
+    if (results.length === 0) {
+        contentEl.style.display = 'none';
+        emptyEl.style.display = 'block';
+        return;
+    }
+
+    contentEl.style.display = 'block';
+    emptyEl.style.display = 'none';
+    labelEl.textContent = query ? 'Matching films' : 'All films';
+
+    const arrowSvg = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>`;
+
+    resultsEl.innerHTML = results.map(film => {
+        const service = FILM_STREAMING[film.key];
+        let subtitle = '';
+        if (service) {
+            const config = STREAMING_SERVICES[service];
+            subtitle = config ? `Streaming on ${config.name}` : '';
+        }
+        if (!subtitle) {
+            // Use first category as subtitle
+            const categories = getFilmCategories(film.key);
+            if (categories.length > 0) {
+                subtitle = categories[0].categoryName;
+            }
+        }
+
+        return `
+        <li class="search-result" data-film="${film.key}" role="listitem">
+            <div class="search-result-info">
+                <div class="search-result-title">${film.title}</div>
+                <div class="search-result-subtitle">${subtitle}</div>
+            </div>
+            <div class="search-result-count">${film.nominations}</div>
+            <div class="search-result-arrow">${arrowSvg}</div>
+        </li>
+    `}).join('');
+
+    // Add click handlers
+    resultsEl.querySelectorAll('.search-result').forEach(el => {
+        el.addEventListener('click', () => {
+            const filmKey = el.dataset.film;
+            searchQuery = query; // Save current query for back navigation
+            showSearch(filmKey);
+        });
+    });
+}
+
+// Render list of categories for a film (film results view)
+function renderSearchCategoryList(filmKey) {
+    const categories = getFilmCategories(filmKey);
+    const resultsEl = document.getElementById('search-results');
+    const labelEl = document.getElementById('search-section-label');
+
+    labelEl.textContent = 'Categories';
+
+    resultsEl.innerHTML = categories.map(cat => {
+        const state = getSearchSelectionState(cat.nomineeId);
+        const stateClass = state ? 'checked' : 'empty';
+        const stateIcon = state ? '✓' : '○';
+
+        // For person categories (director, actor, etc.), show the person name (subtitle is the film)
+        // For film categories (picture, screenplay), show the studio/writer (subtitle)
+        // Use subtitle if it's different from the film title, otherwise use title
+        const film = ALL_FILMS.find(f => f.key === filmKey);
+        const displaySubtitle = cat.nomineeSubtitle && cat.nomineeSubtitle !== film?.title
+            ? cat.nomineeSubtitle
+            : cat.nomineeTitle;
+
+        return `
+        <li class="category-result" data-category-index="${cat.categoryIndex}" role="listitem">
+            <div class="category-result-state ${stateClass}">${stateIcon}</div>
+            <div class="category-result-info">
+                <div class="category-result-name">${cat.categoryName}</div>
+                <div class="category-result-nominee">${displaySubtitle}</div>
+            </div>
+        </li>
+    `}).join('');
+
+    // Add click handlers
+    resultsEl.querySelectorAll('.category-result').forEach(el => {
+        el.addEventListener('click', () => {
+            const categoryIndex = parseInt(el.dataset.categoryIndex, 10);
+            navigateFromSearch(categoryIndex);
+        });
+    });
+}
+
+// Navigate to a category from search results
+function navigateFromSearch(categoryIndex) {
+    hideSearch();
+
+    // Switch to appropriate mode
+    let targetMode = searchSourceMode;
+    if (targetMode === 'streamable') {
+        targetMode = 'watched'; // Streamable has no category view
+    }
+
+    // Switch mode if needed
+    if (currentMode !== targetMode && !isSharedMode()) {
+        currentMode = targetMode;
+        currentSharedId = null;
+        saveMode();
+        updateActiveMenuItem(targetMode);
+        updateCurrentModeLabel(targetMode);
+        updateNavShareVisibility();
+        updateStreamableUI();
+        updateShareDeleteButton();
+        updateSharedBanner();
+    }
+
+    // Show category screen first
+    onboardingScreen.style.display = 'none';
+    categoryScreen.style.display = '';
+
+    // Use navigateToCategory which properly updates selects and renders
+    navigateToCategory(categoryIndex, false);
+
+    // Scroll to top
+    window.scrollTo(0, 0);
+}
+
+// Render the streamable flat list (all streamable films in one view)
+function renderStreamableList() {
+    const streamableFilms = ALL_FILMS.filter(f => FILM_STREAMING[f.key]);
+
+    const playIcon = `<svg viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="0" stroke-linecap="round" stroke-linejoin="round">
+        <polygon points="8 5 19 12 8 19 8 5"></polygon>
+    </svg>`;
+
+    filmsList.innerHTML = streamableFilms.map(film => {
+        const watched = isFilmWatched(film.key);
+        const streamingIcon = getStreamingIconHtmlForFilm(film.key);
+        const subtitleText = watched ? '✓ Watched' : 'Not yet watched';
+        const subtitleClass = watched ? 'film-studio streamable-watched' : 'film-studio streamable-unwatched';
+        const watchedClass = watched ? ' streamable-item-watched' : '';
+
+        return `
+        <li class="film streamable streamable-view${watchedClass}"
+            data-film="${film.key}"
+            role="listitem"
+            tabindex="-1">
+            <div class="checkbox">
+                ${playIcon}
+            </div>
+            <div class="film-info">
+                <div class="film-title">${film.title}</div>
+                <div class="${subtitleClass}">${subtitleText}</div>
+            </div>
+            <div class="streaming-box">
+                ${streamingIcon}
+            </div>
+        </li>
+    `}).join('');
+
+    // Add click handlers to open search for the film
+    filmsList.querySelectorAll('.film.streamable').forEach(el => {
+        el.style.cursor = 'pointer';
+        el.addEventListener('click', (e) => {
+            // Don't trigger if clicking on streaming icon link
+            if (e.target.closest('.streaming-icon')) return;
+            const filmKey = el.dataset.film;
+            if (filmKey) showSearch(filmKey);
+        });
+    });
+}
+
 // Render nominees list
 function renderNominees() {
+    // Streamable mode renders a completely different flat list
+    if (isStreamableMode()) {
+        renderStreamableList();
+        updateStreamableUI();
+        return;
+    }
+
     const category = getCurrentCategory();
     const isPredictionsMode = currentMode === 'predictions';
     const isFavMode = isFavoritesMode();
@@ -1475,7 +2334,7 @@ function renderNominees() {
         </li>
     `}).join('');
 
-    // Add event listeners (only for non-shared modes)
+    // Add event listeners (only for interactive modes)
     if (!isSharedView) {
         document.querySelectorAll('#films-list .film').forEach(el => {
             el.addEventListener('click', handleNomineeClick);
@@ -1526,6 +2385,7 @@ function toggleNominee(nomineeId, filmEl) {
     saveWatchedItems();
     updateProgress();
     updateTip();
+    updateNavCounts();
 }
 
 // Toggle prediction for a nominee (single-select per category)
@@ -1559,6 +2419,8 @@ function togglePrediction(nomineeId) {
     savePredictions();
     updateProgress();
     updateShareDeleteButton();
+    updateNavShareVisibility();
+    updateNavCounts();
 }
 
 // Toggle favorite for current category
@@ -1591,6 +2453,7 @@ function toggleFavoriteNominee(nomineeId) {
 
     saveFavorites();
     updateProgress();
+    updateNavCounts();
 }
 
 // Update progress display
@@ -1599,7 +2462,13 @@ function updateProgress() {
     let progressText;
     let titleProgress;
 
-    if (currentMode === 'favorites') {
+    if (currentMode === 'streamable') {
+        // For streamable: show watched/total in document title only
+        const watchedCount = getStreamableWatchedCount();
+        const totalCount = getStreamableTotalCount();
+        progressText = '';
+        titleProgress = `${watchedCount}/${totalCount}`;
+    } else if (currentMode === 'favorites') {
         // For favorites: show how many categories have favorites
         const favoritedCount = Object.keys(favorites).length;
         const totalCategories = CATEGORIES.length;
@@ -1657,8 +2526,10 @@ function navigateToCategory(index, scrollToTop = false) {
     renderNominees();
     updateProgress();
     if (scrollToTop) {
+        const stickyHeader = document.querySelector('.ceremony-info');
+        const stickyHeight = stickyHeader ? stickyHeader.offsetHeight : 0;
         const headerTop = categoryHeader.getBoundingClientRect().top + window.scrollY;
-        const offset = 16; // Small margin above the header
+        const offset = stickyHeight + 8; // Account for sticky header + small margin
         window.scrollTo({ top: headerTop - offset, behavior: 'smooth' });
     }
 }
@@ -1679,34 +2550,6 @@ function nextCategory(scrollToTop = false) {
     navigateToCategory(newIndex, scrollToTop);
 }
 
-// Handle mode change
-function handleModeChange(e) {
-    const newMode = e.target.value;
-
-    // Check if we should show copy modal before switching
-    if (newMode === 'favorites' && shouldShowCopyToFavoritesModal()) {
-        pendingCopyTarget = 'favorites';
-        showCopyModal('predictions', countPredictions());
-        // Don't switch mode yet - wait for modal response
-        modeSelect.value = currentMode;
-        return;
-    } else if (newMode === 'predictions' && shouldShowCopyToPredictionsModal()) {
-        pendingCopyTarget = 'predictions';
-        showCopyModal('favorites', countFavorites());
-        // Don't switch mode yet - wait for modal response
-        modeSelect.value = currentMode;
-        return;
-    }
-
-    currentMode = newMode;
-    currentSharedId = isSharedMode() ? currentMode.substring(7) : null;
-    saveMode();
-    renderNominees();
-    updateProgress();
-    updateShareDeleteButton();
-    updateSharedBanner();
-}
-
 // Setup event listeners
 function setupEventListeners() {
     categorySelect.addEventListener('change', (e) => {
@@ -1723,10 +2566,63 @@ function setupEventListeners() {
     nextBtnBottom.addEventListener('click', () => nextCategory(true));
     hardRefreshBtn.addEventListener('click', hardRefresh);
     browseByCategory.addEventListener('click', showCategoryScreen);
-    modeSelect.addEventListener('change', handleModeChange);
+
+    // Search button event listener
+    const searchBtn = document.getElementById('search-btn');
+    if (searchBtn) {
+        searchBtn.addEventListener('click', showSearchInput);
+    }
+
+    // Search input event listener (debounced)
+    const searchInput = document.getElementById('search-input');
+    let searchDebounceTimer = null;
+    if (searchInput) {
+        searchInput.addEventListener('input', (e) => {
+            if (searchInput.readOnly) return;
+            clearTimeout(searchDebounceTimer);
+            searchDebounceTimer = setTimeout(() => {
+                renderSearchFilmList(e.target.value);
+            }, 150);
+        });
+    }
+
+    // Search back button
+    const searchBack = document.getElementById('search-back');
+    if (searchBack) {
+        searchBack.addEventListener('click', searchGoBack);
+    }
+
+    // Search close button
+    const searchClose = document.getElementById('search-close');
+    if (searchClose) {
+        searchClose.addEventListener('click', hideSearch);
+    }
+
+    // Handle browser back button/gesture for search navigation
+    window.addEventListener('popstate', (e) => {
+        if (!searchActive) return;
+
+        if (e.state && e.state.search === 'input') {
+            // Back from film view to search input (via browser back)
+            if (searchSelectedFilm) {
+                searchGoBackInternal();
+            }
+        } else if (e.state && e.state.search === 'film') {
+            // Forward navigation or restored state - no action needed
+        } else {
+            // Back from search input to main view (no search state)
+            hideSearch(true);
+        }
+    });
 
     // Keyboard navigation
     document.addEventListener('keydown', (e) => {
+        // Close search on Escape
+        if (e.key === 'Escape' && searchActive) {
+            hideSearch();
+            return;
+        }
+
         // Close modals on Escape
         if (e.key === 'Escape') {
             if (aboutModal && !aboutModal.hidden) {
@@ -1928,9 +2824,31 @@ function showAboutModal() {
     updateCountdown();
     renderChangelog();
     if (versionBadge) versionBadge.textContent = `v${APP_VERSION}`;
+    updateSwVersion();
     if (aboutModal) {
         aboutModal.hidden = false;
         document.body.classList.add('modal-open');
+    }
+}
+
+function updateSwVersion() {
+    const swVersionEl = document.getElementById('sw-version');
+    if (!swVersionEl) return;
+
+    if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
+        // Ask the active service worker for its version
+        const messageChannel = new MessageChannel();
+        messageChannel.port1.onmessage = (event) => {
+            if (event.data && event.data.type === 'SW_VERSION') {
+                swVersionEl.textContent = `SW v${event.data.version}`;
+            }
+        };
+        navigator.serviceWorker.controller.postMessage(
+            { type: 'GET_VERSION' },
+            [messageChannel.port2]
+        );
+    } else {
+        swVersionEl.textContent = 'SW inactive';
     }
 }
 

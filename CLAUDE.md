@@ -60,6 +60,8 @@ These scripts measure:
 
 ## Versioning & Deployment
 
+- **Deploy branch**: Only pushes to `main` deploy to production (awardstracker.app). Do feature work on a branch and merge to `main` via PR; feature branches never deploy.
+
 The app uses automated versioning via GitHub Actions:
 
 - **Version format**: `1.0.{run_number}` (e.g., `1.0.42`)

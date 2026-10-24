@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Search Feature Mockup - Phase 2</title>
+    <style>
+        :root {
+            --color-black: #0a0a0a;
+            --color-black-light: #141414;
+            --color-black-lighter: #1f1f1f;
+            --color-white: #ffffff;
+            --color-white-dim: rgba(255, 255, 255, 0.7);
+            --color-white-dimmer: rgba(255, 255, 255, 0.4);
+            --color-gold: #d4af37;
+            --color-gold-dark: #b8960c;
+            --font-display: system-ui, -apple-system, sans-serif;
+            --font-body: system-ui, -apple-system, sans-serif;
+            --spacing-xs: 8px;
+            --spacing-sm: 12px;
+            --spacing-md: 16px;
+            --spacing-lg: 24px;
+            --spacing-xl: 32px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: var(--font-body);
+            background: var(--color-black);
+            color: var(--color-white);
+            min-height: 100vh;
+        }
+
+        .mockup-container {
+            max-width: 420px;
+            margin: 0 auto;
+            min-height: 100vh;
+            background: var(--color-black);
+            position: relative;
+        }
+
+        .mockup-label {
+            background: var(--color-gold);
+            color: var(--color-black);
+            font-size: 0.75rem;
+            font-weight: 600;
+            padding: 4px 12px;
+            text-align: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        /* Header with search icon */
+        .app-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: var(--spacing-sm) var(--spacing-md);
+            border-bottom: 1px solid var(--color-black-lighter);
+        }
+
+        .app-title {
+            font-family: var(--font-display);
+            font-size: 1.125rem;
+            font-weight: 600;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+        }
+
+        .search-btn {
+            background: none;
+            border: none;
+            color: var(--color-white-dim);
+            cursor: pointer;
+            padding: 4px;
+            width: 28px;
+            height: 28px;
+            transition: color 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .search-btn:hover {
+            color: var(--color-gold);
+        }
+
+        .search-btn svg {
+            width: 20px;
+            height: 20px;
+        }
+
+        /* Search View */
+        .search-view {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: var(--color-black);
+            z-index: 50;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .search-header {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+            padding: var(--spacing-sm) var(--spacing-md);
+            border-bottom: 1px solid var(--color-black-lighter);
+        }
+
+        .search-back,
+        .search-close {
+            background: none;
+            border: none;
+            color: var(--color-white-dim);
+            cursor: pointer;
+            padding: 4px;
+            width: 28px;
+            height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .search-back:hover,
+        .search-close:hover {
+            color: var(--color-white);
+        }
+
+        .search-back svg {
+            width: 20px;
+            height: 20px;
+        }
+
+        .search-close {
+            font-size: 1.5rem;
+            line-height: 1;
+        }
+
+        .search-input {
+            flex: 1;
+            background: var(--color-black-light);
+            border: 1px solid var(--color-black-lighter);
+            border-radius: 8px;
+            color: var(--color-white);
+            font-family: var(--font-body);
+            font-size: 0.9375rem;
+            padding: 10px 14px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .search-input:focus {
+            border-color: var(--color-gold);
+        }
+
+        .search-input::placeholder {
+            color: var(--color-white-dimmer);
+        }
+
+        /* Search Results */
+        .search-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: var(--spacing-md);
+        }
+
+        .search-section-label {
+            font-size: 0.8125rem;
+            color: var(--color-white-dim);
+            margin-bottom: var(--spacing-sm);
+            padding-left: 4px;
+        }
+
+        .search-results {
+            list-style: none;
+        }
+
+        .search-result {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-md);
+            padding: var(--spacing-md);
+            background: var(--color-black-light);
+            border: 1px solid var(--color-black-lighter);
+            border-radius: 10px;
+            margin-bottom: var(--spacing-xs);
+            cursor: pointer;
+            transition: background 0.15s, border-color 0.15s;
+        }
+
+        .search-result:hover {
+            background: var(--color-black-lighter);
+            border-color: var(--color-gold-dark);
+        }
+
+        .search-result-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .search-result-title {
+            font-weight: 500;
+            font-size: 0.9375rem;
+            color: var(--color-white);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .search-result-subtitle {
+            font-size: 0.8125rem;
+            color: var(--color-white-dim);
+            margin-top: 2px;
+        }
+
+        .search-result-count {
+            font-size: 0.875rem;
+            color: var(--color-white-dimmer);
+            flex-shrink: 0;
+            background: var(--color-black-lighter);
+            padding: 4px 10px;
+            border-radius: 12px;
+        }
+
+        .search-result-arrow {
+            color: var(--color-white-dimmer);
+            flex-shrink: 0;
+        }
+
+        .search-result-arrow svg {
+            width: 16px;
+            height: 16px;
+        }
+
+        /* Empty State */
+        .search-empty {
+            text-align: center;
+            padding: var(--spacing-xl) var(--spacing-md);
+            margin-top: var(--spacing-xl);
+        }
+
+        .search-empty-icon {
+            font-size: 3.5rem;
+            margin-bottom: var(--spacing-md);
+            opacity: 0.8;
+        }
+
+        .search-empty-title {
+            font-family: var(--font-display);
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: var(--color-white);
+            margin-bottom: var(--spacing-xs);
+        }
+
+        .search-empty-subtitle {
+            font-size: 0.875rem;
+            color: var(--color-white-dim);
+            font-style: italic;
+        }
+
+        /* Film Detail View (after tapping a film) */
+        .search-film-header {
+            text-align: center;
+            padding: var(--spacing-md);
+            border-bottom: 1px solid var(--color-black-lighter);
+        }
+
+        .search-film-title {
+            font-family: var(--font-display);
+            font-size: 1.375rem;
+            font-weight: 600;
+            color: var(--color-white);
+        }
+
+        .search-film-count {
+            font-size: 0.875rem;
+            color: var(--color-gold);
+            margin-top: 4px;
+        }
+
+        .search-film-streaming {
+            display: inline-flex;
+            align-items: center;
+            gap: var(--spacing-xs);
+            margin-top: var(--spacing-sm);
+            font-size: 0.8125rem;
+            color: var(--color-white-dim);
+            background: var(--color-black-lighter);
+            padding: 6px 12px;
+            border-radius: 16px;
+        }
+
+        .streaming-icon {
+            width: 18px;
+            height: 18px;
+            background: #fff;
+            border-radius: 4px;
+        }
+
+        /* Category result rows */
+        .category-result {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+            padding: var(--spacing-md);
+            background: var(--color-black-light);
+            border: 1px solid var(--color-black-lighter);
+            border-radius: 10px;
+            margin-bottom: var(--spacing-xs);
+            cursor: pointer;
+            transition: background 0.15s, border-color 0.15s;
+        }
+
+        .category-result:hover {
+            background: var(--color-black-lighter);
+            border-color: var(--color-gold-dark);
+        }
+
+        .category-result-state {
+            width: 24px;
+            height: 24px;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+        }
+
+        .category-result-state.checked {
+            color: var(--color-gold);
+        }
+
+        .category-result-state.empty {
+            color: var(--color-white-dimmer);
+        }
+
+        .category-result-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .category-result-name {
+            font-weight: 500;
+            font-size: 0.9375rem;
+            color: var(--color-white);
+        }
+
+        .category-result-nominee {
+            font-size: 0.8125rem;
+            color: var(--color-white-dim);
+            margin-top: 2px;
+        }
+
+        /* View toggle for mockup */
+        .mockup-toggle {
+            display: flex;
+            gap: 8px;
+            padding: 12px;
+            background: var(--color-black-light);
+            border-bottom: 1px solid var(--color-black-lighter);
+        }
+
+        .mockup-toggle button {
+            flex: 1;
+            padding: 8px 12px;
+            border: 1px solid var(--color-black-lighter);
+            background: var(--color-black);
+            color: var(--color-white-dim);
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.8125rem;
+            transition: all 0.2s;
+        }
+
+        .mockup-toggle button.active {
+            background: var(--color-gold);
+            color: var(--color-black);
+            border-color: var(--color-gold);
+        }
+
+        .mockup-toggle button:hover:not(.active) {
+            border-color: var(--color-gold-dark);
+            color: var(--color-white);
+        }
+
+        .view-state {
+            display: none;
+        }
+
+        .view-state.active {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+        }
+
+        /* Hidden by default */
+        .hidden {
+            display: none !important;
+        }
+    </style>
+</head>
+<body>
+    <div class="mockup-container">
+        <div class="mockup-label">SEARCH FEATURE MOCKUP - PHASE 2</div>
+
+        <div class="mockup-toggle">
+            <button class="active" onclick="showView('input')">Search Input</button>
+            <button onclick="showView('results')">Film Results</button>
+            <button onclick="showView('empty')">Empty State</button>
+        </div>
+
+        <!-- VIEW 1: Search Input with Film List -->
+        <div id="view-input" class="view-state active">
+            <div class="search-header">
+                <button class="search-back">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="15 18 9 12 15 6"></polyline>
+                    </svg>
+                </button>
+                <input type="text" class="search-input" placeholder="Search films..." value="sin">
+                <button class="search-close">&times;</button>
+            </div>
+
+            <div class="search-content">
+                <div class="search-section-label">Matching films</div>
+                <ul class="search-results">
+                    <li class="search-result">
+                        <div class="search-result-info">
+                            <div class="search-result-title">Sinners</div>
+                            <div class="search-result-subtitle">Warner Bros. • Streaming on Max</div>
+                        </div>
+                        <div class="search-result-count">16</div>
+                        <div class="search-result-arrow">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="9 18 15 12 9 6"></polyline>
+                            </svg>
+                        </div>
+                    </li>
+                </ul>
+
+                <div style="margin-top: 24px; padding-top: 16px; border-top: 1px solid var(--color-black-lighter);">
+                    <div class="search-section-label">Other films with "s"</div>
+                    <ul class="search-results">
+                        <li class="search-result">
+                            <div class="search-result-info">
+                                <div class="search-result-title">Sentimental Value</div>
+                                <div class="search-result-subtitle">Norway</div>
+                            </div>
+                            <div class="search-result-count">9</div>
+                            <div class="search-result-arrow">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polyline points="9 18 15 12 9 6"></polyline>
+                                </svg>
+                            </div>
+                        </li>
+                        <li class="search-result">
+                            <div class="search-result-info">
+                                <div class="search-result-title">The Secret Agent</div>
+                                <div class="search-result-subtitle">Brazil</div>
+                            </div>
+                            <div class="search-result-count">4</div>
+                            <div class="search-result-arrow">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polyline points="9 18 15 12 9 6"></polyline>
+                                </svg>
+                            </div>
+                        </li>
+                        <li class="search-result">
+                            <div class="search-result-info">
+                                <div class="search-result-title">Sirât</div>
+                                <div class="search-result-subtitle">Spain</div>
+                            </div>
+                            <div class="search-result-count">2</div>
+                            <div class="search-result-arrow">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polyline points="9 18 15 12 9 6"></polyline>
+                                </svg>
+                            </div>
+                        </li>
+                        <li class="search-result">
+                            <div class="search-result-info">
+                                <div class="search-result-title">Song Sung Blue</div>
+                                <div class="search-result-subtitle">Best Actress nominee</div>
+                            </div>
+                            <div class="search-result-count">1</div>
+                            <div class="search-result-arrow">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polyline points="9 18 15 12 9 6"></polyline>
+                                </svg>
+                            </div>
+                        </li>
+                        <li class="search-result">
+                            <div class="search-result-info">
+                                <div class="search-result-title">The Smashing Machine</div>
+                                <div class="search-result-subtitle">Makeup and Hairstyling</div>
+                            </div>
+                            <div class="search-result-count">1</div>
+                            <div class="search-result-arrow">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polyline points="9 18 15 12 9 6"></polyline>
+                                </svg>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- VIEW 2: Film Results (Category List) -->
+        <div id="view-results" class="view-state">
+            <div class="search-header">
+                <button class="search-back">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="15 18 9 12 15 6"></polyline>
+                    </svg>
+                </button>
+                <input type="text" class="search-input" value="Sinners" readonly style="text-align: center; font-weight: 500;">
+                <button class="search-close">&times;</button>
+            </div>
+
+            <div class="search-film-header">
+                <div class="search-film-title">Sinners</div>
+                <div class="search-film-count">16 nominations</div>
+                <div class="search-film-streaming">
+                    <span class="streaming-icon" style="background: linear-gradient(135deg, #002be7, #00c8ff);"></span>
+                    Streaming on Max
+                </div>
+            </div>
+
+            <div class="search-content">
+                <ul class="search-results">
+                    <li class="category-result">
+                        <div class="category-result-state checked">✓</div>
+                        <div class="category-result-info">
+                            <div class="category-result-name">Best Picture</div>
+                            <div class="category-result-nominee">Warner Bros.</div>
+                        </div>
+                    </li>
+                    <li class="category-result">
+                        <div class="category-result-state checked">✓</div>
+                        <div class="category-result-info">
+                            <div class="category-result-name">Best Director</div>
+                            <div class="category-result-nominee">Ryan Coogler</div>
+                        </div>
+                    </li>
+                    <li class="category-result">
+                        <div class="category-result-state empty">○</div>
+                        <div class="category-result-info">
+                            <div class="category-result-name">Best Actor</div>
+                            <div class="category-result-nominee">Michael B. Jordan</div>
+                        </div>
+                    </li>
+                    <li class="category-result">
+                        <div class="category-result-state checked">✓</div>
+                        <div class="category-result-info">
+                            <div class="category-result-name">Best Supporting Actor</div>
+                            <div class="category-result-nominee">Delroy Lindo</div>
+                        </div>
+                    </li>
+                    <li class="category-result">
+                        <div class="category-result-state empty">○</div>
+                        <div class="category-result-info">
+                            <div class="category-result-name">Best Supporting Actress</div>
+                            <div class="category-result-nominee">Wunmi Mosaku</div>
+                        </div>
+                    </li>
+                    <li class="category-result">
+                        <div class="category-result-state empty">○</div>
+                        <div class="category-result-info">
+                            <div class="category-result-name">Best Original Screenplay</div>
+                            <div class="category-result-nominee">Ryan Coogler</div>
+                        </div>
+                    </li>
+                    <li class="category-result">
+                        <div class="category-result-state checked">✓</div>
+                        <div class="category-result-info">
+                            <div class="category-result-name">Best Cinematography</div>
+                            <div class="category-result-nominee">Autumn Durald Arkapaw</div>
+                        </div>
+                    </li>
+                    <li class="category-result">
+                        <div class="category-result-state empty">○</div>
+                        <div class="category-result-info">
+                            <div class="category-result-name">Best Film Editing</div>
+                            <div class="category-result-nominee">Michael P. Shawver</div>
+                        </div>
+                    </li>
+                    <li class="category-result">
+                        <div class="category-result-state empty">○</div>
+                        <div class="category-result-info">
+                            <div class="category-result-name">Best Production Design</div>
+                            <div class="category-result-nominee">Hannah Beachler & Monique Champagne</div>
+                        </div>
+                    </li>
+                    <li class="category-result">
+                        <div class="category-result-state empty">○</div>
+                        <div class="category-result-info">
+                            <div class="category-result-name">Best Costume Design</div>
+                            <div class="category-result-nominee">Ruth E. Carter</div>
+                        </div>
+                    </li>
+                    <li class="category-result">
+                        <div class="category-result-state empty">○</div>
+                        <div class="category-result-info">
+                            <div class="category-result-name">Best Makeup and Hairstyling</div>
+                            <div class="category-result-nominee">Ken Diaz, Mike Fontaine & Shunika Terry</div>
+                        </div>
+                    </li>
+                    <li class="category-result">
+                        <div class="category-result-state checked">✓</div>
+                        <div class="category-result-info">
+                            <div class="category-result-name">Best Original Score</div>
+                            <div class="category-result-nominee">Ludwig Göransson</div>
+                        </div>
+                    </li>
+                    <li class="category-result">
+                        <div class="category-result-state empty">○</div>
+                        <div class="category-result-info">
+                            <div class="category-result-name">Best Original Song</div>
+                            <div class="category-result-nominee">"I Lied to You"</div>
+                        </div>
+                    </li>
+                    <li class="category-result">
+                        <div class="category-result-state empty">○</div>
+                        <div class="category-result-info">
+                            <div class="category-result-name">Best Sound</div>
+                            <div class="category-result-nominee">Chris Welcker, Benjamin A. Burtt & team</div>
+                        </div>
+                    </li>
+                    <li class="category-result">
+                        <div class="category-result-state empty">○</div>
+                        <div class="category-result-info">
+                            <div class="category-result-name">Best Visual Effects</div>
+                            <div class="category-result-nominee">Michael Ralla, Espen Nordahl & team</div>
+                        </div>
+                    </li>
+                    <li class="category-result">
+                        <div class="category-result-state empty">○</div>
+                        <div class="category-result-info">
+                            <div class="category-result-name">Best Casting</div>
+                            <div class="category-result-nominee">Francine Maisler</div>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- VIEW 3: Empty State -->
+        <div id="view-empty" class="view-state">
+            <div class="search-header">
+                <button class="search-back">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="15 18 9 12 15 6"></polyline>
+                    </svg>
+                </button>
+                <input type="text" class="search-input" value="xylophone">
+                <button class="search-close">&times;</button>
+            </div>
+
+            <div class="search-content">
+                <div class="search-empty">
+                    <div class="search-empty-icon">🎬</div>
+                    <div class="search-empty-title">No nominations found</div>
+                    <div class="search-empty-subtitle">Better luck next year!</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function showView(viewName) {
+            // Hide all views
+            document.querySelectorAll('.view-state').forEach(v => v.classList.remove('active'));
+            // Show selected view
+            document.getElementById('view-' + viewName).classList.add('active');
+            // Update toggle buttons
+            document.querySelectorAll('.mockup-toggle button').forEach(b => b.classList.remove('active'));
+            event.target.classList.add('active');
+        }
+    </script>
+</body>
+</html>

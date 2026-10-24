@@ -30,7 +30,7 @@ async function measureDOMChurn() {
         await page.waitForSelector('#films-list .film', { state: 'visible' });
     }
 
-    await page.locator('#mode-select').selectOption('predictions');
+    await page.click('.menu-item[data-mode="predictions"]');
 
     // Get count of film elements
     const filmCount = await page.locator('#films-list .film').count();
@@ -96,7 +96,7 @@ async function measureDOMChurn() {
         await page.locator('#browse-by-category').click();
         await page.waitForSelector('#films-list .film', { state: 'visible' });
     }
-    await page.locator('#mode-select').selectOption('predictions');
+    await page.click('.menu-item[data-mode="predictions"]');
 
     // Set up observer again
     await page.evaluate(() => {

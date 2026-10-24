@@ -58,18 +58,176 @@
             </div>
             <h1 class="title">Oscar<sup>®</sup> Tracker</h1>
             <p class="subtitle">98th <a href="https://www.oscars.org/" target="_blank" rel="noopener noreferrer" class="subtitle-link">Academy Awards<sup>®</sup></a> · 2026</p>
-            <div class="ceremony-info">
-                <span>March 15 on ABC</span>
-                <span class="separator">|</span>
-                <select class="mode-select" id="mode-select" aria-label="Select tracking mode">
-                    <option value="watched">Watched</option>
-                    <option value="favorites">Favorites</option>
-                    <option value="predictions">Predictions</option>
-                </select>
-                <button class="share-btn" id="share-btn" style="display: none;" disabled>Share</button>
-                <button class="delete-btn" id="delete-btn" style="display: none;">Delete</button>
-            </div>
         </header>
+
+        <!-- Sticky ceremony info bar -->
+        <div class="ceremony-info">
+            <span>March 15 on ABC</span>
+            <span class="current-mode-label" id="current-mode-label">Watched</span>
+            <button class="search-btn" id="search-btn" aria-label="Search films">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                </svg>
+            </button>
+            <button class="hamburger-btn" id="hamburger-btn" aria-label="Open navigation menu" aria-expanded="false" aria-controls="nav-drawer">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="3" y1="6" x2="21" y2="6"/>
+                    <line x1="3" y1="12" x2="21" y2="12"/>
+                    <line x1="3" y1="18" x2="21" y2="18"/>
+                </svg>
+            </button>
+            <button class="share-btn" id="share-btn" style="display: none;" disabled>Share</button>
+            <button class="delete-btn" id="delete-btn" style="display: none;">Delete</button>
+        </div>
+
+        <!-- Navigation Drawer -->
+        <nav id="nav-drawer" class="nav-drawer" role="navigation" aria-label="Main navigation">
+            <div class="drawer-header">
+                <button class="drawer-close" id="drawer-close" aria-label="Close navigation menu">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="18" y1="6" x2="6" y2="18"/>
+                        <line x1="6" y1="6" x2="18" y2="18"/>
+                    </svg>
+                </button>
+            </div>
+
+            <!-- Scrollable nav content wrapper -->
+            <div class="nav-content">
+                <!-- Sidebar collapse toggle (desktop only) -->
+                <button class="sidebar-toggle" id="sidebar-toggle" aria-label="Collapse sidebar">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="11 17 6 12 11 7"/>
+                    <line x1="6" y1="12" x2="18" y2="12"/>
+                </svg>
+            </button>
+            <div class="nav-divider sidebar-toggle-divider"></div>
+
+            <!-- Search Films -->
+            <ul class="nav-menu nav-menu-search">
+                <li>
+                    <a href="#" class="menu-item" id="nav-search">
+                        <span class="menu-icon">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="11" cy="11" r="8"></circle>
+                                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                            </svg>
+                        </span>
+                        <span class="menu-text">Search Films</span>
+                    </a>
+                </li>
+            </ul>
+
+            <div class="nav-divider"></div>
+
+            <ul class="nav-menu">
+                <li>
+                    <a href="#" class="menu-item active" data-mode="watched">
+                        <span class="menu-icon">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                                <circle cx="12" cy="12" r="3"/>
+                            </svg>
+                        </span>
+                        <span class="menu-text">Watched</span>
+                        <span class="menu-count" id="nav-count-watched">0/0</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="menu-item" data-mode="predictions">
+                        <span class="menu-icon">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+                            </svg>
+                        </span>
+                        <span class="menu-text">Predictions</span>
+                        <span class="menu-count" id="nav-count-predictions">0/21</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="menu-item" data-mode="favorites">
+                        <span class="menu-icon">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+                            </svg>
+                        </span>
+                        <span class="menu-text">Favorites</span>
+                        <span class="menu-count" id="nav-count-favorites">0/21</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="menu-item" data-mode="streamable">
+                        <span class="menu-icon">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polygon points="5 3 19 12 5 21 5 3"/>
+                            </svg>
+                        </span>
+                        <span class="menu-text">Streamable</span>
+                        <span class="menu-count" id="nav-count-streamable">0/0</span>
+                    </a>
+                </li>
+            </ul>
+
+            <div class="nav-divider"></div>
+
+            <!-- Share section (always visible) -->
+            <ul class="nav-menu nav-menu-actions" id="nav-share-section">
+                <li>
+                    <a href="#" class="menu-item menu-item-share" id="nav-share">
+                        <span class="menu-icon">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="18" cy="5" r="3"></circle>
+                                <circle cx="6" cy="12" r="3"></circle>
+                                <circle cx="18" cy="19" r="3"></circle>
+                                <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line>
+                                <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
+                            </svg>
+                        </span>
+                        <span class="menu-text">Share Predictions</span>
+                    </a>
+                </li>
+            </ul>
+
+            <div class="nav-divider" id="nav-share-divider" style="display: none;"></div>
+
+            <!-- Shared Lists (dynamically populated) -->
+            <div class="nav-divider nav-shared-divider" id="nav-shared-divider" style="display: none;"></div>
+            <ul class="nav-menu nav-menu-shared" id="nav-shared-lists"></ul>
+
+            <ul class="nav-menu nav-menu-secondary">
+                <li>
+                    <a href="https://www.oscars.org/oscars/ceremonies/2026" target="_blank" rel="noopener noreferrer" class="menu-item" id="nav-official-list">
+                        <span class="menu-icon">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
+                                <polyline points="15 3 21 3 21 9"/>
+                                <line x1="10" y1="14" x2="21" y2="3"/>
+                            </svg>
+                        </span>
+                        <span class="menu-text">Official List</span>
+                        <span class="external-arrow">↗</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="menu-item" id="nav-about">
+                        <span class="menu-icon">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="12" r="10"/>
+                                <line x1="12" y1="16" x2="12" y2="12"/>
+                                <line x1="12" y1="8" x2="12.01" y2="8"/>
+                            </svg>
+                        </span>
+                        <span class="menu-text">About</span>
+                    </a>
+                </li>
+            </ul>
+            </div>
+
+            <div class="nav-dedication">Made for Ande ❤️</div>
+        </nav>
+
+        <!-- Navigation Overlay (mobile only) -->
+        <div class="nav-overlay" id="nav-overlay"></div>
 
         <!-- First-time experience screen -->
         <main class="main onboarding-screen" id="onboarding-screen" style="display: none;">
@@ -102,7 +260,10 @@
                                 <!-- Options will be rendered by JavaScript -->
                             </select>
                         </div>
-                        <span class="progress" id="progress">0 / 10</span>
+                        <div class="progress-row">
+                            <span class="progress" id="progress">0 / 10</span>
+                            <a href="https://www.oscars.org/oscars/ceremonies/2026" target="_blank" rel="noopener noreferrer" class="source-link" id="source-link-top">source <span class="source-arrow">↗</span></a>
+                        </div>
                     </div>
                     <button class="nav-btn nav-next" id="next-category" aria-label="Next category">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -134,7 +295,10 @@
                                 <!-- Options will be rendered by JavaScript -->
                             </select>
                         </div>
-                        <span class="progress" id="progress-bottom">0 / 10</span>
+                        <div class="progress-row">
+                            <span class="progress" id="progress-bottom">0 / 10</span>
+                            <a href="https://www.oscars.org/oscars/ceremonies/2026" target="_blank" rel="noopener noreferrer" class="source-link" id="source-link-bottom">source <span class="source-arrow">↗</span></a>
+                        </div>
                     </div>
                     <button class="nav-btn nav-next" id="next-category-bottom" aria-label="Next category">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -144,7 +308,7 @@
                 </div>
             </section>
         </main>
-        
+
         <footer class="footer">
             <p id="tip-text"><span class="tip-label">Tip:</span> <span id="tip-content">Tap a film to mark as watched</span></p>
             <a href="#" class="about-link" id="about-link">About</a>
@@ -168,7 +332,8 @@
             <button class="modal-close" id="about-close" aria-label="Close">&times;</button>
 
             <h2 id="about-title">Oscar Tracker</h2>
-            <span class="version-badge" id="version-badge">v1.0.0</span>
+            <span class="version-badge" id="version-badge">v1.2.0</span>
+            <span class="sw-version" id="sw-version"></span>
 
             <p class="about-description">
                 Track your Oscar watch progress and make predictions for the 98th Academy Awards.
@@ -289,6 +454,40 @@
                 <button class="btn btn-secondary" id="copy-no">No</button>
                 <button class="btn btn-primary" id="copy-yes">Yes</button>
             </div>
+        </div>
+    </div>
+
+    <!-- Search View (outside .app for proper overlay) -->
+    <div id="search-view" class="search-view">
+        <div class="search-header">
+            <button class="search-back" id="search-back" aria-label="Back">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="15 18 9 12 15 6"></polyline>
+                </svg>
+            </button>
+            <input type="text" class="search-input" id="search-input"
+                   placeholder="Search films..." autocomplete="off"
+                   role="searchbox" aria-label="Search Oscar-nominated films">
+            <button class="search-close" id="search-close" aria-label="Close search">&times;</button>
+        </div>
+
+        <div class="search-film-header" id="search-film-header" style="display: none;">
+            <div class="search-film-title" id="search-film-title"></div>
+            <div class="search-film-count" id="search-film-count"></div>
+            <div class="search-film-streaming" id="search-film-streaming"></div>
+        </div>
+
+        <div class="search-content" id="search-content">
+            <div class="search-section-label" id="search-section-label">Matching films</div>
+            <ul class="search-results" id="search-results" role="list">
+                <!-- Results rendered here -->
+            </ul>
+        </div>
+
+        <div class="search-empty" id="search-empty" style="display: none;">
+            <div class="search-empty-icon">🎬</div>
+            <div class="search-empty-title">No nominations found</div>
+            <div class="search-empty-subtitle">Better luck next year!</div>
         </div>
     </div>
 
