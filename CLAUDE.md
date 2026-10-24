@@ -64,9 +64,19 @@ These scripts measure:
 
 The app uses automated versioning via GitHub Actions:
 
-- **Version format**: `1.0.{run_number}` (e.g., `1.0.42`)
+- **Version format**: `1.2.{run_number}` (e.g., `1.2.118`)
 - **Location**: `APP_VERSION` constant in `app.js`
 - **Automation**: The deploy workflow (`.github/workflows/deploy.yml`) auto-injects the version at deploy time using the workflow run number
 - **No manual bumping**: Version increments automatically with each deployment
 
 The version is displayed in the About modal and helps identify which build is deployed.
+
+## Service Worker
+
+- **Never bump `SW_VERSION` by hand.** The deploy workflow replaces it with the commit's short SHA, so `sw.js` changes on every deploy and installed clients always pick up the new worker. Locally it reads `'dev'`.
+- **`sw.js` must stay at `/sw.js`.** Installed clients check that exact URL for updates; moving it strands them on their old worker.
+- **Caching strategy**: pages and `.html`/`.js`/`.css`/`.json` files are network-first, falling back to the cache after 3 seconds or when offline. Images are cache-first. Google Fonts use their own `awards-tracker-fonts` cache that survives updates.
+- **Query strings are ignored for cache keys**, so share links (`/?p=...`) are served from the one cached copy of the app.
+- **New data files** (`.js`/`.json`) are network-first automatically. Add them to `ASSETS_TO_CACHE` so they work offline on first launch.
+- **service-worker.spec.js** covers precaching, online/offline/slow-network behavior and upgrading from the v9 worker (`tests/fixtures/sw-v9.js`, the version on clients before automatic versioning).
+- Set `CHROMIUM_PATH` to run tests against a preinstalled Chromium instead of Playwright's own browser.

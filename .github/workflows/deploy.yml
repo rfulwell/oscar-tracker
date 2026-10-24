@@ -37,8 +37,13 @@ jobs:
           # Update version in package.json
           sed -i "s/\"version\": \"[^\"]*\"/\"version\": \"$VERSION\"/" package.json
 
-          # Verify the update
-          grep "APP_VERSION" app.js
+          # Stamp the service worker with the commit so every deploy reaches installed clients
+          SW_VERSION="${GITHUB_SHA::7}"
+          sed -i "s/const SW_VERSION = '[^']*'/const SW_VERSION = '$SW_VERSION'/" sw.js
+
+          # Verify the updates (fail the deploy if either replacement didn't happen)
+          grep "const APP_VERSION = '$VERSION'" app.js
+          grep "const SW_VERSION = '$SW_VERSION'" sw.js
 
       - name: Setup Pages
         uses: actions/configure-pages@v4
