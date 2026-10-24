@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - main
-      - claude/update-2026-Z1D9s
   workflow_dispatch:  # Allow manual triggering
 
 permissions:
