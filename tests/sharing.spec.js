@@ -1,5 +1,19 @@
 // @ts-check
 const { test, expect } = require('@playwright/test');
+const fs = require('fs');
+const path = require('path');
+
+const APP_SOURCE = fs.readFileSync(path.join(__dirname, '..', 'app.js'), 'utf8');
+
+// Serve app.js as if this build tracked a different season
+async function useSeason(context, season) {
+    const source = APP_SOURCE.replace("const SEASON = '2026';", `const SEASON = '${season}';`);
+    expect(source).not.toBe(APP_SOURCE);
+    await context.route('**/app.js', (route) => route.fulfill({
+        body: source,
+        contentType: 'application/javascript'
+    }));
+}
 
 // Helper to clear all localStorage before each test
 test.beforeEach(async ({ page }) => {
@@ -335,4 +349,114 @@ test.describe('Sharing Predictions', () => {
 
     });
 
+    test.describe('Share Link Seasons', () => {
+
+        test('new share links should include the season', async ({ page }) => {
+            await completeOnboarding(page);
+            const url = await page.evaluate(() => generateShareURL({ 'best-picture': 'sinners' }, 'Sarah'));
+
+            const params = new URL(url).searchParams;
+            expect(params.get('y')).toBe('2026');
+            expect(params.get('p')).toHaveLength(24);
+            expect(params.get('name')).toBe('Sarah');
+        });
+
+        test('should open links with the current season', async ({ page }) => {
+            await page.goto('/?p=8-----------------------&y=2026&name=Sarah');
+            await completeOnboarding(page);
+
+            expect(await hasSharedList(page, 'Sarah')).toBeTruthy();
+            await expect(page.locator('#shared-banner')).toContainText('Sarah');
+        });
+
+        test('should open links made before seasons were added as 2026 links', async ({ page }) => {
+            await page.goto('/?p=8-----------------------&name=Sarah');
+            await completeOnboarding(page);
+
+            expect(await hasSharedList(page, 'Sarah')).toBeTruthy();
+        });
+
+        test('should explain that 21-category links from before Feb 8 cannot be opened', async ({ page }) => {
+            await page.goto('/?p=8--------------------&name=Sarah');
+
+            await expect(page.locator('#toast')).toBeVisible();
+            await expect(page.locator('#toast')).toHaveText("This link is from an older version of the app and can't be opened.");
+            expect(new URL(page.url()).search).toBe('');
+
+            await completeOnboarding(page);
+            expect(await hasSharedList(page, 'Sarah')).toBeFalsy();
+            expect(await page.evaluate(() => localStorage.getItem('oscar-tracker-shared-lists'))).toBeNull();
+        });
+
+        test('should explain that links from another season cannot be opened', async ({ page }) => {
+            await page.goto('/?p=8-----------------------&y=2027&name=Sarah');
+
+            await expect(page.locator('#toast')).toHaveText("This link is for the 2027 Oscars and can't be opened here.");
+
+            await completeOnboarding(page);
+            expect(await hasSharedList(page, 'Sarah')).toBeFalsy();
+        });
+
+        test('a new season should not read 2026 links as its own', async ({ page, context }) => {
+            await useSeason(context, '2027');
+            await page.goto('/?p=8-----------------------&name=Sarah');
+
+            await expect(page.locator('#toast')).toHaveText("This link is for the 2026 Oscars and can't be opened here.");
+
+            await completeOnboarding(page);
+            expect(await hasSharedList(page, 'Sarah')).toBeFalsy();
+            const stored = await page.evaluate(() => ({
+                legacy: localStorage.getItem('oscar-tracker-shared-lists'),
+                current: localStorage.getItem('oscar-tracker-shared-lists-2027')
+            }));
+            expect(stored).toEqual({ legacy: null, current: null });
+        });
+
+        test('a new season should open its own links', async ({ page, context }) => {
+            await useSeason(context, '2027');
+            await page.goto('/?p=8-----------------------&y=2027&name=Sarah');
+            await completeOnboarding(page);
+
+            expect(await hasSharedList(page, 'Sarah')).toBeTruthy();
+        });
+
+        test('should ignore links with a malformed season', async ({ page }) => {
+            await page.goto('/?p=8-----------------------&y=abc&name=Sarah');
+            await completeOnboarding(page);
+
+            await expect(page.locator('#toast')).toBeHidden();
+            expect(await hasSharedList(page, 'Sarah')).toBeFalsy();
+        });
+
+        test('long messages should fit on a small phone screen', async ({ page }) => {
+            await page.setViewportSize({ width: 375, height: 667 });
+            await page.goto('/?p=8--------------------&name=Sarah');
+
+            await expect(page.locator('#toast')).toBeVisible();
+            // Wait for the slide-in transition to finish before measuring
+            await page.waitForFunction(() => getComputedStyle(document.getElementById('toast')).opacity === '1');
+            const box = await page.locator('#toast').boundingBox();
+            expect(box.x).toBeGreaterThanOrEqual(0);
+            expect(box.x + box.width).toBeLessThanOrEqual(375);
+        });
+    });
+
+    test.describe('Toast Messages', () => {
+
+        test('should show the link-copied message', async ({ page }) => {
+            await completeOnboarding(page);
+            await page.evaluate(() => showToast('Link copied! Share it with your friends.'));
+
+            await expect(page.locator('#toast')).toBeVisible();
+            await expect(page.locator('#toast')).toHaveText('Link copied! Share it with your friends.');
+        });
+
+        test('should hide the message after its duration', async ({ page }) => {
+            await completeOnboarding(page);
+            await page.evaluate(() => showToast('Shared list removed', 500));
+
+            await expect(page.locator('#toast')).toBeVisible();
+            await expect(page.locator('#toast')).toBeHidden({ timeout: 3000 });
+        });
+    });
 });

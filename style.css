@@ -1664,7 +1664,9 @@ html:has(body.modal-open) {
     opacity: 0;
     visibility: hidden;
     transition: all 0.3s ease;
-    white-space: nowrap;
+    width: max-content;
+    max-width: calc(100vw - 2 * var(--spacing-md));
+    text-align: center;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
 

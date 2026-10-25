@@ -668,8 +668,17 @@ function isValidEncodedString(str) {
 function generateShareURL(preds, name) {
     const encoded = encodePredictions(preds);
     const encodedName = encodeURIComponent(name || 'Friend');
-    return `${window.location.origin}${window.location.pathname}?p=${encoded}&name=${encodedName}`;
+    return `${window.location.origin}${window.location.pathname}?p=${encoded}&y=${SEASON}&name=${encodedName}`;
 }
+
+// Share links record their season in the y parameter. Links made before it
+// was added have none, and are all from 2026.
+const UNVERSIONED_SHARE_SEASON = '2026';
+
+// Links shared before the three short film categories were added (Feb 8, 2026)
+// had one character per category for 21 categories. Several nominee lists were
+// corrected after that, so they can't be read reliably.
+const OUTDATED_SHARE_LENGTH = 21;
 
 // Parse URL parameters for shared predictions
 function parseShareParams() {
@@ -678,7 +687,19 @@ function parseShareParams() {
     const name = params.get('name');
 
     if (!encoded) return null;
-    if (!isValidEncodedString(encoded)) return null;
+
+    const season = params.get('y') || UNVERSIONED_SHARE_SEASON;
+    if (!/^\d{4}$/.test(season)) return null;
+    if (season !== SEASON) {
+        return { error: 'other-season', season: season };
+    }
+
+    if (!isValidEncodedString(encoded)) {
+        if (season === UNVERSIONED_SHARE_SEASON && encoded.length === OUTDATED_SHARE_LENGTH && /^[0-9\-]+$/.test(encoded)) {
+            return { error: 'outdated' };
+        }
+        return null;
+    }
 
     const preds = decodePredictions(encoded);
     // Sanitize incoming name - remove non-printing chars and limit length
@@ -688,6 +709,15 @@ function parseShareParams() {
         name: sanitized,
         encoded: encoded
     };
+}
+
+// Explain why a share link can't be opened, and clear it from the address bar
+function showShareLinkError(shareData) {
+    window.history.replaceState({}, '', window.location.pathname);
+    const message = shareData.error === 'other-season'
+        ? `This link is for the ${shareData.season} Oscars and can't be opened here.`
+        : 'This link is from an older version of the app and can\'t be opened.';
+    showToast(message, 6000);
 }
 
 // Check if predictions have any selections
@@ -804,17 +834,27 @@ function saveSharerName(name) {
 }
 
 // Show toast notification
-function showToast(message) {
-    // Remove existing toast
-    const existing = document.querySelector('.toast');
-    if (existing) existing.remove();
+let toastHideTimer = null;
+let toastRemoveTimer = null;
 
-    const toast = document.createElement('div');
-    toast.className = 'toast';
-    toast.textContent = message;
-    document.body.appendChild(toast);
+function showToast(message, duration = 3000) {
+    const toast = document.getElementById('toast');
+    const toastMessage = document.getElementById('toast-message');
+    if (!toast || !toastMessage) return;
 
-    setTimeout(() => toast.remove(), 3000);
+    clearTimeout(toastHideTimer);
+    clearTimeout(toastRemoveTimer);
+
+    toastMessage.textContent = message;
+    toast.hidden = false;
+    // Add .show on the next frame so the fade-in transition runs
+    requestAnimationFrame(() => toast.classList.add('show'));
+
+    toastHideTimer = setTimeout(() => {
+        toast.classList.remove('show');
+        // Hide once the fade-out transition has finished
+        toastRemoveTimer = setTimeout(() => { toast.hidden = true; }, 300);
+    }, duration);
 }
 
 // Copy text to clipboard
@@ -1531,7 +1571,11 @@ function init() {
     startTipRotation();
 
     // Check for incoming shared URL
-    const shareData = parseShareParams();
+    let shareData = parseShareParams();
+    if (shareData && shareData.error) {
+        showShareLinkError(shareData);
+        shareData = null;
+    }
     if (shareData) {
         // Always show category screen for shared links
         showCategoryScreen(false);

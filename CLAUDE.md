@@ -18,6 +18,15 @@ All changes to stored data (localStorage) must be backwards compatible. Do not m
 - **Picks can name nominees that no longer exist** (data corrections after a user saved them). Count picks with `countValidPicks()` / check them with `isValidPick()` rather than `Object.keys()`, and don't delete them from storage.
 - **season-storage.spec.js** covers loading 2026 data from the original keys, stale picks, and a new season starting fresh without touching 2026 data.
 
+### Share Links
+
+- **Format**: `/?p=<one character per category>&y=<season>&name=<name>`. Each character is the index of the picked nominee in that category (`-` for no pick), in `CATEGORIES` order.
+- **Links without `y` are 2026 links.** Every link shared before seasons were added has no `y`, and they must keep opening in 2026 builds.
+- **A link from another season is never read against this season's nominees.** It shows a message instead (`showShareLinkError()`).
+- **21-character links** (shared before the short film categories were added on Feb 8, 2026) can't be read reliably, so they show "from an older version of the app".
+- **Once a season's nominations are final, never reorder its categories or nominees.** Positions are baked into every link already shared.
+- **Share link tests** are in the "Share Link Seasons" section of `sharing.spec.js`.
+
 ## Testing
 
 This project uses Playwright for automated E2E testing with headless Chromium. Tests are located in the `tests/` directory.
