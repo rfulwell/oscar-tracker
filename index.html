@@ -57,12 +57,12 @@
                 </svg>
             </div>
             <h1 class="title">Oscar<sup>®</sup> Tracker</h1>
-            <p class="subtitle">98th <a href="https://www.oscars.org/" target="_blank" rel="noopener noreferrer" class="subtitle-link">Academy Awards<sup>®</sup></a> · 2026</p>
+            <p class="subtitle"><span data-season="ordinal">98th</span> <a href="https://www.oscars.org/" target="_blank" rel="noopener noreferrer" class="subtitle-link">Academy Awards<sup>®</sup></a> · <span data-season="year">2026</span></p>
         </header>
 
         <!-- Sticky ceremony info bar -->
         <div class="ceremony-info">
-            <span>March 15 on ABC</span>
+            <span data-season="airing">March 15 on ABC</span>
             <span class="current-mode-label" id="current-mode-label">Watched</span>
             <button class="search-btn" id="search-btn" aria-label="Search films">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -141,7 +141,7 @@
                             </svg>
                         </span>
                         <span class="menu-text">Predictions</span>
-                        <span class="menu-count" id="nav-count-predictions">0/21</span>
+                        <span class="menu-count" id="nav-count-predictions">0/24</span>
                     </a>
                 </li>
                 <li>
@@ -152,7 +152,7 @@
                             </svg>
                         </span>
                         <span class="menu-text">Favorites</span>
-                        <span class="menu-count" id="nav-count-favorites">0/21</span>
+                        <span class="menu-count" id="nav-count-favorites">0/24</span>
                     </a>
                 </li>
                 <li>
@@ -196,7 +196,7 @@
 
             <ul class="nav-menu nav-menu-secondary">
                 <li>
-                    <a href="https://www.oscars.org/oscars/ceremonies/2026" target="_blank" rel="noopener noreferrer" class="menu-item" id="nav-official-list">
+                    <a href="https://www.oscars.org/oscars/ceremonies/2026" data-season-href="sourceUrl" target="_blank" rel="noopener noreferrer" class="menu-item" id="nav-official-list">
                         <span class="menu-icon">
                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
@@ -262,7 +262,7 @@
                         </div>
                         <div class="progress-row">
                             <span class="progress" id="progress">0 / 10</span>
-                            <a href="https://www.oscars.org/oscars/ceremonies/2026" target="_blank" rel="noopener noreferrer" class="source-link" id="source-link-top">source <span class="source-arrow">↗</span></a>
+                            <a href="https://www.oscars.org/oscars/ceremonies/2026" data-season-href="sourceUrl" target="_blank" rel="noopener noreferrer" class="source-link" id="source-link-top">source <span class="source-arrow">↗</span></a>
                         </div>
                     </div>
                     <button class="nav-btn nav-next" id="next-category" aria-label="Next category">
@@ -297,7 +297,7 @@
                         </div>
                         <div class="progress-row">
                             <span class="progress" id="progress-bottom">0 / 10</span>
-                            <a href="https://www.oscars.org/oscars/ceremonies/2026" target="_blank" rel="noopener noreferrer" class="source-link" id="source-link-bottom">source <span class="source-arrow">↗</span></a>
+                            <a href="https://www.oscars.org/oscars/ceremonies/2026" data-season-href="sourceUrl" target="_blank" rel="noopener noreferrer" class="source-link" id="source-link-bottom">source <span class="source-arrow">↗</span></a>
                         </div>
                     </div>
                     <button class="nav-btn nav-next" id="next-category-bottom" aria-label="Next category">
@@ -336,12 +336,12 @@
             <span class="sw-version" id="sw-version"></span>
 
             <p class="about-description">
-                Track your Oscar watch progress and make predictions for the 98th Academy Awards.
+                Track your Oscar watch progress and make predictions for the <span data-season="ordinal">98th</span> Academy Awards.
             </p>
 
             <div class="oscar-countdown">
                 <span class="countdown-icon">🏆</span>
-                <span class="countdown-date">March 15, 2026</span>
+                <span class="countdown-date" data-season="dateLabel">March 15, 2026</span>
                 <span class="countdown-remaining" id="countdown-days"></span>
             </div>
 
@@ -388,7 +388,7 @@
             <button class="modal-close" id="share-close" aria-label="Close">&times;</button>
 
             <h2 id="share-title">Share Your Picks!</h2>
-            <p class="modal-description">Your friends will see your predictions for all 21 categories.</p>
+            <p class="modal-description">Your friends will see your predictions for all <span data-season="categoryCount">24</span> categories.</p>
 
             <div class="share-form">
                 <input type="text"
@@ -496,6 +496,9 @@
         <span id="toast-message"></span>
     </div>
 
+    <!-- The current season's data. To start a new season, point this at its file
+         (and update ASSETS_TO_CACHE in sw.js). -->
+    <script src="seasons/2026.js"></script>
     <script src="app.js"></script>
 </body>
 </html>
