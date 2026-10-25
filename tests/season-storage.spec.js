@@ -1,5 +1,5 @@
 // @ts-check
-const { test, expect } = require('@playwright/test');
+const { test, expect } = require('./fixtures/test');
 const fs = require('fs');
 const path = require('path');
 
@@ -47,12 +47,12 @@ async function readStorage(page) {
     });
 }
 
-// Serve the season file as if this build tracked a different season
-// (same nominees, different season id)
+// Serve the season file as if this build tracked the given season
+// (2026's nominees, with that season id)
 async function useSeason(context, season) {
     const source = SEASON_SOURCE.replace("season: '2026',", `season: '${season}',`);
-    expect(source).not.toBe(SEASON_SOURCE);
-    await context.route('**/seasons/2026.js', (route) => route.fulfill({
+    expect(source.includes(`season: '${season}',`)).toBe(true);
+    await context.route(/\/seasons\/\d{4}\.js$/, (route) => route.fulfill({
         body: source,
         contentType: 'application/javascript'
     }));
@@ -135,7 +135,7 @@ test.describe('Season Storage', () => {
         await page.reload();
         await page.locator('#all-films-list .film').first().click();
 
-        await context.unroute('**/seasons/2026.js');
+        await useSeason(context, '2026');
         await page.reload();
 
         await expect(page.locator('#nav-count-predictions')).toHaveText('1/24');

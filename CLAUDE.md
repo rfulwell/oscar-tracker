@@ -14,7 +14,9 @@ All changes to stored data (localStorage) must be backwards compatible. Do not m
 
 - **Season data lives in `seasons/<year>.js`** (`AWARDS_SEASON`): ceremony number, date, broadcaster, official source URL, the films list and the categories with their nominees. `index.html` loads the current season's file before `app.js`, and `sw.js` precaches it.
 - **Everything else is derived from it**: `SEASON`, `OSCAR_DATE`, `CATEGORIES`, `FILM_NOMINEES` (from each nominee's `film`), `ALL_FILMS` with nomination counts, `FILM_STREAMING`, and the season text and links in `index.html` (`[data-season]`, `[data-season-href]`, filled by `applySeasonText()`). Don't hard-code season details anywhere else.
-- **Starting a new season**: add `seasons/<year>.js`, then point the `<script src="seasons/...">` in `index.html` and the entry in `ASSETS_TO_CACHE` in `sw.js` at it (`season-data.spec.js` fails if these disagree).
+- **Starting a new season**: follow `docs/new-season-checklist.md`. In short: save the official nominations page, add `seasons/<year>.js`, then point the `<script src="seasons/...">` in `index.html` and the entry in `ASSETS_TO_CACHE` in `sw.js` at it.
+- **`season-files.spec.js` checks every season file**: required fields, unique ids, film links, at most 10 nominees per category (share links hold one digit), and every title and credit against the saved official page (`The <Nth> Academy Awards _ <year>.html`). Categories whose subtitles are studios have `creditType: 'studio'`.
+- **Released seasons' ids are frozen** in `tests/fixtures/season-<year>-ids.json` (made with `node tests/freeze-season-ids.js <year>`). Never edit those files; fix the season file instead.
 - **`SEASON`** (the season file's `season`) names the awards year the build tracks. Watched films, predictions, favorites and shared lists are stored per season via `seasonKey()`.
 - **2026 keeps the original keys** (`oscar-tracker-watched`, etc.). Later seasons use suffixed keys (`oscar-tracker-watched-2027`). Never write to another season's keys.
 - **Global keys** (not per season): mode, current category, sharer name, the copy-modal dismissals and `sidebarCollapsed`.
@@ -61,6 +63,7 @@ Tests start a local HTTP server on port 3000 and run against the live app. Each 
 - **Official data source**: `The 98th Academy Awards _ 2026.html` is a saved copy of the official nominations page. When `oscar-data-validation.spec.js` and `app.js` disagree, check both against it rather than assuming either is right.
 - **Opening the category view smooth-scrolls the page.** Layout tests that run while it's still scrolling are flaky. Either wait for it to stop (`waitForScrollToStop()` in `viewport-layout.spec.js`), or measure all the elements you compare in a single `page.evaluate()` (`getBoxes()` in `source-links.spec.js`). Don't use fixed `waitForTimeout()` delays.
 - **Share links are one character per category** (24 for 2026). Test links must match `CATEGORIES.length` or the app ignores them.
+- **Browser tests run on the 2026 season's data** whatever season `index.html` loads: import `test` from `./fixtures/test` (not `@playwright/test`), which serves `seasons/2026.js` for any season file. This keeps them working when a new season becomes current. Only `season-files.spec.js` uses the real current season. To simulate another season, `context.route()` the season file in the test; the route registered last wins.
 
 ### CI
 

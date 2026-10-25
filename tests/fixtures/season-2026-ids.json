@@ -1,0 +1,247 @@
+[
+    {
+        "id": "best-picture",
+        "nominees": [
+            "bugonia",
+            "f1",
+            "frankenstein",
+            "hamnet",
+            "marty-supreme",
+            "one-battle-after-another",
+            "secret-agent",
+            "sentimental-value",
+            "sinners",
+            "train-dreams"
+        ]
+    },
+    {
+        "id": "best-director",
+        "nominees": [
+            "dir-coogler",
+            "dir-anderson",
+            "dir-safdie",
+            "dir-zhao",
+            "dir-trier"
+        ]
+    },
+    {
+        "id": "best-actor",
+        "nominees": [
+            "actor-chalamet",
+            "actor-dicaprio",
+            "actor-hawke",
+            "actor-jordan",
+            "actor-moura"
+        ]
+    },
+    {
+        "id": "best-actress",
+        "nominees": [
+            "actress-buckley",
+            "actress-byrne",
+            "actress-hudson",
+            "actress-reinsve",
+            "actress-stone"
+        ]
+    },
+    {
+        "id": "best-supporting-actor",
+        "nominees": [
+            "supp-actor-elordi",
+            "supp-actor-deltoro",
+            "supp-actor-penn",
+            "supp-actor-lindo",
+            "supp-actor-skarsgard"
+        ]
+    },
+    {
+        "id": "best-supporting-actress",
+        "nominees": [
+            "supp-actress-taylor",
+            "supp-actress-mosaku",
+            "supp-actress-fanning",
+            "supp-actress-lilleaas",
+            "supp-actress-madigan"
+        ]
+    },
+    {
+        "id": "best-original-screenplay",
+        "nominees": [
+            "orig-sinners",
+            "orig-sentimental",
+            "orig-bluemoon",
+            "orig-marty",
+            "orig-accident"
+        ]
+    },
+    {
+        "id": "best-adapted-screenplay",
+        "nominees": [
+            "adapt-onebattle",
+            "adapt-traindreams",
+            "adapt-frankenstein",
+            "adapt-hamnet",
+            "adapt-bugonia"
+        ]
+    },
+    {
+        "id": "best-animated-feature",
+        "nominees": [
+            "anim-arco",
+            "anim-elio",
+            "anim-kpop",
+            "anim-amelie",
+            "anim-zootopia2"
+        ]
+    },
+    {
+        "id": "best-international-feature",
+        "nominees": [
+            "intl-sentimental",
+            "intl-secretagent",
+            "intl-sirat",
+            "intl-hind",
+            "intl-accident"
+        ]
+    },
+    {
+        "id": "best-documentary-feature",
+        "nominees": [
+            "doc-alabama",
+            "doc-goodlight",
+            "doc-rocks",
+            "doc-putin",
+            "doc-neighbor"
+        ]
+    },
+    {
+        "id": "best-cinematography",
+        "nominees": [
+            "cin-frankenstein",
+            "cin-marty",
+            "cin-onebattle",
+            "cin-sinners",
+            "cin-traindreams"
+        ]
+    },
+    {
+        "id": "best-film-editing",
+        "nominees": [
+            "edit-f1",
+            "edit-marty",
+            "edit-onebattle",
+            "edit-sentimental",
+            "edit-sinners"
+        ]
+    },
+    {
+        "id": "best-production-design",
+        "nominees": [
+            "prod-frankenstein",
+            "prod-hamnet",
+            "prod-marty",
+            "prod-onebattle",
+            "prod-sinners"
+        ]
+    },
+    {
+        "id": "best-costume-design",
+        "nominees": [
+            "cost-avatar",
+            "cost-frankenstein",
+            "cost-hamnet",
+            "cost-marty",
+            "cost-sinners"
+        ]
+    },
+    {
+        "id": "best-makeup-hairstyling",
+        "nominees": [
+            "makeup-frankenstein",
+            "makeup-kokuho",
+            "makeup-sinners",
+            "makeup-smashing",
+            "makeup-ugly"
+        ]
+    },
+    {
+        "id": "best-original-score",
+        "nominees": [
+            "score-bugonia",
+            "score-frankenstein",
+            "score-hamnet",
+            "score-onebattle",
+            "score-sinners"
+        ]
+    },
+    {
+        "id": "best-original-song",
+        "nominees": [
+            "song-dearme",
+            "song-golden",
+            "song-ilied",
+            "song-sweetdreams",
+            "song-traindreams"
+        ]
+    },
+    {
+        "id": "best-sound",
+        "nominees": [
+            "sound-f1",
+            "sound-frankenstein",
+            "sound-onebattle",
+            "sound-sinners",
+            "sound-sirat"
+        ]
+    },
+    {
+        "id": "best-visual-effects",
+        "nominees": [
+            "vfx-avatar",
+            "vfx-f1",
+            "vfx-jurassic",
+            "vfx-lostbus",
+            "vfx-sinners"
+        ]
+    },
+    {
+        "id": "best-casting",
+        "nominees": [
+            "cast-hamnet",
+            "cast-marty",
+            "cast-onebattle",
+            "cast-secretagent",
+            "cast-sinners"
+        ]
+    },
+    {
+        "id": "best-animated-short",
+        "nominees": [
+            "ashort-butterfly",
+            "ashort-forevergreen",
+            "ashort-pearls",
+            "ashort-retirement",
+            "ashort-sisters"
+        ]
+    },
+    {
+        "id": "best-documentary-short",
+        "nominees": [
+            "dshort-empty",
+            "dshort-camera",
+            "dshort-children",
+            "dshort-devil",
+            "dshort-strange"
+        ]
+    },
+    {
+        "id": "best-live-action-short",
+        "nominees": [
+            "lshort-butcher",
+            "lshort-dorothy",
+            "lshort-austen",
+            "lshort-singers",
+            "lshort-saliva"
+        ]
+    }
+]

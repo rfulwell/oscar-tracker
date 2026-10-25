@@ -1,5 +1,5 @@
 // @ts-check
-const { test, expect } = require('@playwright/test');
+const { test, expect } = require('./fixtures/test');
 
 // Helper to clear all localStorage before each test
 test.beforeEach(async ({ page }) => {
