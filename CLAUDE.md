@@ -102,6 +102,17 @@ The app uses automated versioning via GitHub Actions:
 
 The version is displayed in the About modal and helps identify which build is deployed.
 
+## PR Previews
+
+- **Every open PR from this repo gets a preview at `/preview/pr-<number>/`**, listed at `/preview/`. The deploy workflow builds them with `.github/scripts/build_previews.py` and also runs on `pull_request_target`, so previews update when PRs open, change or close.
+- **Every deploy replaces the whole site**, so every run rebuilds every open preview; a closed PR's preview disappears on the next deploy.
+- **Never run PR code in the workflow.** The script runs from `main`'s checkout and only copies the PR's files out of git. Fork PRs are skipped entirely (the workflow can deploy the site).
+- **Use relative paths** (`style.css`, `icons/x.svg`), never root-relative ones (`/style.css`): a preview would load the live site's files instead of its own. The index page flags any it finds.
+- **Previews share the live site's origin**, so the script keeps them apart: localStorage keys are prefixed `preview-pr-<n>:`, the service worker's `CACHE_PREFIX` becomes `awards-tracker-pr-<n>-`, and the manifest gets its own `id`. Keep `CACHE_PREFIX` in `sw.js`, and have the worker delete only caches with its own prefix.
+- **Previews are noindex**, and `robots.txt` disallows `/preview/`.
+- **A failed preview** is listed as failed on `/preview/` and never blocks the live deploy.
+- **Test the script locally** with `PREVIEW_PRS_JSON=<file> python3 .github/scripts/build_previews.py <out_dir>` (the same JSON `gh pr list --json number,title,url,headRefName,headRefOid,isCrossRepository` returns).
+
 ## Service Worker
 
 - **Never bump `SW_VERSION` by hand.** The deploy workflow replaces it with the commit's short SHA, so `sw.js` changes on every deploy and installed clients always pick up the new worker. Locally it reads `'dev'`.

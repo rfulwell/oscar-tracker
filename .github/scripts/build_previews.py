@@ -71,6 +71,8 @@ STORAGE_SHIM = """<script>
 
 # Root-relative URLs ("/style.css") would load the live site's files instead
 # of the preview's. Checked after the build and reported on the index page.
+# Test files aren't served to visitors and may contain such paths on purpose.
+LEAK_CHECK_SKIPPED_DIRS = {'tests'}
 ROOT_RELATIVE_PATTERNS = {
     '.html': re.compile(r'''(?:href|src)\s*=\s*["']/(?![/"'])'''),
     '.css': re.compile(r'''url\(\s*["']?/(?!/)'''),
@@ -187,7 +189,9 @@ def adjust_preview(dest, pr, sha):
             warnings.append('manifest.json is not valid JSON')
 
     leaks = []
-    for root, _, files in os.walk(dest):
+    for root, dirs, files in os.walk(dest):
+        if root == dest:
+            dirs[:] = [d for d in dirs if d not in LEAK_CHECK_SKIPPED_DIRS]
         for name in files:
             pattern = ROOT_RELATIVE_PATTERNS.get(os.path.splitext(name)[1])
             if not pattern:
