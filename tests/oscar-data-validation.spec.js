@@ -972,9 +972,9 @@ test.describe('Oscar Data Validation - Technical Credits', () => {
         const nominees = await getNomineesFromApp(page);
         const expectedCredits = {
             'Avatar: Fire and Ash': 'Deborah L. Scott',
-            'Frankenstein': 'Luis Sequeira',
-            'Hamnet': 'Sandy Powell',
-            'Marty Supreme': 'Courtney Hoffman',
+            'Frankenstein': 'Kate Hawley',
+            'Hamnet': 'Malgosia Turzanska',
+            'Marty Supreme': 'Miyako Bellizzi',
             'Sinners': 'Ruth E. Carter'
         };
 
@@ -991,11 +991,11 @@ test.describe('Oscar Data Validation - Technical Credits', () => {
 
         const nominees = await getNomineesFromApp(page);
         const expectedCredits = {
-            'F1': 'Mark Weingarten & James H. Mather',
-            'Frankenstein': 'Randy Thom & Gary Rydstrom',
-            'One Battle After Another': 'Richard King',
-            'Sinners': 'Steve Boeddeker & Brandon Proctor',
-            'Sirât': 'Olivier Goinard'
+            'F1': 'Gareth John, Al Nelson, Gwendolyn Yates Whittle, Gary A. Rizzo & Juan Peralta',
+            'Frankenstein': 'Greg Chapman, Nathan Robitaille, Nelson Ferreira, Christian Cooke & Brad Zoern',
+            'One Battle After Another': 'José Antonio García, Christopher Scarabosio & Tony Villaflor',
+            'Sinners': 'Chris Welcker, Benjamin A. Burtt, Felipe Pacheco, Brandon Proctor & Steve Boeddeker',
+            'Sirât': 'Amanda Villavieja, Laia Casanovas & Yasmina Praderas'
         };
 
         for (const [film, soundTeam] of Object.entries(expectedCredits)) {
@@ -1011,11 +1011,11 @@ test.describe('Oscar Data Validation - Technical Credits', () => {
 
         const nominees = await getNomineesFromApp(page);
         const expectedCredits = {
-            'Avatar: Fire and Ash': 'Joe Letteri & Eric Saindon',
-            'F1': 'Alex Wuttke',
-            'Jurassic World Rebirth': 'David Vickery',
-            'The Lost Bus': 'Charmaine Chan',
-            'Sinners': 'Erik Henry'
+            'Avatar: Fire and Ash': 'Joe Letteri, Richard Baneham, Eric Saindon & Daniel Barrett',
+            'F1': 'Ryan Tudhope, Nicolas Chevallier, Robert Harrington & Keith Dawson',
+            'Jurassic World Rebirth': 'David Vickery, Stephen Aplin, Charmaine Chan & Neil Corbould',
+            'The Lost Bus': 'Charlie Noble, David Zaretti, Russell Bowen & Brandon K. McLaughlin',
+            'Sinners': 'Michael Ralla, Espen Nordahl, Guido Wolter & Donnie Dean'
         };
 
         for (const [film, vfxSupervisor] of Object.entries(expectedCredits)) {
@@ -1107,8 +1107,8 @@ test.describe('Oscar Data Validation - Documentary Feature', () => {
             'The Alabama Solution': 'Andrew Jarecki & Charlotte Kaufman',
             'Come See Me in the Good Light': 'Ryan White',
             'Cutting through Rocks': 'Sara Khaki & Mohammadreza Eyni',
-            'Mr. Nobody against Putin': 'Vera Krichevskaya',
-            'The Perfect Neighbor': 'Geeta Gandbhir & Alison Payne'
+            'Mr. Nobody against Putin': 'David Borenstein, Pavel Talankin, Helle Faber & Alžběta Karásková',
+            'The Perfect Neighbor': 'Geeta Gandbhir, Alisa Payne, Nikon Kwantu & Sam Bisbee'
         };
 
         for (const [doc, directors] of Object.entries(expectedDocs)) {
@@ -1156,7 +1156,7 @@ test.describe('Oscar Data Validation - Screenplays', () => {
         const expectedWriters = {
             'Sinners': 'Ryan Coogler',
             'Sentimental Value': 'Eskil Vogt & Joachim Trier',
-            'Blue Moon': 'Richard Linklater',
+            'Blue Moon': 'Robert Kaplow',
             'Marty Supreme': 'Ronald Bronstein & Josh Safdie',
             'It Was Just an Accident': 'Jafar Panahi'
         };

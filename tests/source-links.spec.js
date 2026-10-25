@@ -16,6 +16,17 @@ async function completeOnboarding(page) {
     await page.waitForSelector('#films-list .film', { state: 'visible' });
 }
 
+// Measure several elements in one step. Opening the category view starts a
+// smooth scroll, so measuring them one at a time can catch the page mid-scroll.
+async function getBoxes(page, ...selectors) {
+    return page.evaluate((sels) => sels.map((sel) => {
+        const el = document.querySelector(sel);
+        if (!el) return null;
+        const { x, y, width, height } = el.getBoundingClientRect();
+        return { x, y, width, height };
+    }), selectors);
+}
+
 test.describe('Source Links', () => {
 
     test.describe('Top Category Navigation', () => {
@@ -51,12 +62,8 @@ test.describe('Source Links', () => {
             await page.setViewportSize({ width: 1200, height: 800 });
             await completeOnboarding(page);
 
-            const progress = page.locator('#progress');
-            const sourceLink = page.locator('#source-link-top');
-
             // Get bounding boxes to verify positioning
-            const progressBox = await progress.boundingBox();
-            const sourceLinkBox = await sourceLink.boundingBox();
+            const [progressBox, sourceLinkBox] = await getBoxes(page, '#progress', '#source-link-top');
 
             expect(progressBox).not.toBeNull();
             expect(sourceLinkBox).not.toBeNull();
@@ -69,11 +76,7 @@ test.describe('Source Links', () => {
             await page.setViewportSize({ width: 1200, height: 800 });
             await completeOnboarding(page);
 
-            const progress = page.locator('#progress');
-            const sourceLink = page.locator('#source-link-top');
-
-            const progressBox = await progress.boundingBox();
-            const sourceLinkBox = await sourceLink.boundingBox();
+            const [progressBox, sourceLinkBox] = await getBoxes(page, '#progress', '#source-link-top');
 
             expect(progressBox).not.toBeNull();
             expect(sourceLinkBox).not.toBeNull();
@@ -205,11 +208,7 @@ test.describe('Source Links', () => {
             await page.setViewportSize({ width: 375, height: 667 });
             await completeOnboarding(page);
 
-            const progress = page.locator('#progress');
-            const sourceLink = page.locator('#source-link-top');
-
-            const progressBox = await progress.boundingBox();
-            const sourceLinkBox = await sourceLink.boundingBox();
+            const [progressBox, sourceLinkBox] = await getBoxes(page, '#progress', '#source-link-top');
 
             expect(progressBox).not.toBeNull();
             expect(sourceLinkBox).not.toBeNull();

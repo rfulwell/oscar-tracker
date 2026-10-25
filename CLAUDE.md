@@ -14,6 +14,10 @@ All changes to stored data (localStorage) must be backwards compatible. Do not m
 
 This project uses Playwright for automated E2E testing with headless Chromium. Tests are located in the `tests/` directory.
 
+### Failing Tests Come First
+
+Before starting any other work, run the full suite. If anything fails, fixing it is the first priority: fix it in its own PR and merge that before any feature PR. A feature PR is ready only when the full suite passes on it, not when its failures "also fail on `main`".
+
 ### Running Tests
 
 ```bash
@@ -33,6 +37,10 @@ npx playwright test --debug
 ### Test Structure
 
 Tests start a local HTTP server on port 3000 and run against the live app. Each test clears localStorage to ensure isolation.
+
+- **Official data source**: `The 98th Academy Awards _ 2026.html` is a saved copy of the official nominations page. When `oscar-data-validation.spec.js` and `app.js` disagree, check both against it rather than assuming either is right.
+- **Measure layout in one step**: opening the category view starts a smooth scroll, so reading two elements' positions with separate `boundingBox()` calls can catch the page mid-scroll. Measure them together in a single `page.evaluate()` (see `getBoxes()` in `source-links.spec.js`).
+- **Share links are one character per category** (24 for 2026). Test links must match `CATEGORIES.length` or the app ignores them.
 
 ### Coverage
 

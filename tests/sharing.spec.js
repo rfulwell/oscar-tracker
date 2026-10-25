@@ -51,7 +51,7 @@ test.describe('Sharing Predictions', () => {
         test('should save shared list during first-time onboarding flow', async ({ page }) => {
             // Simulate a first-time visitor opening a shared link
             // They have never been to the site, so localStorage is empty
-            await page.goto('/?p=8--------------------&name=Sarah');
+            await page.goto('/?p=8-----------------------&name=Sarah');
 
             // First-time visitor sees onboarding screen
             const browseBtn = page.locator('#browse-by-category');
@@ -68,7 +68,7 @@ test.describe('Sharing Predictions', () => {
         });
 
         test('should auto-switch to shared view after first-time onboarding', async ({ page }) => {
-            await page.goto('/?p=8--------------------&name=Sarah');
+            await page.goto('/?p=8-----------------------&name=Sarah');
 
             // Complete onboarding if showing
             await completeOnboarding(page);
@@ -79,7 +79,7 @@ test.describe('Sharing Predictions', () => {
         });
 
         test('should show shared banner after first-time onboarding', async ({ page }) => {
-            await page.goto('/?p=8--------------------&name=Sarah');
+            await page.goto('/?p=8-----------------------&name=Sarah');
 
             await completeOnboarding(page);
 
@@ -91,7 +91,7 @@ test.describe('Sharing Predictions', () => {
 
         test('should persist shared list after first-time visitor reloads', async ({ page }) => {
             // First visit with shared link
-            await page.goto('/?p=8--------------------&name=Sarah');
+            await page.goto('/?p=8-----------------------&name=Sarah');
             await completeOnboarding(page);
 
             // Reload without URL params (simulating normal return visit)
@@ -110,7 +110,7 @@ test.describe('Sharing Predictions', () => {
 
         test('should display correct predictions from shared link after onboarding', async ({ page }) => {
             // Share link with Best Picture = index 8 (Sinners)
-            await page.goto('/?p=8--------------------&name=Sarah');
+            await page.goto('/?p=8-----------------------&name=Sarah');
             await completeOnboarding(page);
 
             // Best Picture is the default category
@@ -131,7 +131,7 @@ test.describe('Sharing Predictions', () => {
             await completeOnboarding(page);
 
             // Now visit with a shared link
-            await page.goto('/?p=8--------------------&name=Mike');
+            await page.goto('/?p=8-----------------------&name=Mike');
             await waitForCategoryScreen(page);
 
             // Mike's list should be in the navigation
@@ -151,7 +151,7 @@ test.describe('Sharing Predictions', () => {
             await expect(page.locator('#films-list .film').first()).toHaveClass(/predicted/);
 
             // Now receive a shared link
-            await page.goto('/?p=8--------------------&name=Sarah');
+            await page.goto('/?p=8-----------------------&name=Sarah');
             await waitForCategoryScreen(page);
 
             // Switch back to own predictions
@@ -166,7 +166,7 @@ test.describe('Sharing Predictions', () => {
     test.describe('Shared List Management', () => {
 
         test('should show delete button when viewing shared list', async ({ page }) => {
-            await page.goto('/?p=8--------------------&name=Sarah');
+            await page.goto('/?p=8-----------------------&name=Sarah');
             await completeOnboarding(page);
 
             // Should show delete button, not share button
@@ -186,7 +186,7 @@ test.describe('Sharing Predictions', () => {
         });
 
         test('should show correct name in delete confirmation modal', async ({ page }) => {
-            await page.goto('/?p=8--------------------&name=Sarah');
+            await page.goto('/?p=8-----------------------&name=Sarah');
             await completeOnboarding(page);
 
             // Click delete
@@ -199,7 +199,7 @@ test.describe('Sharing Predictions', () => {
         });
 
         test('should remove shared list when delete confirmed', async ({ page }) => {
-            await page.goto('/?p=8--------------------&name=Sarah');
+            await page.goto('/?p=8-----------------------&name=Sarah');
             await completeOnboarding(page);
 
             // Click delete
@@ -216,7 +216,7 @@ test.describe('Sharing Predictions', () => {
         });
 
         test('should keep shared list when delete cancelled', async ({ page }) => {
-            await page.goto('/?p=8--------------------&name=Sarah');
+            await page.goto('/?p=8-----------------------&name=Sarah');
             await completeOnboarding(page);
 
             // Click delete
@@ -236,11 +236,11 @@ test.describe('Sharing Predictions', () => {
 
         test('should support multiple shared lists from different people', async ({ page }) => {
             // Receive first shared list
-            await page.goto('/?p=8--------------------&name=Sarah');
+            await page.goto('/?p=8-----------------------&name=Sarah');
             await completeOnboarding(page);
 
             // Receive second shared list
-            await page.goto('/?p=0--------------------&name=Mike');
+            await page.goto('/?p=0-----------------------&name=Mike');
             await waitForCategoryScreen(page);
 
             // Both should be in navigation
@@ -251,11 +251,11 @@ test.describe('Sharing Predictions', () => {
         test('should load correct predictions when switching between shared lists', async ({ page }) => {
             // Set up two shared lists with different predictions
             // Sarah: Best Picture index 8
-            await page.goto('/?p=8--------------------&name=Sarah');
+            await page.goto('/?p=8-----------------------&name=Sarah');
             await completeOnboarding(page);
 
             // Mike: Best Picture index 0
-            await page.goto('/?p=0--------------------&name=Mike');
+            await page.goto('/?p=0-----------------------&name=Mike');
             await waitForCategoryScreen(page);
 
             // Currently viewing Mike's - first film should be predicted
@@ -287,14 +287,14 @@ test.describe('Sharing Predictions', () => {
     test.describe('Name Sanitization', () => {
 
         test('should handle names with special URL characters', async ({ page }) => {
-            await page.goto('/?p=8--------------------&name=Sarah%20%26%20John');
+            await page.goto('/?p=8-----------------------&name=Sarah%20%26%20John');
             await completeOnboarding(page);
 
             expect(await hasSharedList(page, "Sarah & John")).toBeTruthy();
         });
 
         test('should trim whitespace from names', async ({ page }) => {
-            await page.goto('/?p=8--------------------&name=%20Sarah%20');
+            await page.goto('/?p=8-----------------------&name=%20Sarah%20');
             await completeOnboarding(page);
 
             const banner = page.locator('#shared-banner');
@@ -306,7 +306,7 @@ test.describe('Sharing Predictions', () => {
         });
 
         test('should default to Friend when no name provided', async ({ page }) => {
-            await page.goto('/?p=8--------------------');
+            await page.goto('/?p=8-----------------------');
             await completeOnboarding(page);
 
             const banner = page.locator('#shared-banner');
