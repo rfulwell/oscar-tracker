@@ -47,8 +47,14 @@ npx playwright test --debug
 Tests start a local HTTP server on port 3000 and run against the live app. Each test clears localStorage to ensure isolation.
 
 - **Official data source**: `The 98th Academy Awards _ 2026.html` is a saved copy of the official nominations page. When `oscar-data-validation.spec.js` and `app.js` disagree, check both against it rather than assuming either is right.
-- **Measure layout in one step**: opening the category view starts a smooth scroll, so reading two elements' positions with separate `boundingBox()` calls can catch the page mid-scroll. Measure them together in a single `page.evaluate()` (see `getBoxes()` in `source-links.spec.js`).
+- **Opening the category view smooth-scrolls the page.** Layout tests that run while it's still scrolling are flaky. Either wait for it to stop (`waitForScrollToStop()` in `viewport-layout.spec.js`), or measure all the elements you compare in a single `page.evaluate()` (`getBoxes()` in `source-links.spec.js`). Don't use fixed `waitForTimeout()` delays.
 - **Share links are one character per category** (24 for 2026). Test links must match `CATEGORIES.length` or the app ignores them.
+
+### CI
+
+- **`.github/workflows/test.yml`** runs the full suite on every pull request. The deploy workflow calls it first, and nothing deploys unless it passes.
+- **`package-lock.json` is committed** so CI installs the exact Playwright version (`npm ci`). Update it with `npm install` when changing dependencies.
+- **CI retries a failed test twice** (`playwright.config.js`). A test reported as "flaky" passed only on a retry: treat it as a bug and fix it, don't rely on the retry.
 
 ### Coverage
 
