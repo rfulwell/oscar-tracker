@@ -63,7 +63,7 @@ Tests start a local HTTP server on port 3000 and run against the live app. Each 
 - **Official data source**: `The 98th Academy Awards _ 2026.html` is a saved copy of the official nominations page. When `oscar-data-validation.spec.js` and `app.js` disagree, check both against it rather than assuming either is right.
 - **Opening the category view smooth-scrolls the page.** Layout tests that run while it's still scrolling are flaky. Either wait for it to stop (`waitForScrollToStop()` in `viewport-layout.spec.js`), or measure all the elements you compare in a single `page.evaluate()` (`getBoxes()` in `source-links.spec.js`). Don't use fixed `waitForTimeout()` delays.
 - **Share links are one character per category** (24 for 2026). Test links must match `CATEGORIES.length` or the app ignores them.
-- **Browser tests run on the 2026 season's data** whatever season `index.html` loads: import `test` from `./fixtures/test` (not `@playwright/test`), which serves `seasons/2026.js` for any season file. This keeps them working when a new season becomes current. Only `season-files.spec.js` uses the real current season. To simulate another season, `context.route()` the season file in the test; the route registered last wins.
+- **Browser tests run on the 2026 season's data** whatever season `index.html` loads: import `test` from `./fixtures/test` (not `@playwright/test`), which serves `seasons/2026.js` for any season file. This keeps them working when a new season becomes current. Only `season-files.spec.js` and `site-files.spec.js` use the real current season. To simulate another season, `context.route()` the season file in the test; the route registered last wins.
 
 ### CI
 
@@ -98,6 +98,7 @@ These scripts measure:
 ## Versioning & Deployment
 
 - **Deploy branch**: Only pushes to `main` deploy to production (awardstracker.app). Do feature work on a branch and merge to `main` via PR; feature branches never deploy.
+- **Only the files in `.github/site-files.txt` are published.** The deploy copies them into `_site/` with `.github/scripts/build_site.py` (which fails if a listed path is missing) and uploads that. Tests, docs, mockups and the saved official pages stay out. **When the app starts loading a new file or folder, add it to the list**; `site-files.spec.js` fails if anything the app references (index.html, the manifest, `ASSETS_TO_CACHE`, streaming icons) is missing from the built site.
 
 The app uses automated versioning via GitHub Actions:
 
@@ -113,6 +114,7 @@ The version is displayed in the About modal and helps identify which build is de
 - **Every open PR from this repo gets a preview at `/preview/pr-<number>/`**, listed at `/preview/`. The deploy workflow builds them with `.github/scripts/build_previews.py` and also runs on `pull_request_target`, so previews update when PRs open, change or close.
 - **Every deploy replaces the whole site**, so every run rebuilds every open preview; a closed PR's preview disappears on the next deploy.
 - **Never run PR code in the workflow.** The script runs from `main`'s checkout and only copies the PR's files out of git. Fork PRs are skipped entirely (the workflow can deploy the site).
+- **A preview publishes only what the PR's own `.github/site-files.txt` lists** (main's list if the branch has none), never `CNAME`.
 - **Use relative paths** (`style.css`, `icons/x.svg`), never root-relative ones (`/style.css`): a preview would load the live site's files instead of its own. The index page flags any it finds.
 - **Previews share the live site's origin**, so the script keeps them apart: localStorage keys are prefixed `preview-pr-<n>:`, the service worker's `CACHE_PREFIX` becomes `awards-tracker-pr-<n>-`, and the manifest gets its own `id`. Keep `CACHE_PREFIX` in `sw.js`, and have the worker delete only caches with its own prefix.
 - **Previews are noindex**, and `robots.txt` disallows `/preview/`.

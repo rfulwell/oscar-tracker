@@ -31,5 +31,5 @@ node_modules/
 test-results/
 playwright-report/
 
-# PR previews built locally by .github/scripts/build_previews.py
-preview/
+# Site and PR previews built locally by .github/scripts/build_site.py and build_previews.py
+_site/

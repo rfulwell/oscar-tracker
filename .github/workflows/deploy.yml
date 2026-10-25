@@ -62,12 +62,16 @@ jobs:
           grep "const APP_VERSION = '$VERSION'" app.js
           grep "const SW_VERSION = '$SW_VERSION'" sw.js
 
+      - name: Build site
+        # Only the files listed in .github/site-files.txt are published
+        run: python3 .github/scripts/build_site.py . _site
+
       - name: Build PR previews
         # A failed preview is listed on /preview/ and never blocks the live deploy
         continue-on-error: true
         env:
           GH_TOKEN: ${{ github.token }}
-        run: python3 .github/scripts/build_previews.py preview
+        run: python3 .github/scripts/build_previews.py _site/preview
 
       - name: Setup Pages
         uses: actions/configure-pages@v4
@@ -75,7 +79,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: '.'
+          path: _site
 
       - name: Deploy to GitHub Pages
         id: deployment
