@@ -406,32 +406,32 @@ const FILM_STREAMING = {
 const STREAMING_SERVICES = {
     netflix: {
         urlTemplate: 'https://www.netflix.com/search?q={title}',
-        icon: '/icons/netflix.svg',
+        icon: 'icons/netflix.svg',
         name: 'Netflix'
     },
     max: {
         urlTemplate: 'https://play.max.com/search?q={title}',
-        icon: '/icons/max.svg',
+        icon: 'icons/max.svg',
         name: 'Max'
     },
     appletv: {
         urlTemplate: 'https://tv.apple.com/search?term={title}',
-        icon: '/icons/appletv.svg',
+        icon: 'icons/appletv.svg',
         name: 'Apple TV+'
     },
     peacock: {
         urlTemplate: 'https://www.peacocktv.com/watch/search?q={title}',
-        icon: '/icons/peacock.svg',
+        icon: 'icons/peacock.svg',
         name: 'Peacock'
     },
     hulu: {
         urlTemplate: 'https://www.hulu.com/search?q={title}',
-        icon: '/icons/hulu.svg',
+        icon: 'icons/hulu.svg',
         name: 'Hulu'
     },
     disneyplus: {
         urlTemplate: 'https://www.disneyplus.com/search/{title}',
-        icon: '/icons/disneyplus.svg',
+        icon: 'icons/disneyplus.svg',
         name: 'Disney+'
     }
 };
