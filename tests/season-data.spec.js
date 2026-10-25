@@ -1,5 +1,5 @@
 // @ts-check
-const { test, expect } = require('@playwright/test');
+const { test, expect } = require('./fixtures/test');
 const fs = require('fs');
 const path = require('path');
 
@@ -28,7 +28,7 @@ async function useNextSeason(context) {
         expect(source).toContain(changed);
     }
     expect(source).not.toContain('best-live-action-short');
-    await context.route('**/seasons/2026.js', (route) => route.fulfill({
+    await context.route(/\/seasons\/\d{4}\.js$/, (route) => route.fulfill({
         body: source,
         contentType: 'application/javascript'
     }));

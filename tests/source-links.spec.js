@@ -1,5 +1,5 @@
 // @ts-check
-const { test, expect } = require('@playwright/test');
+const { test, expect } = require('./fixtures/test');
 
 const OFFICIAL_OSCAR_URL = 'https://www.oscars.org/oscars/ceremonies/2026';
 

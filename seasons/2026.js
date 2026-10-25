@@ -7,6 +7,9 @@
 // change an id: share links store each pick as its position in its category,
 // and saved data stores ids.
 //
+// tests/season-files.spec.js checks this file's structure, and checks every
+// title and credit against the saved official nominations page.
+//
 // Each nominee's `film` links it to an entry in `films`. Marking a film as
 // watched marks every nominee linked to it. A nominee with no `film` isn't in
 // the films list and is marked on its own.
@@ -58,6 +61,8 @@ const AWARDS_SEASON = {
         {
             id: 'best-picture',
             name: 'Best Picture',
+            // Subtitles name the studio, which the official nominations page doesn't list
+            creditType: 'studio',
             nominees: [
                 { id: 'bugonia', title: 'Bugonia', subtitle: 'Focus Features', film: 'bugonia' },
                 { id: 'f1', title: 'F1', subtitle: 'Apple Original Films', film: 'f1' },
@@ -151,6 +156,8 @@ const AWARDS_SEASON = {
         {
             id: 'best-animated-feature',
             name: 'Best Animated Feature',
+            // Subtitles name the studio, which the official nominations page doesn't list
+            creditType: 'studio',
             nominees: [
                 { id: 'anim-arco', title: 'Arco', subtitle: 'Neon', film: 'arco' },
                 { id: 'anim-elio', title: 'Elio', subtitle: 'Disney/Pixar', film: 'elio' },

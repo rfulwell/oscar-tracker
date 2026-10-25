@@ -1,5 +1,5 @@
 // @ts-check
-const { test, expect } = require('@playwright/test');
+const { test, expect } = require('./fixtures/test');
 
 // Helper to clear all localStorage before each test and navigate to category screen
 test.beforeEach(async ({ page }) => {
