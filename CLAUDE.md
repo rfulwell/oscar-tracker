@@ -10,6 +10,14 @@ The current UI design is polished and should be preserved. Avoid making unnecess
 
 All changes to stored data (localStorage) must be backwards compatible. Do not modify the format of existing data. When adding new features that require additional data, use new keys/tables rather than changing existing ones. This ensures users' existing watched items and preferences remain valid as the app evolves.
 
+### Seasons
+
+- **`SEASON` in `app.js`** names the awards year the build tracks. Watched films, predictions, favorites and shared lists are stored per season via `seasonKey()`.
+- **2026 keeps the original keys** (`oscar-tracker-watched`, etc.). Later seasons use suffixed keys (`oscar-tracker-watched-2027`). Never write to another season's keys.
+- **Global keys** (not per season): mode, current category, sharer name, the copy-modal dismissals and `sidebarCollapsed`.
+- **Picks can name nominees that no longer exist** (data corrections after a user saved them). Count picks with `countValidPicks()` / check them with `isValidPick()` rather than `Object.keys()`, and don't delete them from storage.
+- **season-storage.spec.js** covers loading 2026 data from the original keys, stale picks, and a new season starting fresh without touching 2026 data.
+
 ## Testing
 
 This project uses Playwright for automated E2E testing with headless Chromium. Tests are located in the `tests/` directory.

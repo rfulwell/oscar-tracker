@@ -9,6 +9,11 @@ const CHANGELOG = [
     { version: '1.0.0', description: 'Initial release - track watched films and make predictions' }
 ];
 
+// Awards season this build tracks. Watched films, predictions, favorites and
+// shared lists are stored per season, so a new year starts fresh and earlier
+// seasons' data is never overwritten.
+const SEASON = '2026';
+
 // Oscar ceremony date (March 15, 2026, 7pm ET)
 const OSCAR_DATE = new Date('2026-03-15T19:00:00-05:00');
 
@@ -284,12 +289,18 @@ const CATEGORIES = [
     }
 ];
 
-const STORAGE_KEY = 'oscar-tracker-watched';
+// 2026 predates per-season storage and keeps the original keys, so existing
+// users' data stays where it is. Later seasons get their own keys.
+function seasonKey(baseKey) {
+    return SEASON === '2026' ? baseKey : `${baseKey}-${SEASON}`;
+}
+
+const STORAGE_KEY = seasonKey('oscar-tracker-watched');
 const CATEGORY_KEY = 'oscar-tracker-category';
-const PREDICTIONS_KEY = 'oscar-tracker-predictions';
-const FAVORITES_KEY = 'oscar-tracker-favorites';
+const PREDICTIONS_KEY = seasonKey('oscar-tracker-predictions');
+const FAVORITES_KEY = seasonKey('oscar-tracker-favorites');
 const MODE_KEY = 'oscar-tracker-mode';
-const SHARED_LISTS_KEY = 'oscar-tracker-shared-lists';
+const SHARED_LISTS_KEY = seasonKey('oscar-tracker-shared-lists');
 const SHARER_NAME_KEY = 'oscar-tracker-sharer-name';
 const FAVORITES_COPY_DISMISSED_KEY = 'oscar-tracker-favorites-copy-dismissed';
 const PREDICTIONS_COPY_DISMISSED_KEY = 'oscar-tracker-predictions-copy-dismissed';
@@ -681,7 +692,7 @@ function parseShareParams() {
 
 // Check if predictions have any selections
 function hasAnyPredictions(preds) {
-    return Object.keys(preds || predictions).length > 0;
+    return countValidPicks(preds || predictions) > 0;
 }
 
 // Sanitize name - remove non-printing characters and trim whitespace
@@ -1649,9 +1660,20 @@ function toggleFavorite(categoryId, nomineeId) {
     saveFavorites();
 }
 
+// Whether a stored pick names a nominee in this category. Picks saved by older
+// builds can name nominees that were later corrected out of the data.
+function isValidPick(category, nomineeId) {
+    return !!nomineeId && category.nominees.some(n => n.id === nomineeId);
+}
+
+// Count categories whose pick names a current nominee
+function countValidPicks(picks) {
+    return CATEGORIES.filter(cat => isValidPick(cat, picks[cat.id])).length;
+}
+
 // Count favorites
 function countFavorites() {
-    return Object.keys(favorites).length;
+    return countValidPicks(favorites);
 }
 
 // Check if favorites copy modal was dismissed
@@ -1699,7 +1721,7 @@ function shouldShowCopyToPredictionsModal() {
 
 // Count predictions
 function countPredictions() {
-    return Object.keys(predictions).length;
+    return countValidPicks(predictions);
 }
 
 // Copy predictions to favorites
@@ -2470,25 +2492,25 @@ function updateProgress() {
         titleProgress = `${watchedCount}/${totalCount}`;
     } else if (currentMode === 'favorites') {
         // For favorites: show how many categories have favorites
-        const favoritedCount = Object.keys(favorites).length;
+        const favoritedCount = countFavorites();
         const totalCategories = CATEGORIES.length;
-        const hasFavorite = favorites[category.id] ? '♥' : '♡';
+        const hasFavorite = isValidPick(category, favorites[category.id]) ? '♥' : '♡';
         progressText = hasFavorite;
         titleProgress = favoritedCount > 0 ? `${favoritedCount}/${totalCategories}` : null;
     } else if (currentMode === 'predictions') {
         // For predictions: show how many categories have predictions
-        const predictedCount = Object.keys(predictions).length;
+        const predictedCount = countPredictions();
         const totalCategories = CATEGORIES.length;
-        const hasPrediction = predictions[category.id] ? '✓' : '○';
+        const hasPrediction = isValidPick(category, predictions[category.id]) ? '✓' : '○';
         progressText = hasPrediction;
         titleProgress = predictedCount > 0 ? `${predictedCount}/${totalCategories}` : null;
     } else if (isSharedMode()) {
         // For shared view: show progress for shared predictions
         const sharedList = getCurrentSharedList();
         if (sharedList) {
-            const predictedCount = Object.keys(sharedList.predictions).length;
+            const predictedCount = countValidPicks(sharedList.predictions);
             const totalCategories = CATEGORIES.length;
-            const hasPrediction = sharedList.predictions[category.id] ? '✓' : '○';
+            const hasPrediction = isValidPick(category, sharedList.predictions[category.id]) ? '✓' : '○';
             progressText = hasPrediction;
             titleProgress = `${predictedCount}/${totalCategories}`;
         } else {
