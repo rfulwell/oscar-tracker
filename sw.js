@@ -8,29 +8,34 @@
 // for updates. Caches only hold copies of app files; user data lives in
 // localStorage and is never touched here.
 const SW_VERSION = 'dev';
-const CACHE_NAME = `awards-tracker-v${SW_VERSION}`;
+
+// Every cache this worker owns starts with this prefix. PR previews run on the
+// same origin as the live site and share its caches, so the preview build
+// rewrites it (.github/scripts/build_previews.py) to keep them apart.
+const CACHE_PREFIX = 'awards-tracker-';
+const CACHE_NAME = `${CACHE_PREFIX}v${SW_VERSION}`;
 
 // Google Fonts never change at a given URL, so they live in their own cache
 // that survives app updates.
-const FONT_CACHE = 'awards-tracker-fonts';
+const FONT_CACHE = `${CACHE_PREFIX}fonts`;
 
 // How long to wait for the network before falling back to a cached copy
 const NETWORK_TIMEOUT_MS = 3000;
 
 const ASSETS_TO_CACHE = [
-    '/',
-    '/index.html',
-    '/style.css',
-    '/app.js',
-    '/manifest.json',
-    '/icons/icon-192.png',
-    '/icons/icon-512.png',
-    '/icons/netflix.svg',
-    '/icons/max.svg',
-    '/icons/appletv.svg',
-    '/icons/peacock.svg',
-    '/icons/hulu.svg',
-    '/icons/disneyplus.svg'
+    './',
+    'index.html',
+    'style.css',
+    'app.js',
+    'manifest.json',
+    'icons/icon-192.png',
+    'icons/icon-512.png',
+    'icons/netflix.svg',
+    'icons/max.svg',
+    'icons/appletv.svg',
+    'icons/peacock.svg',
+    'icons/hulu.svg',
+    'icons/disneyplus.svg'
 ];
 
 // Respond to version queries from the app
@@ -59,14 +64,15 @@ self.addEventListener('install', (event) => {
     );
 });
 
-// Activate event - clean up old caches
+// Activate event - clean up this worker's old versions. Other caches on the
+// origin (a PR preview's, or the live site's when this is a preview) are left alone.
 self.addEventListener('activate', (event) => {
     event.waitUntil(
         caches.keys()
             .then((cacheNames) => {
                 return Promise.all(
                     cacheNames
-                        .filter((name) => name !== CACHE_NAME && name !== FONT_CACHE)
+                        .filter((name) => name.startsWith(`${CACHE_PREFIX}v`) && name !== CACHE_NAME)
                         .map((name) => caches.delete(name))
                 );
             })
@@ -111,7 +117,7 @@ function networkFirst(event, cacheKey) {
     event.waitUntil(network.catch(() => {}));
 
     const cached = () => caches.match(cacheKey)
-        .then((response) => response || (request.mode === 'navigate' ? caches.match('/index.html') : undefined));
+        .then((response) => response || (request.mode === 'navigate' ? caches.match('index.html') : undefined));
 
     return new Promise((resolve, reject) => {
         let settled = false;

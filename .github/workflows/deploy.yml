@@ -4,19 +4,32 @@ on:
   push:
     branches:
       - main
+  # Rebuild PR previews (/preview/pr-<number>/) when a PR into main opens,
+  # changes or closes. pull_request_target runs this workflow from main, the
+  # only branch allowed to deploy Pages. It must never run code from the PR:
+  # the preview script runs from main's checkout and only copies the PR's files.
+  pull_request_target:
+    types: [opened, synchronize, reopened, closed]
+    branches:
+      - main
   workflow_dispatch:  # Allow manual triggering
 
 permissions:
   contents: read
   pages: write
   id-token: write
+  pull-requests: read  # List open PRs for previews
 
 concurrency:
   group: "pages"
-  cancel-in-progress: true
+  # Let a running deploy finish; a newer run waits, and only the latest waiting run goes next
+  cancel-in-progress: false
 
 jobs:
   test:
+    # Skip everything for PRs from forks: this workflow can deploy the site.
+    # Tests run on main's code (never the PR's), since every deploy republishes the live site.
+    if: github.event_name != 'pull_request_target' || github.event.pull_request.head.repo.full_name == github.repository
     uses: ./.github/workflows/test.yml
 
   deploy:
@@ -48,6 +61,13 @@ jobs:
           # Verify the updates (fail the deploy if either replacement didn't happen)
           grep "const APP_VERSION = '$VERSION'" app.js
           grep "const SW_VERSION = '$SW_VERSION'" sw.js
+
+      - name: Build PR previews
+        # A failed preview is listed on /preview/ and never blocks the live deploy
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python3 .github/scripts/build_previews.py preview
 
       - name: Setup Pages
         uses: actions/configure-pages@v4
