@@ -89,7 +89,7 @@ test.describe('Published site', () => {
             /^(tests|docs|mockups|node_modules|\.github)\//.test(f) ||
             /\.(md|py)$/.test(f) ||
             /Academy Awards/.test(f) ||
-            ['package.json', 'package-lock.json', 'playwright.config.js', 'tests.html', 'tests.js', '.gitignore'].includes(f));
+            ['package.json', 'package-lock.json', 'playwright.config.js', '.gitignore'].includes(f));
         expect(unexpected).toEqual([]);
         for (const required of ['index.html', 'app.js', 'sw.js', 'style.css', 'manifest.json', 'robots.txt', 'CNAME']) {
             expect(files).toContain(required);

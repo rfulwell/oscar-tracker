@@ -40,7 +40,7 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Bump version
         run: |
@@ -50,9 +50,6 @@ jobs:
 
           # Update APP_VERSION in app.js
           sed -i "s/const APP_VERSION = '[^']*'/const APP_VERSION = '$VERSION'/" app.js
-
-          # Update version in package.json
-          sed -i "s/\"version\": \"[^\"]*\"/\"version\": \"$VERSION\"/" package.json
 
           # Stamp the service worker with the commit so every deploy reaches installed clients
           SW_VERSION="${GITHUB_SHA::7}"
@@ -74,13 +71,13 @@ jobs:
         run: python3 .github/scripts/build_previews.py _site/preview
 
       - name: Setup Pages
-        uses: actions/configure-pages@v4
+        uses: actions/configure-pages@v6
 
       - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
+        uses: actions/upload-pages-artifact@v5
         with:
           path: _site
 
       - name: Deploy to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@v5

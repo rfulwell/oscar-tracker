@@ -76,6 +76,13 @@ Tests start a local HTTP server on port 3000 and run against the live app. Each 
 - **predictions.spec.js**: Predictions mode functionality (mode switching, single-select behavior, persistence, progress display, performance regression tests)
 - **sharing.spec.js**: Sharing predictions via URL (first-time visitors, returning visitors, shared list management, name sanitization, invalid links)
 - **favorites.spec.js**: Favorites mode (heart icons, single-select, cross-population modals, persistence, mode switching)
+- **nominees.spec.js**, **oscar-data-validation.spec.js**: the 2026 nominees, checked against the official list
+- **nav-counts.spec.js**, **search.spec.js**, **streamable.spec.js**: navigation counts, film search, the streamable list
+- **sticky-header.spec.js**, **source-links.spec.js**, **viewport-layout.spec.js**: header, source links and mobile layout
+- **season-storage.spec.js**, **season-data.spec.js**: per-season storage, and season text filled in from the season file
+- **season-files.spec.js**: every `seasons/*.js` file's structure and accuracy, frozen ids, and the current season loading
+- **service-worker.spec.js**: caching, offline, slow network, upgrading from the v9 worker
+- **site-files.spec.js**: the published site has everything the app loads and nothing else
 
 ### Performance Profiling
 

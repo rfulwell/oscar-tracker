@@ -11,7 +11,7 @@ A progressive web app for tracking Oscar-nominated films, making predictions, an
 ## Features
 
 ### Track Your Watch Progress
-- Check off films as you watch them across all 21 Oscar categories
+- Check off films as you watch them, across every Oscar category
 - See nomination counts for each film
 - Progress indicator shows how many you've seen
 
@@ -29,6 +29,10 @@ A progressive web app for tracking Oscar-nominated films, making predictions, an
 - Share your predictions via URL - no account needed
 - View friends' picks side-by-side with yours
 - Works great for Oscar party competitions
+
+### Find Where to Watch
+- Streamable list of nominated films on subscription services, with links to each service
+- Search any film to see all of its nominations
 
 ### Beautiful Design
 - Elegant gold and black awards-show aesthetic
@@ -81,6 +85,9 @@ php -S localhost:3000
 This project uses Playwright for E2E testing:
 
 ```bash
+# Install the exact Playwright version (package-lock.json)
+npm ci
+
 # Run all tests
 npx playwright test
 
@@ -89,17 +96,25 @@ npx playwright test --headed
 
 # Run specific test file
 npx playwright test tests/predictions.spec.js
+
+# Use a Chromium that's already installed instead of Playwright's own
+CHROMIUM_PATH=/path/to/chrome npx playwright test
 ```
 
-## Deploying to GitHub Pages
+The full suite runs on every pull request (`.github/workflows/test.yml`).
 
-1. Create a new repository on GitHub
-2. Push this code to the repository
-3. Go to Settings > Pages
-4. Set source to "Deploy from a branch" and select `main` / `root`
-5. Your site will be available at `https://username.github.io/repo-name`
+## Deployment
 
-The deploy workflow automatically versions each build.
+The site is hosted on GitHub Pages at [awardstracker.app](https://awardstracker.app), deployed by GitHub Actions (Settings → Pages → Source: **GitHub Actions**).
+
+- Every push to `main` runs the test suite, then deploys. Nothing deploys unless the tests pass.
+- Only the files listed in `.github/site-files.txt` are published. Add any new file or folder the app loads there.
+- Each deploy stamps the version shown in the About box, and the service worker's version, so installed apps pick up the update on their own.
+- Every open pull request from this repo gets a preview at `/preview/pr-<number>/`, listed at [/preview/](https://awardstracker.app/preview/).
+
+## A New Year's Oscars
+
+Each year's nominees live in one file, `seasons/<year>.js`. To switch to a new year, follow the [new season checklist](docs/new-season-checklist.md).
 
 ## File Structure
 
@@ -108,12 +123,14 @@ oscar-tracker/
 ├── index.html          # Main HTML with PWA meta tags
 ├── style.css           # Styles with CSS variables
 ├── app.js              # App logic and localStorage
+├── seasons/            # One data file per year's Oscars (nominees, date)
 ├── sw.js               # Service worker for offline
 ├── manifest.json       # Web app manifest
 ├── icons/              # App and streaming service icons
 ├── splash/             # iOS splash screens
 ├── tests/              # Playwright E2E tests
-└── docs/               # Documentation and screenshots
+├── docs/               # Feature notes, new season checklist, screenshots
+└── .github/            # Test and deploy workflows, site file list, build scripts
 ```
 
 ## Privacy
