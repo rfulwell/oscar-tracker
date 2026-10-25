@@ -1,0 +1,18 @@
+# Files and folders published to awardstracker.app, relative to the repo root.
+# A folder ends in "/". Everything else in the repo (tests, docs, mockups, the
+# saved official nominations pages) is left out of the site.
+#
+# Used by .github/scripts/build_site.py for the live site, and by
+# build_previews.py for PR previews (read from the PR's own branch).
+# Add any new file or folder the app loads here.
+
+index.html
+style.css
+app.js
+sw.js
+manifest.json
+robots.txt
+CNAME
+icons/
+seasons/
+splash/

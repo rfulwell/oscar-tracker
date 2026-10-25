@@ -6,7 +6,8 @@ site is ready. The deploy replaces the whole site, so every run rebuilds every
 open preview, and a closed PR's preview disappears on the next deploy.
 
 The PR's files are only copied out of git and lightly rewritten; nothing from
-the PR is ever executed. Pull requests from forks are never previewed: the
+the PR is ever executed. Only the files its own .github/site-files.txt lists
+are published, like the live site. Pull requests from forks are never previewed: the
 previews are served from the live site's origin, so a fork's code could read
 and change visitors' data there.
 
@@ -37,10 +38,13 @@ import subprocess
 import sys
 import tarfile
 
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from build_site import LIST_PATH, is_published, parse_site_files  # noqa: E402
+
 PR_FIELDS = 'number,title,url,headRefName,headRefOid,isCrossRepository'
 
-# Top-level paths in a PR that are never published inside its preview
-EXCLUDED_PATHS = {'.github', 'CNAME', 'preview', 'node_modules'}
+# Never published inside a preview, even if the PR's site files list names it
+EXCLUDED_PATHS = {'CNAME'}
 
 NOINDEX = '<meta name="robots" content="noindex, nofollow">'
 
@@ -114,21 +118,35 @@ def fetch_pr(pr):
     raise RuntimeError('could not fetch the branch')
 
 
-def extract(sha, dest):
-    """Copy the commit's regular files into dest (no symlinks, no .git)."""
+def site_files(sha):
+    """The PR's own list of published files, or main's if the branch has none.
+    Returns (entries, warnings)."""
+    try:
+        text = run(['git', 'show', f'{sha}:{LIST_PATH}'])
+        return parse_site_files(text), []
+    except subprocess.CalledProcessError:
+        with open(LIST_PATH, encoding='utf-8') as f:
+            return parse_site_files(f.read()), [f'branch has no {LIST_PATH}; used main\'s']
+
+
+def extract(sha, dest, entries):
+    """Copy the commit's published files into dest (regular files only, no symlinks).
+    Returns the list's entries that matched nothing."""
     archive = subprocess.run(['git', 'archive', '--format=tar', sha],
                              check=True, capture_output=True).stdout
+    found = set()
     with tarfile.open(fileobj=io.BytesIO(archive)) as tar:
         for member in tar.getmembers():
-            top = member.name.split('/', 1)[0]
-            if top in EXCLUDED_PATHS or not member.isfile():
+            if not member.isfile() or member.name in EXCLUDED_PATHS or not is_published(member.name, entries):
                 continue
+            found.update(e for e in entries if is_published(member.name, [e]))
             target = os.path.abspath(os.path.join(dest, member.name))
             if not target.startswith(os.path.abspath(dest) + os.sep):
                 continue
             os.makedirs(os.path.dirname(target), exist_ok=True)
             with tar.extractfile(member) as src, open(target, 'wb') as out:
                 shutil.copyfileobj(src, out)
+    return [e for e in entries if e not in found and e not in EXCLUDED_PATHS]
 
 
 def rewrite(path, fn):
@@ -212,10 +230,13 @@ def build(pr, out_dir):
     os.makedirs(dest)
     try:
         sha = fetch_pr(pr)
-        extract(sha, dest)
+        entries, warnings = site_files(sha)
+        missing = extract(sha, dest, entries)
+        if missing:
+            warnings.append('listed in site files but not on the branch: ' + ', '.join(missing))
         if not os.path.exists(os.path.join(dest, 'index.html')):
             raise RuntimeError('the branch has no index.html')
-        warnings = adjust_preview(dest, pr, sha)
+        warnings += adjust_preview(dest, pr, sha)
         return {'status': 'built', 'sha': sha, 'warnings': warnings}
     except Exception as e:  # any failure only affects this preview
         shutil.rmtree(dest, ignore_errors=True)
