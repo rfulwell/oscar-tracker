@@ -11,6 +11,29 @@ const { test, expect } = require('@playwright/test');
  * - Layout overflow causing horizontal scrolling
  */
 
+// Opening the category view smooth-scrolls the page. Wait until the scroll
+// position has held still for several frames before measuring anything.
+async function waitForScrollToStop(page) {
+    await page.evaluate(() => new Promise((resolve) => {
+        let lastY = window.scrollY;
+        let stillFrames = 0;
+        const check = () => {
+            if (window.scrollY === lastY) {
+                stillFrames++;
+            } else {
+                stillFrames = 0;
+                lastY = window.scrollY;
+            }
+            if (stillFrames >= 5) {
+                resolve();
+            } else {
+                requestAnimationFrame(check);
+            }
+        };
+        requestAnimationFrame(check);
+    }));
+}
+
 // Test with iPhone-like viewport sizes
 const mobileViewport = { width: 390, height: 844 }; // iPhone 14
 const smallMobileViewport = { width: 375, height: 667 }; // iPhone SE
@@ -32,6 +55,7 @@ test.describe('Viewport Layout - Mobile', () => {
             await browseBtn.click();
         }
         await page.waitForSelector('#films-list .film', { state: 'visible' });
+        await waitForScrollToStop(page);
     }
 
     test.describe('Content Visibility', () => {
@@ -235,6 +259,7 @@ test.describe('Viewport Layout - Different Mobile Sizes', () => {
             await browseBtn.click();
         }
         await page.waitForSelector('#films-list .film', { state: 'visible' });
+        await waitForScrollToStop(page);
 
         // Verify no horizontal overflow
         const hasHorizontalScroll = await page.evaluate(() => {
@@ -260,6 +285,7 @@ test.describe('Viewport Layout - Different Mobile Sizes', () => {
             await browseBtn.click();
         }
         await page.waitForSelector('#films-list .film', { state: 'visible' });
+        await waitForScrollToStop(page);
 
         // Verify no horizontal overflow
         const hasHorizontalScroll = await page.evaluate(() => {
@@ -290,6 +316,7 @@ test.describe('Viewport Layout - Safe Area Simulation', () => {
             await browseBtn.click();
         }
         await page.waitForSelector('#films-list .film', { state: 'visible' });
+        await waitForScrollToStop(page);
 
         // Verify safe-area variables don't cause layout issues
         const layoutInfo = await page.evaluate(() => {
@@ -335,6 +362,7 @@ test.describe('Viewport Layout - Safe Area Simulation', () => {
             await browseBtn.click();
         }
         await page.waitForSelector('#films-list .film', { state: 'visible' });
+        await waitForScrollToStop(page);
 
         // Verify no horizontal overflow
         const hasHorizontalScroll = await page.evaluate(() => {
@@ -369,6 +397,7 @@ test.describe('All Sides Visibility', () => {
             await browseBtn.click();
         }
         await page.waitForSelector('#films-list .film', { state: 'visible' });
+        await waitForScrollToStop(page);
     }
 
     test('trophy icon should be fully visible when scrolled to top', async ({ page }) => {
@@ -376,7 +405,7 @@ test.describe('All Sides Visibility', () => {
 
         // Scroll to top to ensure trophy is in view
         await page.evaluate(() => window.scrollTo(0, 0));
-        await page.waitForTimeout(100);
+        await waitForScrollToStop(page);
 
         const trophy = page.locator('.trophy-icon');
         const box = await trophy.boundingBox();
@@ -393,6 +422,10 @@ test.describe('All Sides Visibility', () => {
 
     test('subtitle (Academy Awards) should be fully visible', async ({ page }) => {
         await goToCategoryScreen(page);
+
+        // The subtitle is at the top of the page, above the category list
+        await page.evaluate(() => window.scrollTo(0, 0));
+        await waitForScrollToStop(page);
 
         const subtitle = page.locator('.subtitle');
         const box = await subtitle.boundingBox();
@@ -471,6 +504,7 @@ test.describe('Search View Layout', () => {
             await browseBtn.click();
         }
         await page.waitForSelector('#films-list .film', { state: 'visible' });
+        await waitForScrollToStop(page);
     });
 
     test('search view should fill viewport without clipping', async ({ page }) => {
