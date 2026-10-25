@@ -122,6 +122,7 @@ The version is displayed in the About modal and helps identify which build is de
 - **Every deploy replaces the whole site**, so every run rebuilds every open preview; a closed PR's preview disappears on the next deploy.
 - **Never run PR code in the workflow.** The script runs from `main`'s checkout and only copies the PR's files out of git. Fork PRs are skipped entirely (the workflow can deploy the site).
 - **A preview publishes only what the PR's own `.github/site-files.txt` lists** (main's list if the branch has none), never `CNAME`.
+- **The deploy's checkout uses `persist-credentials: false`**, so the preview script fetches PR branches without a token. That only works while the repo is public: if it becomes private, previews will fail to fetch, and the fetch needs the token passed explicitly.
 - **Use relative paths** (`style.css`, `icons/x.svg`), never root-relative ones (`/style.css`): a preview would load the live site's files instead of its own. The index page flags any it finds.
 - **Previews share the live site's origin**, so the script keeps them apart: localStorage keys are prefixed `preview-pr-<n>:`, the service worker's `CACHE_PREFIX` becomes `awards-tracker-pr-<n>-`, and the manifest gets its own `id`. Keep `CACHE_PREFIX` in `sw.js`, and have the worker delete only caches with its own prefix.
 - **Previews are noindex**, and `robots.txt` disallows `/preview/`.

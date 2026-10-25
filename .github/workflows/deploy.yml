@@ -41,6 +41,11 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v7
+        with:
+          # Don't leave the token in git for later steps. Nothing here pushes, and
+          # the preview script's `git fetch` of PR branches works without it while
+          # the repo is public.
+          persist-credentials: false
 
       - name: Bump version
         run: |
