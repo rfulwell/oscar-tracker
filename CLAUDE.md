@@ -14,6 +14,10 @@ All changes to stored data (localStorage) must be backwards compatible. Do not m
 
 This project uses Playwright for automated E2E testing with headless Chromium. Tests are located in the `tests/` directory.
 
+### Failing Tests Come First
+
+Before starting any other work, run the full suite. If anything fails, fixing it is the first priority: fix it in its own PR and merge that before any feature PR. A feature PR is ready only when the full suite passes on it, not when its failures "also fail on `main`".
+
 ### Running Tests
 
 ```bash
