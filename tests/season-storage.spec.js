@@ -11,7 +11,7 @@ const path = require('path');
  * overwrite earlier seasons' data.
  */
 
-const APP_SOURCE = fs.readFileSync(path.join(__dirname, '..', 'app.js'), 'utf8');
+const SEASON_SOURCE = fs.readFileSync(path.join(__dirname, '..', 'seasons', '2026.js'), 'utf8');
 
 // Data saved by the 2026 builds, in the original keys and format
 const LEGACY_DATA = {
@@ -47,11 +47,12 @@ async function readStorage(page) {
     });
 }
 
-// Serve app.js as if this build tracked a different season
+// Serve the season file as if this build tracked a different season
+// (same nominees, different season id)
 async function useSeason(context, season) {
-    const source = APP_SOURCE.replace("const SEASON = '2026';", `const SEASON = '${season}';`);
-    expect(source).not.toBe(APP_SOURCE);
-    await context.route('**/app.js', (route) => route.fulfill({
+    const source = SEASON_SOURCE.replace("season: '2026',", `season: '${season}',`);
+    expect(source).not.toBe(SEASON_SOURCE);
+    await context.route('**/seasons/2026.js', (route) => route.fulfill({
         body: source,
         contentType: 'application/javascript'
     }));
@@ -134,7 +135,7 @@ test.describe('Season Storage', () => {
         await page.reload();
         await page.locator('#all-films-list .film').first().click();
 
-        await context.unroute('**/app.js');
+        await context.unroute('**/seasons/2026.js');
         await page.reload();
 
         await expect(page.locator('#nav-count-predictions')).toHaveText('1/24');

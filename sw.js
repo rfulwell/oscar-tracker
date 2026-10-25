@@ -27,6 +27,8 @@ const ASSETS_TO_CACHE = [
     'index.html',
     'style.css',
     'app.js',
+    // The current season's data, as loaded by index.html
+    'seasons/2026.js',
     'manifest.json',
     'icons/icon-192.png',
     'icons/icon-512.png',

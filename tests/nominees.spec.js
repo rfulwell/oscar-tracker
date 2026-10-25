@@ -9,7 +9,7 @@ const { test, expect } = require('@playwright/test');
  */
 
 // Categories indexed by their position in the dropdown (0-indexed)
-// These match the CATEGORIES array order in app.js
+// These match the category order in seasons/2026.js
 const CATEGORY_INDICES = {
     'best-picture': 0,
     'best-director': 1,

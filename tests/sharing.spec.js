@@ -3,13 +3,14 @@ const { test, expect } = require('@playwright/test');
 const fs = require('fs');
 const path = require('path');
 
-const APP_SOURCE = fs.readFileSync(path.join(__dirname, '..', 'app.js'), 'utf8');
+const SEASON_SOURCE = fs.readFileSync(path.join(__dirname, '..', 'seasons', '2026.js'), 'utf8');
 
-// Serve app.js as if this build tracked a different season
+// Serve the season file as if this build tracked a different season
+// (same nominees, different season id)
 async function useSeason(context, season) {
-    const source = APP_SOURCE.replace("const SEASON = '2026';", `const SEASON = '${season}';`);
-    expect(source).not.toBe(APP_SOURCE);
-    await context.route('**/app.js', (route) => route.fulfill({
+    const source = SEASON_SOURCE.replace("season: '2026',", `season: '${season}',`);
+    expect(source).not.toBe(SEASON_SOURCE);
+    await context.route('**/seasons/2026.js', (route) => route.fulfill({
         body: source,
         contentType: 'application/javascript'
     }));

@@ -1,5 +1,6 @@
 // Oscar Tracker App
-// 98th Academy Awards (2026)
+// Season data (nominees, ceremony date) comes from seasons/<year>.js, which
+// index.html loads before this file.
 
 // Version and Changelog
 const APP_VERSION = '1.2.0';
@@ -12,282 +13,46 @@ const CHANGELOG = [
 // Awards season this build tracks. Watched films, predictions, favorites and
 // shared lists are stored per season, so a new year starts fresh and earlier
 // seasons' data is never overwritten.
-const SEASON = '2026';
+const SEASON = AWARDS_SEASON.season;
 
-// Oscar ceremony date (March 15, 2026, 7pm ET)
-const OSCAR_DATE = new Date('2026-03-15T19:00:00-05:00');
+// Oscar ceremony date and time
+const OSCAR_DATE = new Date(AWARDS_SEASON.ceremonyDate);
 
-const CATEGORIES = [
-    {
-        id: 'best-picture',
-        name: 'Best Picture',
-        nominees: [
-            { id: 'bugonia', title: 'Bugonia', subtitle: 'Focus Features' },
-            { id: 'f1', title: 'F1', subtitle: 'Apple Original Films' },
-            { id: 'frankenstein', title: 'Frankenstein', subtitle: 'Netflix' },
-            { id: 'hamnet', title: 'Hamnet', subtitle: 'Focus Features' },
-            { id: 'marty-supreme', title: 'Marty Supreme', subtitle: 'A24' },
-            { id: 'one-battle-after-another', title: 'One Battle After Another', subtitle: 'Warner Bros.' },
-            { id: 'secret-agent', title: 'The Secret Agent', subtitle: 'Neon' },
-            { id: 'sentimental-value', title: 'Sentimental Value', subtitle: 'Neon' },
-            { id: 'sinners', title: 'Sinners', subtitle: 'Warner Bros.' },
-            { id: 'train-dreams', title: 'Train Dreams', subtitle: 'Netflix' }
-        ]
-    },
-    {
-        id: 'best-director',
-        name: 'Best Director',
-        nominees: [
-            { id: 'dir-coogler', title: 'Ryan Coogler', subtitle: 'Sinners' },
-            { id: 'dir-anderson', title: 'Paul Thomas Anderson', subtitle: 'One Battle After Another' },
-            { id: 'dir-safdie', title: 'Josh Safdie', subtitle: 'Marty Supreme' },
-            { id: 'dir-zhao', title: 'Chloé Zhao', subtitle: 'Hamnet' },
-            { id: 'dir-trier', title: 'Joachim Trier', subtitle: 'Sentimental Value' }
-        ]
-    },
-    {
-        id: 'best-actor',
-        name: 'Best Actor',
-        nominees: [
-            { id: 'actor-chalamet', title: 'Timothée Chalamet', subtitle: 'Marty Supreme' },
-            { id: 'actor-dicaprio', title: 'Leonardo DiCaprio', subtitle: 'One Battle After Another' },
-            { id: 'actor-hawke', title: 'Ethan Hawke', subtitle: 'Blue Moon' },
-            { id: 'actor-jordan', title: 'Michael B. Jordan', subtitle: 'Sinners' },
-            { id: 'actor-moura', title: 'Wagner Moura', subtitle: 'The Secret Agent' }
-        ]
-    },
-    {
-        id: 'best-actress',
-        name: 'Best Actress',
-        nominees: [
-            { id: 'actress-buckley', title: 'Jessie Buckley', subtitle: 'Hamnet' },
-            { id: 'actress-byrne', title: 'Rose Byrne', subtitle: 'If I Had Legs I\'d Kick You' },
-            { id: 'actress-hudson', title: 'Kate Hudson', subtitle: 'Song Sung Blue' },
-            { id: 'actress-reinsve', title: 'Renate Reinsve', subtitle: 'Sentimental Value' },
-            { id: 'actress-stone', title: 'Emma Stone', subtitle: 'Bugonia' }
-        ]
-    },
-    {
-        id: 'best-supporting-actor',
-        name: 'Best Supporting Actor',
-        nominees: [
-            { id: 'supp-actor-elordi', title: 'Jacob Elordi', subtitle: 'Frankenstein' },
-            { id: 'supp-actor-deltoro', title: 'Benicio Del Toro', subtitle: 'One Battle After Another' },
-            { id: 'supp-actor-penn', title: 'Sean Penn', subtitle: 'One Battle After Another' },
-            { id: 'supp-actor-lindo', title: 'Delroy Lindo', subtitle: 'Sinners' },
-            { id: 'supp-actor-skarsgard', title: 'Stellan Skarsgård', subtitle: 'Sentimental Value' }
-        ]
-    },
-    {
-        id: 'best-supporting-actress',
-        name: 'Best Supporting Actress',
-        nominees: [
-            { id: 'supp-actress-taylor', title: 'Teyana Taylor', subtitle: 'One Battle After Another' },
-            { id: 'supp-actress-mosaku', title: 'Wunmi Mosaku', subtitle: 'Sinners' },
-            { id: 'supp-actress-fanning', title: 'Elle Fanning', subtitle: 'Sentimental Value' },
-            { id: 'supp-actress-lilleaas', title: 'Inga Ibsdotter Lilleaas', subtitle: 'Sentimental Value' },
-            { id: 'supp-actress-madigan', title: 'Amy Madigan', subtitle: 'Weapons' }
-        ]
-    },
-    {
-        id: 'best-original-screenplay',
-        name: 'Best Original Screenplay',
-        nominees: [
-            { id: 'orig-sinners', title: 'Sinners', subtitle: 'Ryan Coogler' },
-            { id: 'orig-sentimental', title: 'Sentimental Value', subtitle: 'Eskil Vogt & Joachim Trier' },
-            { id: 'orig-bluemoon', title: 'Blue Moon', subtitle: 'Robert Kaplow' },
-            { id: 'orig-marty', title: 'Marty Supreme', subtitle: 'Ronald Bronstein & Josh Safdie' },
-            { id: 'orig-accident', title: 'It Was Just an Accident', subtitle: 'Jafar Panahi' }
-        ]
-    },
-    {
-        id: 'best-adapted-screenplay',
-        name: 'Best Adapted Screenplay',
-        nominees: [
-            { id: 'adapt-onebattle', title: 'One Battle After Another', subtitle: 'Paul Thomas Anderson' },
-            { id: 'adapt-traindreams', title: 'Train Dreams', subtitle: 'Clint Bentley & Greg Kwedar' },
-            { id: 'adapt-frankenstein', title: 'Frankenstein', subtitle: 'Guillermo del Toro' },
-            { id: 'adapt-hamnet', title: 'Hamnet', subtitle: 'Chloé Zhao' },
-            { id: 'adapt-bugonia', title: 'Bugonia', subtitle: 'Will Tracy' }
-        ]
-    },
-    {
-        id: 'best-animated-feature',
-        name: 'Best Animated Feature',
-        nominees: [
-            { id: 'anim-arco', title: 'Arco', subtitle: 'Neon' },
-            { id: 'anim-elio', title: 'Elio', subtitle: 'Disney/Pixar' },
-            { id: 'anim-kpop', title: 'KPop Demon Hunters', subtitle: 'Netflix' },
-            { id: 'anim-amelie', title: 'Little Amélie or the Character of Rain', subtitle: 'GKIDS' },
-            { id: 'anim-zootopia2', title: 'Zootopia 2', subtitle: 'Disney' }
-        ]
-    },
-    {
-        id: 'best-international-feature',
-        name: 'Best International Feature',
-        nominees: [
-            { id: 'intl-sentimental', title: 'Sentimental Value', subtitle: 'Norway' },
-            { id: 'intl-secretagent', title: 'The Secret Agent', subtitle: 'Brazil' },
-            { id: 'intl-sirat', title: 'Sirât', subtitle: 'Spain' },
-            { id: 'intl-hind', title: 'The Voice of Hind Rajab', subtitle: 'Tunisia' },
-            { id: 'intl-accident', title: 'It Was Just an Accident', subtitle: 'France' }
-        ]
-    },
-    {
-        id: 'best-documentary-feature',
-        name: 'Best Documentary Feature',
-        nominees: [
-            { id: 'doc-alabama', title: 'The Alabama Solution', subtitle: 'Andrew Jarecki & Charlotte Kaufman' },
-            { id: 'doc-goodlight', title: 'Come See Me in the Good Light', subtitle: 'Ryan White' },
-            { id: 'doc-rocks', title: 'Cutting through Rocks', subtitle: 'Sara Khaki & Mohammadreza Eyni' },
-            { id: 'doc-putin', title: 'Mr. Nobody against Putin', subtitle: 'David Borenstein, Pavel Talankin, Helle Faber & Alžběta Karásková' },
-            { id: 'doc-neighbor', title: 'The Perfect Neighbor', subtitle: 'Geeta Gandbhir, Alisa Payne, Nikon Kwantu & Sam Bisbee' }
-        ]
-    },
-    {
-        id: 'best-cinematography',
-        name: 'Best Cinematography',
-        nominees: [
-            { id: 'cin-frankenstein', title: 'Frankenstein', subtitle: 'Dan Laustsen' },
-            { id: 'cin-marty', title: 'Marty Supreme', subtitle: 'Darius Khondji' },
-            { id: 'cin-onebattle', title: 'One Battle After Another', subtitle: 'Michael Bauman' },
-            { id: 'cin-sinners', title: 'Sinners', subtitle: 'Autumn Durald Arkapaw' },
-            { id: 'cin-traindreams', title: 'Train Dreams', subtitle: 'Adolpho Veloso' }
-        ]
-    },
-    {
-        id: 'best-film-editing',
-        name: 'Best Film Editing',
-        nominees: [
-            { id: 'edit-f1', title: 'F1', subtitle: 'Stephen Mirrione' },
-            { id: 'edit-marty', title: 'Marty Supreme', subtitle: 'Ronald Bronstein & Josh Safdie' },
-            { id: 'edit-onebattle', title: 'One Battle After Another', subtitle: 'Andy Jurgensen' },
-            { id: 'edit-sentimental', title: 'Sentimental Value', subtitle: 'Olivier Bugge Coutté' },
-            { id: 'edit-sinners', title: 'Sinners', subtitle: 'Michael P. Shawver' }
-        ]
-    },
-    {
-        id: 'best-production-design',
-        name: 'Best Production Design',
-        nominees: [
-            { id: 'prod-frankenstein', title: 'Frankenstein', subtitle: 'Tamara Deverell & Shane Vieau' },
-            { id: 'prod-hamnet', title: 'Hamnet', subtitle: 'Fiona Crombie & Alice Felton' },
-            { id: 'prod-marty', title: 'Marty Supreme', subtitle: 'Jack Fisk & Adam Willis' },
-            { id: 'prod-onebattle', title: 'One Battle After Another', subtitle: 'Florencia Martin & Anthony Carlino' },
-            { id: 'prod-sinners', title: 'Sinners', subtitle: 'Hannah Beachler & Monique Champagne' }
-        ]
-    },
-    {
-        id: 'best-costume-design',
-        name: 'Best Costume Design',
-        nominees: [
-            { id: 'cost-avatar', title: 'Avatar: Fire and Ash', subtitle: 'Deborah L. Scott' },
-            { id: 'cost-frankenstein', title: 'Frankenstein', subtitle: 'Kate Hawley' },
-            { id: 'cost-hamnet', title: 'Hamnet', subtitle: 'Malgosia Turzanska' },
-            { id: 'cost-marty', title: 'Marty Supreme', subtitle: 'Miyako Bellizzi' },
-            { id: 'cost-sinners', title: 'Sinners', subtitle: 'Ruth E. Carter' }
-        ]
-    },
-    {
-        id: 'best-makeup-hairstyling',
-        name: 'Best Makeup and Hairstyling',
-        nominees: [
-            { id: 'makeup-frankenstein', title: 'Frankenstein', subtitle: 'Mike Hill, Jordan Samuel & Cliona Furey' },
-            { id: 'makeup-kokuho', title: 'Kokuho', subtitle: 'Kyoko Toyokawa, Naomi Hibino & Tadashi Nishimatsu' },
-            { id: 'makeup-sinners', title: 'Sinners', subtitle: 'Ken Diaz, Mike Fontaine & Shunika Terry' },
-            { id: 'makeup-smashing', title: 'The Smashing Machine', subtitle: 'Kazu Hiro, Glen Griffin & Bjoern Rehbein' },
-            { id: 'makeup-ugly', title: 'The Ugly Stepsister', subtitle: 'Thomas Foldberg & Anne Cathrine Sauerberg' }
-        ]
-    },
-    {
-        id: 'best-original-score',
-        name: 'Best Original Score',
-        nominees: [
-            { id: 'score-bugonia', title: 'Bugonia', subtitle: 'Jerskin Fendrix' },
-            { id: 'score-frankenstein', title: 'Frankenstein', subtitle: 'Alexandre Desplat' },
-            { id: 'score-hamnet', title: 'Hamnet', subtitle: 'Max Richter' },
-            { id: 'score-onebattle', title: 'One Battle After Another', subtitle: 'Jonny Greenwood' },
-            { id: 'score-sinners', title: 'Sinners', subtitle: 'Ludwig Göransson' }
-        ]
-    },
-    {
-        id: 'best-original-song',
-        name: 'Best Original Song',
-        nominees: [
-            { id: 'song-dearme', title: '"Dear Me"', subtitle: 'Diane Warren: Relentless' },
-            { id: 'song-golden', title: '"Golden"', subtitle: 'KPop Demon Hunters' },
-            { id: 'song-ilied', title: '"I Lied to You"', subtitle: 'Sinners' },
-            { id: 'song-sweetdreams', title: '"Sweet Dreams of Joy"', subtitle: 'Viva Verdi!' },
-            { id: 'song-traindreams', title: '"Train Dreams"', subtitle: 'Train Dreams' }
-        ]
-    },
-    {
-        id: 'best-sound',
-        name: 'Best Sound',
-        nominees: [
-            { id: 'sound-f1', title: 'F1', subtitle: 'Gareth John, Al Nelson, Gwendolyn Yates Whittle, Gary A. Rizzo & Juan Peralta' },
-            { id: 'sound-frankenstein', title: 'Frankenstein', subtitle: 'Greg Chapman, Nathan Robitaille, Nelson Ferreira, Christian Cooke & Brad Zoern' },
-            { id: 'sound-onebattle', title: 'One Battle After Another', subtitle: 'José Antonio García, Christopher Scarabosio & Tony Villaflor' },
-            { id: 'sound-sinners', title: 'Sinners', subtitle: 'Chris Welcker, Benjamin A. Burtt, Felipe Pacheco, Brandon Proctor & Steve Boeddeker' },
-            { id: 'sound-sirat', title: 'Sirât', subtitle: 'Amanda Villavieja, Laia Casanovas & Yasmina Praderas' }
-        ]
-    },
-    {
-        id: 'best-visual-effects',
-        name: 'Best Visual Effects',
-        nominees: [
-            { id: 'vfx-avatar', title: 'Avatar: Fire and Ash', subtitle: 'Joe Letteri, Richard Baneham, Eric Saindon & Daniel Barrett' },
-            { id: 'vfx-f1', title: 'F1', subtitle: 'Ryan Tudhope, Nicolas Chevallier, Robert Harrington & Keith Dawson' },
-            { id: 'vfx-jurassic', title: 'Jurassic World Rebirth', subtitle: 'David Vickery, Stephen Aplin, Charmaine Chan & Neil Corbould' },
-            { id: 'vfx-lostbus', title: 'The Lost Bus', subtitle: 'Charlie Noble, David Zaretti, Russell Bowen & Brandon K. McLaughlin' },
-            { id: 'vfx-sinners', title: 'Sinners', subtitle: 'Michael Ralla, Espen Nordahl, Guido Wolter & Donnie Dean' }
-        ]
-    },
-    {
-        id: 'best-casting',
-        name: 'Best Casting',
-        nominees: [
-            { id: 'cast-hamnet', title: 'Hamnet', subtitle: 'Nina Gold' },
-            { id: 'cast-marty', title: 'Marty Supreme', subtitle: 'Jennifer Venditti' },
-            { id: 'cast-onebattle', title: 'One Battle After Another', subtitle: 'Cassandra Kulukundis' },
-            { id: 'cast-secretagent', title: 'The Secret Agent', subtitle: 'Gabriel Domingues' },
-            { id: 'cast-sinners', title: 'Sinners', subtitle: 'Francine Maisler' }
-        ]
-    },
-    {
-        id: 'best-animated-short',
-        name: 'Best Animated Short Film',
-        nominees: [
-            { id: 'ashort-butterfly', title: 'Butterfly', subtitle: 'Florence Miailhe & Ron Dyens' },
-            { id: 'ashort-forevergreen', title: 'Forevergreen', subtitle: 'Nathan Engelhardt & Jeremy Spears' },
-            { id: 'ashort-pearls', title: 'The Girl Who Cried Pearls', subtitle: 'Chris Lavis & Maciek Szczerbowski' },
-            { id: 'ashort-retirement', title: 'Retirement Plan', subtitle: 'John Kelly & Andrew Freedman' },
-            { id: 'ashort-sisters', title: 'The Three Sisters', subtitle: 'Konstantin Bronzit' }
-        ]
-    },
-    {
-        id: 'best-documentary-short',
-        name: 'Best Documentary Short Film',
-        nominees: [
-            { id: 'dshort-empty', title: 'All the Empty Rooms', subtitle: 'Joshua Seftel & Conall Jones' },
-            { id: 'dshort-camera', title: 'Armed Only with a Camera: The Life and Death of Brent Renaud', subtitle: 'Craig Renaud & Juan Arredondo' },
-            { id: 'dshort-children', title: 'Children No More: "Were and Are Gone"', subtitle: 'Hilla Medalia & Sheila Nevins' },
-            { id: 'dshort-devil', title: 'The Devil Is Busy', subtitle: 'Christalyn Hampton & Geeta Gandbhir' },
-            { id: 'dshort-strange', title: 'Perfectly a Strangeness', subtitle: 'Alison McAlpine' }
-        ]
-    },
-    {
-        id: 'best-live-action-short',
-        name: 'Best Live Action Short Film',
-        nominees: [
-            { id: 'lshort-butcher', title: "Butcher's Stain", subtitle: 'Meyer Levinson-Blount & Oron Caspi' },
-            { id: 'lshort-dorothy', title: 'A Friend of Dorothy', subtitle: 'Lee Knight & James Dean' },
-            { id: 'lshort-austen', title: "Jane Austen's Period Drama", subtitle: 'Julia Aks & Steve Pinder' },
-            { id: 'lshort-singers', title: 'The Singers', subtitle: 'Sam A. Davis & Jack Piatt' },
-            { id: 'lshort-saliva', title: 'Two People Exchanging Saliva', subtitle: 'Alexandre Singh & Natalie Musteata' }
-        ]
-    }
-];
+// Categories in display order, each with its nominees
+const CATEGORIES = AWARDS_SEASON.categories;
+
+// "98th", "101st", ...
+function ordinal(n) {
+    const suffixes = ['th', 'st', 'nd', 'rd'];
+    const v = n % 100;
+    return n + (suffixes[(v - 20) % 10] || suffixes[v] || suffixes[0]);
+}
+
+// Ceremony dates are shown in Eastern time, as in the official listings
+function formatCeremonyDate(options) {
+    return OSCAR_DATE.toLocaleDateString('en-US', { timeZone: 'America/New_York', ...options });
+}
+
+const CEREMONY_NAME = `${ordinal(AWARDS_SEASON.ceremonyNumber)} Academy Awards`;
+
+// Fill in index.html's season-specific text and links ([data-season], [data-season-href])
+function applySeasonText() {
+    const values = {
+        ordinal: ordinal(AWARDS_SEASON.ceremonyNumber),
+        year: SEASON,
+        dateLabel: formatCeremonyDate({ month: 'long', day: 'numeric', year: 'numeric' }),
+        airing: `${formatCeremonyDate({ month: 'long', day: 'numeric' })} on ${AWARDS_SEASON.broadcaster}`,
+        categoryCount: String(CATEGORIES.length)
+    };
+    document.querySelectorAll('[data-season]').forEach(el => {
+        const value = values[el.dataset.season];
+        if (value !== undefined) el.textContent = value;
+    });
+    document.querySelectorAll('[data-season-href]').forEach(el => {
+        const url = AWARDS_SEASON[el.dataset.seasonHref];
+        if (url) el.href = url;
+    });
+}
 
 // 2026 predates per-season storage and keeps the original keys, so existing
 // users' data stays where it is. Later seasons get their own keys.
@@ -307,38 +72,17 @@ const PREDICTIONS_COPY_DISMISSED_KEY = 'oscar-tracker-predictions-copy-dismissed
 
 // Film-to-nominees mapping for cross-category tracking
 // When a film is checked, all related nominees are also checked
-const FILM_NOMINEES = {
-    'sinners': ['sinners', 'dir-coogler', 'actor-jordan', 'supp-actor-lindo', 'supp-actress-mosaku', 'orig-sinners', 'cin-sinners', 'edit-sinners', 'prod-sinners', 'cost-sinners', 'makeup-sinners', 'score-sinners', 'song-ilied', 'sound-sinners', 'vfx-sinners', 'cast-sinners'],
-    'one-battle-after-another': ['one-battle-after-another', 'dir-anderson', 'actor-dicaprio', 'supp-actor-deltoro', 'supp-actor-penn', 'supp-actress-taylor', 'adapt-onebattle', 'cin-onebattle', 'edit-onebattle', 'prod-onebattle', 'score-onebattle', 'sound-onebattle', 'cast-onebattle'],
-    'marty-supreme': ['marty-supreme', 'dir-safdie', 'actor-chalamet', 'orig-marty', 'cin-marty', 'edit-marty', 'prod-marty', 'cost-marty', 'cast-marty'],
-    'hamnet': ['hamnet', 'dir-zhao', 'actress-buckley', 'adapt-hamnet', 'prod-hamnet', 'cost-hamnet', 'score-hamnet', 'cast-hamnet'],
-    'frankenstein': ['frankenstein', 'supp-actor-elordi', 'adapt-frankenstein', 'cin-frankenstein', 'prod-frankenstein', 'cost-frankenstein', 'makeup-frankenstein', 'score-frankenstein', 'sound-frankenstein'],
-    'sentimental-value': ['sentimental-value', 'dir-trier', 'actress-reinsve', 'supp-actor-skarsgard', 'supp-actress-fanning', 'supp-actress-lilleaas', 'orig-sentimental', 'intl-sentimental', 'edit-sentimental'],
-    'train-dreams': ['train-dreams', 'adapt-traindreams', 'cin-traindreams', 'song-traindreams'],
-    'bugonia': ['bugonia', 'actress-stone', 'adapt-bugonia', 'score-bugonia'],
-    'f1': ['f1', 'edit-f1', 'sound-f1', 'vfx-f1'],
-    'secret-agent': ['secret-agent', 'actor-moura', 'intl-secretagent', 'cast-secretagent'],
-    'it-was-just-an-accident': ['orig-accident', 'intl-accident'],
-    'arco': ['anim-arco'],
-    'little-amelie': ['anim-amelie'],
-    'kpop-demon-hunters': ['anim-kpop', 'song-golden'],
-    'avatar-fire-and-ash': ['cost-avatar', 'vfx-avatar'],
-    'blue-moon': ['actor-hawke', 'orig-bluemoon'],
-    'sirat': ['intl-sirat', 'sound-sirat'],
-    'voice-of-hind-rajab': ['intl-hind'],
-    'if-i-had-legs': ['actress-byrne'],
-    'song-sung-blue': ['actress-hudson'],
-    'elio': ['anim-elio'],
-    'zootopia-2': ['anim-zootopia2'],
-    'alabama-solution': ['doc-alabama'],
-    'come-see-me': ['doc-goodlight'],
-    'perfect-neighbor': ['doc-neighbor'],
-    'weapons': ['supp-actress-madigan'],
-    'smashing-machine': ['makeup-smashing'],
-    'ugly-stepsister': ['makeup-ugly'],
-    'jurassic-world-rebirth': ['vfx-jurassic'],
-    'lost-bus': ['vfx-lostbus']
-};
+const FILM_NOMINEES = {};
+for (const filmKey of Object.keys(AWARDS_SEASON.films)) {
+    FILM_NOMINEES[filmKey] = [];
+}
+for (const category of CATEGORIES) {
+    for (const nominee of category.nominees) {
+        if (nominee.film) {
+            FILM_NOMINEES[nominee.film].push(nominee.id);
+        }
+    }
+}
 
 // Build reverse lookup: nominee ID -> film key
 const NOMINEE_TO_FILM = {};
@@ -348,59 +92,19 @@ for (const [filmKey, nomineeIds] of Object.entries(FILM_NOMINEES)) {
     }
 }
 
-// All unique films with titles and nomination counts (sorted by nominations desc)
-const ALL_FILMS = [
-    { key: 'sinners', title: 'Sinners', nominations: 16 },
-    { key: 'one-battle-after-another', title: 'One Battle After Another', nominations: 13 },
-    { key: 'marty-supreme', title: 'Marty Supreme', nominations: 9 },
-    { key: 'sentimental-value', title: 'Sentimental Value', nominations: 9 },
-    { key: 'frankenstein', title: 'Frankenstein', nominations: 9 },
-    { key: 'hamnet', title: 'Hamnet', nominations: 8 },
-    { key: 'train-dreams', title: 'Train Dreams', nominations: 4 },
-    { key: 'f1', title: 'F1', nominations: 4 },
-    { key: 'secret-agent', title: 'The Secret Agent', nominations: 4 },
-    { key: 'bugonia', title: 'Bugonia', nominations: 4 },
-    { key: 'sirat', title: 'Sirât', nominations: 2 },
-    { key: 'blue-moon', title: 'Blue Moon', nominations: 2 },
-    { key: 'it-was-just-an-accident', title: 'It Was Just an Accident', nominations: 2 },
-    { key: 'kpop-demon-hunters', title: 'KPop Demon Hunters', nominations: 2 },
-    { key: 'avatar-fire-and-ash', title: 'Avatar: Fire and Ash', nominations: 2 },
-    { key: 'arco', title: 'Arco', nominations: 1 },
-    { key: 'little-amelie', title: 'Little Amélie or the Character of Rain', nominations: 1 },
-    { key: 'voice-of-hind-rajab', title: 'The Voice of Hind Rajab', nominations: 1 },
-    { key: 'if-i-had-legs', title: 'If I Had Legs I\'d Kick You', nominations: 1 },
-    { key: 'song-sung-blue', title: 'Song Sung Blue', nominations: 1 },
-    { key: 'elio', title: 'Elio', nominations: 1 },
-    { key: 'zootopia-2', title: 'Zootopia 2', nominations: 1 },
-    { key: 'alabama-solution', title: 'The Alabama Solution', nominations: 1 },
-    { key: 'come-see-me', title: 'Come See Me in the Good Light', nominations: 1 },
-    { key: 'perfect-neighbor', title: 'The Perfect Neighbor', nominations: 1 },
-    { key: 'smashing-machine', title: 'The Smashing Machine', nominations: 1 },
-    { key: 'ugly-stepsister', title: 'The Ugly Stepsister', nominations: 1 },
-    { key: 'jurassic-world-rebirth', title: 'Jurassic World Rebirth', nominations: 1 },
-    { key: 'lost-bus', title: 'The Lost Bus', nominations: 1 },
-    { key: 'weapons', title: 'Weapons', nominations: 1 }
-].sort((a, b) => b.nominations - a.nominations);
+// All films with titles and nomination counts (sorted by nominations desc;
+// ties keep their order in the season file)
+const ALL_FILMS = Object.entries(AWARDS_SEASON.films)
+    .map(([key, film]) => ({ key, title: film.title, nominations: FILM_NOMINEES[key].length }))
+    .sort((a, b) => b.nominations - a.nominations);
 
 // Streaming service availability for films (subscription streaming only, not rent/buy)
-const FILM_STREAMING = {
-    'sinners': 'max',
-    'one-battle-after-another': 'max',
-    'if-i-had-legs': 'max',
-    'smashing-machine': 'max',
-    'alabama-solution': 'max',
-    'frankenstein': 'netflix',
-    'train-dreams': 'netflix',
-    'kpop-demon-hunters': 'netflix',
-    'perfect-neighbor': 'netflix',
-    'f1': 'appletv',
-    'come-see-me': 'appletv',
-    'lost-bus': 'appletv',
-    'bugonia': 'peacock',
-    'jurassic-world-rebirth': 'peacock',
-    'ugly-stepsister': 'hulu',
-    'elio': 'disneyplus'
-};
+const FILM_STREAMING = {};
+for (const [filmKey, film] of Object.entries(AWARDS_SEASON.films)) {
+    if (film.streaming) {
+        FILM_STREAMING[filmKey] = film.streaming;
+    }
+}
 
 // Streaming service configuration
 const STREAMING_SERVICES = {
@@ -1352,7 +1056,7 @@ async function handleShare() {
         try {
             await navigator.share({
                 title: 'Oscar Predictions',
-                text: `Check out ${name}'s Oscar predictions for the 98th Academy Awards!`,
+                text: `Check out ${name}'s Oscar predictions for the ${CEREMONY_NAME}!`,
                 url: url
             });
             // Native share was successful (user may have shared or cancelled)
@@ -1558,6 +1262,7 @@ function handleDeleteConfirm() {
 
 
 function init() {
+    applySeasonText();
     loadWatchedItems();
     loadPredictions();
     loadFavorites();

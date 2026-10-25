@@ -12,7 +12,10 @@ All changes to stored data (localStorage) must be backwards compatible. Do not m
 
 ### Seasons
 
-- **`SEASON` in `app.js`** names the awards year the build tracks. Watched films, predictions, favorites and shared lists are stored per season via `seasonKey()`.
+- **Season data lives in `seasons/<year>.js`** (`AWARDS_SEASON`): ceremony number, date, broadcaster, official source URL, the films list and the categories with their nominees. `index.html` loads the current season's file before `app.js`, and `sw.js` precaches it.
+- **Everything else is derived from it**: `SEASON`, `OSCAR_DATE`, `CATEGORIES`, `FILM_NOMINEES` (from each nominee's `film`), `ALL_FILMS` with nomination counts, `FILM_STREAMING`, and the season text and links in `index.html` (`[data-season]`, `[data-season-href]`, filled by `applySeasonText()`). Don't hard-code season details anywhere else.
+- **Starting a new season**: add `seasons/<year>.js`, then point the `<script src="seasons/...">` in `index.html` and the entry in `ASSETS_TO_CACHE` in `sw.js` at it (`season-data.spec.js` fails if these disagree).
+- **`SEASON`** (the season file's `season`) names the awards year the build tracks. Watched films, predictions, favorites and shared lists are stored per season via `seasonKey()`.
 - **2026 keeps the original keys** (`oscar-tracker-watched`, etc.). Later seasons use suffixed keys (`oscar-tracker-watched-2027`). Never write to another season's keys.
 - **Global keys** (not per season): mode, current category, sharer name, the copy-modal dismissals and `sidebarCollapsed`.
 - **Picks can name nominees that no longer exist** (data corrections after a user saved them). Count picks with `countValidPicks()` / check them with `isValidPick()` rather than `Object.keys()`, and don't delete them from storage.
